@@ -1,6 +1,6 @@
 import './index.scss';
 import i18n from "./i18n";
-import api from "./api";
-import utils from "./utils";
+import * as api from "./api";
+import * as utils from "./utils";
 
-console.log('island-comment');
+console.log('test')

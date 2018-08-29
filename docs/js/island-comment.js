@@ -4,7 +4,14 @@
     (factory());
 }(this, (function () { 'use strict';
 
-    console.log('island-comment');
+    /*!
+     * isobject <https://github.com/jonschlinkert/isobject>
+     *
+     * Copyright (c) 2014-2017, Jon Schlinkert.
+     * Released under the MIT License.
+     */
+
+    console.log('test');
 
 })));
 //# sourceMappingURL=island-comment.js.map
