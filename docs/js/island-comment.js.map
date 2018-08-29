@@ -1,0 +1,1 @@
+{"version":3,"file":"island-comment.js","sources":["../../src/index.js"],"sourcesContent":["import './index.scss';\nconsole.log('island-comment');"],"names":["console","log"],"mappings":";;;;;;IACAA,QAAQC,GAAR,CAAY,gBAAZ;;;;"}

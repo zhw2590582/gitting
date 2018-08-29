@@ -1,0 +1,32 @@
+{
+  "name": "island-comment",
+  "version": "1.0.0",
+  "description": "自用github issues评论框",
+  "main": "dist/island-comment.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development rollup -c -m -w",
+    "build": "cross-env NODE_ENV=production rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhw2590582/island-comment.git"
+  },
+  "keywords": [],
+  "author": "Harvey Zack <laozhaochaguan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zhw2590582/island-comment/issues"
+  },
+  "homepage": "https://github.com/zhw2590582/island-comment#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
+    "cross-env": "^5.2.0",
+    "rollup": "^0.63.2",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-scss": "^0.4.0"
+  }
+}
