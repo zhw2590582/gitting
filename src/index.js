@@ -3,4 +3,21 @@ import i18n from "./i18n";
 import * as api from "./api";
 import * as utils from "./utils";
 
-console.log('test')
+class Comment {
+    constructor(option) {
+        this.option = Object.assign({}, Comment.DEFAULTS, option);
+    }
+
+    static get DEFAULTS() {
+        return {
+            
+        };
+    }
+
+    render(el) {
+        this.container = el instanceof Element ? el : document.querySelector(el);
+    }
+}
+
+window.Comment = Comment;
+export default Comment;
