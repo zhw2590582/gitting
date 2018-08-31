@@ -13,8 +13,7 @@ export default {
 	output: {
 		name: "gitting",
 		file: isProd ? "dist/gitting.js" : "docs/js/gitting.js",
-		format: "umd",
-		sourceMap: 'inline'
+		format: "umd"
 	},
 	plugins: [
 		postcss({
