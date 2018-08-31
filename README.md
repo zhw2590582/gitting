@@ -1,16 +1,16 @@
-# island-comment
+# gitting
 
 > 自用github issues评论框
 
 ## Install
 
 ```
-$ npm i -S island-comment
+$ npm i -S gitting
 ```
 
 ## Usage
 ```js
-import Comment from 'island-comment';
+import Gitting from 'gitting';
 ```
 
 ## License
