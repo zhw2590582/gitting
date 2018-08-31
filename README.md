@@ -1,6 +1,6 @@
 # Gitting
 
-> 自用github issues评论框
+> 又是一个基于 Github Issue 开发的评论插件
 
 ## Install
 
