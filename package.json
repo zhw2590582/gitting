@@ -1,23 +1,23 @@
 {
-  "name": "island-comment",
+  "name": "gitting",
   "version": "1.0.0",
   "description": "自用github issues评论框",
-  "main": "dist/island-comment.js",
+  "main": "dist/gitting.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",
     "build": "cross-env NODE_ENV=production rollup -c"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhw2590582/island-comment.git"
+    "url": "git+https://github.com/zhw2590582/gitting.git"
   },
   "keywords": [],
   "author": "Harvey Zack <laozhaochaguan@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zhw2590582/island-comment/issues"
+    "url": "https://github.com/zhw2590582/gitting/issues"
   },
-  "homepage": "https://github.com/zhw2590582/island-comment#readme",
+  "homepage": "https://github.com/zhw2590582/gitting#readme",
   "devDependencies": {
     "autoprefixer": "^9.1.3",
     "babel-core": "^6.26.3",
