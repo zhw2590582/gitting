@@ -6,6 +6,7 @@ import * as utils from "./utils";
 class Comment {
     constructor(option) {
         this.option = Object.assign({}, Comment.DEFAULTS, option);
+        console.log(isProd);
     }
 
     static get DEFAULTS() {

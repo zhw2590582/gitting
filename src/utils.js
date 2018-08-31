@@ -1,3 +1,4 @@
+// 请求
 export function request(method, url, body) {
   method = method.toUpperCase();
   body = body && JSON.stringify(body);
@@ -17,3 +18,11 @@ export function request(method, url, body) {
     }
   });
 }
+
+// 查询url参数
+export function getQueryString(name) {
+  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+  const r = window.location.search.substr(1).match(reg);
+  if (r != null) return unescape(r[2]);
+  return null;
+};

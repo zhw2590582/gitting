@@ -1,5 +1,7 @@
 import { request } from "./utils";
 
+// 授权
+
 // 获取某条issues
 export function getIssues(name, repos, issue) {
     return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${issue}`);

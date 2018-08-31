@@ -35,11 +35,14 @@
      * Released under the MIT License.
      */
 
+    // 请求
+
     var Comment = function () {
         function Comment(option) {
             classCallCheck(this, Comment);
 
             this.option = Object.assign({}, Comment.DEFAULTS, option);
+            console.log(false);
         }
 
         createClass(Comment, [{
