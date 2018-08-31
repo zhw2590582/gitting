@@ -25,6 +25,7 @@
     "babel-preset-env": "^1.7.0",
     "cross-env": "^5.2.0",
     "cssnano": "^4.1.0",
+    "node-sass": "^4.9.3",
     "rollup": "^0.63.2",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.3",
@@ -34,6 +35,7 @@
     "rollup-plugin-uglify": "^5.0.2"
   },
   "dependencies": {
+    "dayjs": "^1.7.5",
     "get-value": "^3.0.1",
     "obj-to-string": "^1.0.1"
   }
