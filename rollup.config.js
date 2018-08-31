@@ -1,7 +1,9 @@
 const babel = require("rollup-plugin-babel");
 const commonjs = require("rollup-plugin-commonjs");
 const nodeResolve = require("rollup-plugin-node-resolve");
-const scss = require('rollup-plugin-scss');
+const postcss = require('rollup-plugin-postcss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
 const replace = require("rollup-plugin-replace");
 const isProd = process.env.NODE_ENV === "production";
 
@@ -13,9 +15,10 @@ export default {
 		format: "umd"
 	},
 	plugins: [
-		scss({
-			output: isProd ? "dist/island-comment.css" : "docs/css/island-comment.css"
-		}),
+		postcss({
+            plugins: [autoprefixer, cssnano],
+            extract: isProd ? "dist/island-comment.css" : "docs/css/island-comment.css"
+        }),
 		nodeResolve(),
 		commonjs(),
 		babel({
