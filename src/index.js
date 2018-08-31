@@ -3,10 +3,10 @@ import i18n from "./i18n";
 import * as api from "./api";
 import * as utils from "./utils";
 
-class Comment {
+class Gitting {
     constructor(option) {
-        this.option = Object.assign({}, Comment.DEFAULTS, option);
-        console.log(isProd);
+        this.option = Object.assign({}, Gitting.DEFAULTS, option);
+        console.log(ENV);
     }
 
     static get DEFAULTS() {
@@ -20,5 +20,5 @@ class Comment {
     }
 }
 
-window.Comment = Comment;
-export default Comment;
+window.Gitting = Gitting;
+export default Gitting;

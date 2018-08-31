@@ -1,8 +1,17 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
-    (global['island-comment'] = factory());
+    (global.gitting = factory());
 }(this, (function () { 'use strict';
+
+    /*!
+     * isobject <https://github.com/jonschlinkert/isobject>
+     *
+     * Copyright (c) 2014-2017, Jon Schlinkert.
+     * Released under the MIT License.
+     */
+
+    // 请求
 
     var classCallCheck = function (instance, Constructor) {
       if (!(instance instanceof Constructor)) {
@@ -28,24 +37,15 @@
       };
     }();
 
-    /*!
-     * isobject <https://github.com/jonschlinkert/isobject>
-     *
-     * Copyright (c) 2014-2017, Jon Schlinkert.
-     * Released under the MIT License.
-     */
+    var Gitting = function () {
+        function Gitting(option) {
+            classCallCheck(this, Gitting);
 
-    // 请求
-
-    var Comment = function () {
-        function Comment(option) {
-            classCallCheck(this, Comment);
-
-            this.option = Object.assign({}, Comment.DEFAULTS, option);
-            console.log(true);
+            this.option = Object.assign({}, Gitting.DEFAULTS, option);
+            console.log("production");
         }
 
-        createClass(Comment, [{
+        createClass(Gitting, [{
             key: "render",
             value: function render(el) {
                 this.container = el instanceof Element ? el : document.querySelector(el);
@@ -56,11 +56,11 @@
                 return {};
             }
         }]);
-        return Comment;
+        return Gitting;
     }();
 
-    window.Comment = Comment;
+    window.Gitting = Gitting;
 
-    return Comment;
+    return Gitting;
 
 })));
