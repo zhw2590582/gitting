@@ -5,6 +5,14 @@
         box-sizing: border-box;
     }
 
+    a {
+        color: #a5a5a5;
+        text-decoration: none;
+        &:hover {
+            color: #797979;
+        }
+    }
+
     .clearfix:after,
     .clearfix:before {
         content: '';
@@ -21,6 +29,38 @@
     
     .fr {
         float: right;
+    }
+
+    .gt-avatar {
+        width: 60px;
+        padding-right: 15px;
+        img {
+            width: 100%;
+            vertical-align: top;
+            border-radius: 3px;
+        }
+    }
+
+    .caret {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: -7px;
+            border-right: 8px solid #a6afb9;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+          }
+        &::after {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 11px;
+            border-right: 7px solid #fff;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+        }
     }
 
     .gt-header {
@@ -54,15 +94,6 @@
         margin-bottom: 30px;
         border-bottom: 1px dashed #c3c8cf;
         display: flex;
-        .gt-avatar {
-            width: 55px;
-            padding-right: 10px;
-            img {
-                width: 100%;
-                vertical-align: top;
-                border-radius: 3px;
-            }
-        }
         .gt-editor {
             flex: 1;
             .gt-textarea {
@@ -84,7 +115,9 @@
                 border-bottom-left-radius: 0;
             }
             .gt-tip {
-                padding: 7px 10px;
+                height: 30px;
+                line-height: 30px;
+                padding: 0 10px;
                 font-size: 12px;
                 vertical-align: top;
                 margin-top: -1px;
@@ -166,6 +199,61 @@
     }
 
     .gt-comments {
+        .comments-item {
+            display: flex;
+            margin-bottom: 30px;
+            .gt-comment-content {
+                flex: 1;
+                .gt-comment-body {
+                    min-height: 80px;
+                    padding: 10px;
+                    border: 1px solid #d1d5da;
+                    border-bottom: 1px dashed #c3c8cf;
+                    border-radius: 3px;
+                }
+                .gt-comment-mate {
+                    font-size: 12px;
+                    padding: 0 10px;
+                    height: 30px;
+                    line-height: 30px;
+                    margin-top: -1px;
+                    color: #a5a5a5;
+                    border: 1px solid #c3c8cf;
+                    border-top: 0;
+                    border-bottom-right-radius: 3px;
+                    border-bottom-left-radius: 3px;
+                    .gt-comment-name {
+                        margin-right: 15px;
+                        color: #666;
+                        &:hover {
+                            color: #333;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    .gt-load {
+        text-align: center;
+        margin-bottom: 50px;
+        a {
+            color: #808080;
+            font-size: 13px;
+            display: inline-block;
+            vertical-align: top;
+            height: 35px;
+            line-height: 35px;
+            width: 100px;
+            border-radius: 3px;
+            border: 1px solid #c3c8cf;
+        }
+        .gt-load-end {
+            color: #808080;
+            font-size: 13px;
+            vertical-align: top;
+            height: 35px;
+            line-height: 35px;
+        }
     }
 }

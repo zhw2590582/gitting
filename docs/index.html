@@ -9,7 +9,6 @@
     <meta name="keywords" content="gitting">
     <meta name="description" content="gitting">
     <link rel="stylesheet" href="./css/normalize.css">
-    <link rel="stylesheet" href="./css/consola.css">
     <link rel="stylesheet" href="./css/app.css">
     <link rel="stylesheet" href="./css/gitting.css">
 </head>
@@ -33,7 +32,8 @@
                 <div class="gt-editor">
                     <textarea placeholder="Leave a comment" class="gt-textarea" maxlength="300"></textarea>
                     <div class="gt-tip clearfix">
-                        <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">Styling with Markdown is supported</a>
+                        <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">Styling
+                            with Markdown is supported</a>
                         <span class="fr">123 / 300</span>
                     </div>
                     <div class="gt-tool clearfix">
@@ -45,19 +45,81 @@
                     </div>
                 </div>
             </div>
-            <div class="igt-comments">
-                    gt-comments
+            <div class="gt-comments">
+                <div class="comments-item">
+                    <div class="gt-avatar">
+                        <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+                    </div>
+                    <div class="gt-comment-content caret">
+                        <div class="gt-comment-body markdown-body">
+                            markdown-body
+                        </div>
+                        <div class="gt-comment-mate clearfix">
+                            <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
+                            <span class="gt-comment-time fl">发表于3 天前</span>
+                            <a class="gt-comment-reply fr" href="#" target="_blank">Reply</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="comments-item">
+                    <div class="gt-avatar">
+                        <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+                    </div>
+                    <div class="gt-comment-content caret">
+                        <div class="gt-comment-body markdown-body">
+                            markdown-body
+                        </div>
+                        <div class="gt-comment-mate clearfix">
+                            <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
+                            <span class="gt-comment-time fl">发表于3 天前</span>
+                            <a class="gt-comment-reply fr" href="#" target="_blank">Reply</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="comments-item">
+                    <div class="gt-avatar">
+                        <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+                    </div>
+                    <div class="gt-comment-content caret">
+                        <div class="gt-comment-body markdown-body">
+                            markdown-body
+                        </div>
+                        <div class="gt-comment-mate clearfix">
+                            <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
+                            <span class="gt-comment-time fl">发表于3 天前</span>
+                            <a class="gt-comment-reply fr" href="#" target="_blank">Reply</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="comments-item">
+                    <div class="gt-avatar">
+                        <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+                    </div>
+                    <div class="gt-comment-content caret">
+                        <div class="gt-comment-body markdown-body">
+                            markdown-body
+                        </div>
+                        <div class="gt-comment-mate clearfix">
+                            <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
+                            <span class="gt-comment-time fl">发表于3 天前</span>
+                            <a class="gt-comment-reply fr" href="#" target="_blank">Reply</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gt-load">
+                <a class="gt-load-more" href="#">加载更多</a>
+                <a class="gt-load-ing" href="#">加载中...</a>
+                <span class="gt-load-end">加载完毕</span>
             </div>
         </div>
     </div>
-    <script src="./js/consola.js"></script>
-    <script>consola.creat({position: 'right'});</script>
     <script src="./js/gitting.js"></script>
     <script>
         const gitting = new Gitting({
 
         });
-        
+
         gitting.render('gitting');
     </script>
 </body>

@@ -38,25 +38,25 @@
     }();
 
     var Gitting = function () {
-        function Gitting(option) {
-            classCallCheck(this, Gitting);
+      function Gitting(option) {
+        classCallCheck(this, Gitting);
 
-            this.option = Object.assign({}, Gitting.DEFAULTS, option);
-            console.log("development");
+        this.option = Object.assign({}, Gitting.DEFAULTS, option);
+        console.log("development");
+      }
+
+      createClass(Gitting, [{
+        key: "render",
+        value: function render(el) {
+          this.container = el instanceof Element ? el : document.querySelector(el);
         }
-
-        createClass(Gitting, [{
-            key: "render",
-            value: function render(el) {
-                this.container = el instanceof Element ? el : document.querySelector(el);
-            }
-        }], [{
-            key: "DEFAULTS",
-            get: function get$$1() {
-                return {};
-            }
-        }]);
-        return Gitting;
+      }], [{
+        key: "DEFAULTS",
+        get: function get$$1() {
+          return {};
+        }
+      }]);
+      return Gitting;
     }();
 
     window.Gitting = Gitting;
