@@ -4,15 +4,6 @@
   (global.gitting = factory());
 }(this, (function () { 'use strict';
 
-  /*!
-   * isobject <https://github.com/jonschlinkert/isobject>
-   *
-   * Copyright (c) 2014-2017, Jon Schlinkert.
-   * Released under the MIT License.
-   */
-
-  // 请求
-
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -36,6 +27,15 @@
       return Constructor;
     };
   }();
+
+  /*!
+   * isobject <https://github.com/jonschlinkert/isobject>
+   *
+   * Copyright (c) 2014-2017, Jon Schlinkert.
+   * Released under the MIT License.
+   */
+
+  // 请求
 
   var Gitting = function () {
     function Gitting(option) {

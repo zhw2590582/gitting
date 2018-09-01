@@ -121,6 +121,23 @@
     }
   }
 
+  .gt-init {
+    display: none;
+    font-size: 13px;
+    text-align: center;
+    a {
+      color: #3e6fbf;
+      padding: 10px 15px;
+      display: inline-block;
+      vertical-align: top;
+      border-radius: 3px;
+      border: 1px solid #c3c8cf;
+    }
+    .gt-init-ing {
+      display: none;
+    }
+  }
+
   .gt-header {
     font-size: 13px;
     padding-bottom: 15px;
@@ -337,12 +354,9 @@
     color: #808080;
     .gt-load-more {
       color: #808080;
-      vertical-align: top;
-      height: 35px;
-      line-height: 35px;
+      padding: 10px 15px;
       display: inline-block;
       vertical-align: top;
-      width: 100px;
       border-radius: 3px;
       border: 1px solid #c3c8cf;
     }
