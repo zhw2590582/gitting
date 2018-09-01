@@ -19,17 +19,16 @@
             <div class="gt-header clearfix">
                 <a href="#" class="gt-counts fl">900 条评论</a>
                 <div class="gt-mate fr clearfix">
-                    <a href="#" class="fl active">从旧到新排序</a>
-                    <a href="#" class="fl">从新到旧排序</a>
                     <a href="#" class="fl">注销</a>
-                    <a href="#" target="_blank">Gitting 1.0.0</a>
+                    <a href="#" class="fl" target="_blank">Gitting 1.0.0</a>
                 </div>
             </div>
             <div class="gt-body">
                 <div class="gt-avatar">
                     <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
                 </div>
-                <div class="gt-editor">
+                <div class="gt-editor gt-mode-load">
+                    <div class="gt-textarea-preview markdown-body">Leave a comment</div>
                     <textarea placeholder="Leave a comment" class="gt-textarea" maxlength="300"></textarea>
                     <div class="gt-tip clearfix">
                         <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">Styling
@@ -42,6 +41,14 @@
                             <span class="gt-preview gt-btn fl">Preview</span>
                         </div>
                         <button class="gt-send fr">Submit</button>
+                    </div>
+                    <div class="gt-ajax-load">
+                        <div class="lds-ellipsis">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,10 +114,17 @@
                     </div>
                 </div>
             </div>
-            <div class="gt-load">
-                <a class="gt-load-more" href="#">加载更多</a>
-                <a class="gt-load-ing" href="#">加载中...</a>
-                <span class="gt-load-end">加载完毕</span>
+            <div class="gt-comments-load">
+                <a class="gt-load-state gt-load-more" href="#">加载更多</a>
+                <div class="gt-load-state gt-load-ing">
+                    <div class="lds-ellipsis">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="gt-load-state gt-load-end">加载完毕</div>
             </div>
         </div>
     </div>
