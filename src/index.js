@@ -126,7 +126,7 @@ class Gitting {
             </div>
             <div class="gt-comment-mate clearfix">
               <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
-              <span class="gt-comment-time fl">发表于3 天前</span>
+              <span class="gt-comment-time fl">${this.i('published')} 3 天前</span>
               <a class="gt-comment-reply fr" href="#" target="_blank">${this.i('reply')}</a>
             </div>
           </div>

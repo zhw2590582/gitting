@@ -10,7 +10,8 @@ const i18n = {
     submit: "提交",
     reply: "回复",
     loadMore: "加载更多",
-    loadEnd: "加载完毕"
+    loadEnd: "加载完毕",
+    published: "发表于"
   },
   en: {
     init: "Initialize A Comment",
@@ -23,7 +24,8 @@ const i18n = {
     submit: "Submit",
     reply: "Reply",
     loadMore: "Load More",
-    loadEnd: "Load completed"
+    loadEnd: "Load completed",
+    published: "Published on"
   }
 };
 
