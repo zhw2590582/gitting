@@ -2423,6 +2423,7 @@
 	    key: "render",
 	    value: function render(el) {
 	      this.container = el instanceof Element ? el : document.querySelector(el);
+	      this.creatGitting();
 	      // this.getUserInfo(utils.getQueryString('code'))
 	    }
 	  }, {
@@ -2491,7 +2492,9 @@
 	    }
 	  }, {
 	    key: "creatGitting",
-	    value: function creatGitting() {}
+	    value: function creatGitting() {
+	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n          <a href=\"#\" class=\"gt-counts fl\">900 \u6761\u8BC4\u8BBA</a>\n          <div class=\"gt-mate fr clearfix\">\n              <a href=\"#\" class=\"fl\">\u6CE8\u9500</a>\n              <a href=\"#\" class=\"fl\" target=\"_blank\">Gitting 1.0.0</a>\n          </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n            <img src=\"https://avatars0.githubusercontent.com/u/5907357?s=88&v=4\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor gt-mode-load\">\n            <div class=\"gt-textarea-preview markdown-body\">Leave a comment</div>\n            <textarea placeholder=\"Leave a comment\" class=\"gt-textarea\" maxlength=\"300\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">Styling\n                    with Markdown is supported</a>\n                <span class=\"fr\">123 / 300</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">Write</span>\n                    <span class=\"gt-preview gt-btn fl\">Preview</span>\n                </div>\n                <button class=\"gt-send fr\">Submit</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"https://avatars0.githubusercontent.com/u/5907357?s=88&v=4\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">\u53D1\u8868\u4E8E3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">Reply</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">\u52A0\u8F7D\u66F4\u591A</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">\u52A0\u8F7D\u5B8C\u6BD5</div>\n      </div>\n    ");
+	    }
 	  }, {
 	    key: "errorHandle",
 	    value: function errorHandle(condition, err, callback) {
