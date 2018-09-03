@@ -2251,7 +2251,7 @@
 
 	// 删除dom元素
 	var removeElement = function removeElement(selector) {
-	  el = query(selector);
+	  var el = query(selector);
 	  el && el.parentNode && el.parentNode.removeChild(el);
 	};
 

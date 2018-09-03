@@ -36,7 +36,6 @@
     "rollup-plugin-uglify": "^5.0.2"
   },
   "dependencies": {
-    "dayjs": "^1.7.5",
-    "primer-markdown": "^3.7.9"
+    "dayjs": "^1.7.5"
   }
 }
