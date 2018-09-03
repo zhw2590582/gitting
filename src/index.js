@@ -25,6 +25,7 @@ class Gitting {
       body: '',
       language: 'zh-CN',
       perPage: 10,
+      maxlength: 500,
       proxy: 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token'
     };
   }
@@ -77,32 +78,32 @@ class Gitting {
   }
 
   creatGitting() {
+    const avatar = 'https://avatars0.githubusercontent.com/u/5907357?s=88&v=4';
     this.container.insertAdjacentHTML('beforeend', `
       <div class="gt-header clearfix">
-          <a href="#" class="gt-counts fl">900 条评论</a>
+          <a href="#" class="gt-counts fl"><span>900</span> ${this.i('counts')}</a>
           <div class="gt-mate fr clearfix">
-              <a href="#" class="fl">注销</a>
-              <a href="#" class="fl" target="_blank">Gitting 1.0.0</a>
+              <a href="#" class="fl">${this.i('logout')}</a>
+              <a href="https://github.com/zhw2590582/gitting" class="fl" target="_blank">Gitting 1.0.0</a>
           </div>
       </div>
       <div class="gt-body">
         <div class="gt-avatar">
-            <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+            <img src="${avatar}" alt="avatar">
         </div>
         <div class="gt-editor gt-mode-load">
-            <div class="gt-textarea-preview markdown-body">Leave a comment</div>
-            <textarea placeholder="Leave a comment" class="gt-textarea" maxlength="300"></textarea>
+            <div class="gt-textarea-preview markdown-body"></div>
+            <textarea placeholder="${this.i('leave')}" class="gt-textarea" maxlength="${this.option.maxlength}"></textarea>
             <div class="gt-tip clearfix">
-                <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">Styling
-                    with Markdown is supported</a>
-                <span class="fr">123 / 300</span>
+                <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">${this.i('styling')}</a>
+                <span class="fr">123 / ${this.option.maxlength}</span>
             </div>
             <div class="gt-tool clearfix">
                 <div class="gt-switch fl clearfix">
-                    <span class="gt-write gt-btn fl active">Write</span>
-                    <span class="gt-preview gt-btn fl">Preview</span>
+                    <span class="gt-write gt-btn fl active">${this.i('write')}</span>
+                    <span class="gt-preview gt-btn fl">${this.i('preview')}</span>
                 </div>
-                <button class="gt-send fr">Submit</button>
+                <button class="gt-send fr">${this.i('submit')}</button>
             </div>
             <div class="gt-ajax-load">
                 <div class="lds-ellipsis">
@@ -117,7 +118,7 @@ class Gitting {
       <div class="gt-comments">
         <div class="comments-item">
           <div class="gt-avatar">
-            <img src="https://avatars0.githubusercontent.com/u/5907357?s=88&v=4" alt="avatar">
+            <img src="${avatar}" alt="avatar">
           </div>
           <div class="gt-comment-content caret">
             <div class="gt-comment-body markdown-body">
@@ -126,13 +127,13 @@ class Gitting {
             <div class="gt-comment-mate clearfix">
               <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
               <span class="gt-comment-time fl">发表于3 天前</span>
-              <a class="gt-comment-reply fr" href="#" target="_blank">Reply</a>
+              <a class="gt-comment-reply fr" href="#" target="_blank">${this.i('reply')}</a>
             </div>
           </div>
         </div>
       </div>
       <div class="gt-comments-load">
-          <a class="gt-load-state gt-load-more" href="#">加载更多</a>
+          <a class="gt-load-state gt-load-more" href="#">${this.i('loadMore')}</a>
           <div class="gt-load-state gt-load-ing">
               <div class="lds-ellipsis">
                   <div></div>
@@ -141,7 +142,7 @@ class Gitting {
                   <div></div>
               </div>
           </div>
-          <div class="gt-load-state gt-load-end">加载完毕</div>
+          <div class="gt-load-state gt-load-end">${this.i('loadEnd')}</div>
       </div>
     `);
   }

@@ -2143,171 +2143,39 @@
 
 	var _createClass = unwrapExports(createClass);
 
-	/*!
-	 * isobject <https://github.com/jonschlinkert/isobject>
-	 *
-	 * Copyright (c) 2014-2017, Jon Schlinkert.
-	 * Released under the MIT License.
-	 */
-
-	var _isobject_3_0_1_isobject = function isObject(val) {
-	  return val != null && typeof val === 'object' && Array.isArray(val) === false;
-	};
-
-	/*!
-	 * get-value <https://github.com/jonschlinkert/get-value>
-	 *
-	 * Copyright (c) 2014-2018, Jon Schlinkert.
-	 * Released under the MIT License.
-	 */
-
-
-
-	var _getValue_3_0_1_getValue = function(target, path, options) {
-	  if (!_isobject_3_0_1_isobject(options)) {
-	    options = { default: options };
-	  }
-
-	  if (!isValidObject(target)) {
-	    return typeof options.default !== 'undefined' ? options.default : target;
-	  }
-
-	  if (typeof path === 'number') {
-	    path = String(path);
-	  }
-
-	  const isArray = Array.isArray(path);
-	  const isString = typeof path === 'string';
-	  const splitChar = options.separator || '.';
-	  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
-
-	  if (!isString && !isArray) {
-	    return target;
-	  }
-
-	  if (isString && path in target) {
-	    return isValid(path, target, options) ? target[path] : options.default;
-	  }
-
-	  let segs = isArray ? path : split(path, splitChar, options);
-	  let len = segs.length;
-	  let idx = 0;
-
-	  do {
-	    let prop = segs[idx];
-	    if (typeof prop === 'number') {
-	      prop = String(prop);
-	    }
-
-	    while (prop && prop.slice(-1) === '\\') {
-	      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
-	    }
-
-	    if (prop in target) {
-	      if (!isValid(prop, target, options)) {
-	        return options.default;
-	      }
-
-	      target = target[prop];
-	    } else {
-	      let hasProp = false;
-	      let n = idx + 1;
-
-	      while (n < len) {
-	        prop = join([prop, segs[n++]], joinChar, options);
-
-	        if ((hasProp = prop in target)) {
-	          if (!isValid(prop, target, options)) {
-	            return options.default;
-	          }
-
-	          target = target[prop];
-	          idx = n - 1;
-	          break;
-	        }
-	      }
-
-	      if (!hasProp) {
-	        return options.default;
-	      }
-	    }
-	  } while (++idx < len && isValidObject(target));
-
-	  if (idx === len) {
-	    return target;
-	  }
-
-	  return options.default;
-	};
-
-	function join(segs, joinChar, options) {
-	  if (typeof options.join === 'function') {
-	    return options.join(segs);
-	  }
-	  return segs[0] + joinChar + segs[1];
-	}
-
-	function split(path, splitChar, options) {
-	  if (typeof options.split === 'function') {
-	    return options.split(path);
-	  }
-	  return path.split(splitChar);
-	}
-
-	function isValid(key, target, options) {
-	  if (typeof options.isValid === 'function') {
-	    return options.isValid(key, target);
-	  }
-	  return true;
-	}
-
-	function isValidObject(val) {
-	  return _isobject_3_0_1_isobject(val) || Array.isArray(val) || typeof val === 'function';
-	}
-
-	function objToString(obj) {
-	  switch (typeof obj) {
-	    case "undefined":
-	        return 'undefined';
-	    case "object":
-	        let type = Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
-	        switch (type) {
-	            case "null":
-	                return 'null';
-	            case "array":
-	                return '[' + obj.map(key => objToString(key)).join(', ') + ']';
-	            case 'object':
-	                return '{ ' + Object.keys(obj).map(key => key + ': ' + objToString(obj[key])).join(', ') + ' }';
-	            default:
-	                try {
-	                  return obj.toString();
-	                } catch (e) {
-	                  return '[Unknown type: ' + type + ']';
-	                }
-	        }
-	    default:
-	        return obj.toString();
-	  }
-	}
-
-	var _objToString_1_0_1_objToString = objToString;
-
 	var i18n = {
 	  'zh-CN': {
-	    init: "初始化一个评论"
+	    init: "初始化一个评论",
+	    counts: "条评论",
+	    logout: "注销",
+	    leave: "发表评论",
+	    styling: "支持使用Markdown进行样式设置",
+	    write: "编写",
+	    preview: "预览",
+	    submit: "提交",
+	    reply: "回复",
+	    loadMore: "加载更多",
+	    loadEnd: "加载完毕"
 	  },
 	  en: {
-	    init: "Initialize A Comment"
+	    init: "Initialize A Comment",
+	    counts: "comments",
+	    logout: "Logout",
+	    leave: "Leave a comment",
+	    styling: "Styling with Markdown is supported",
+	    write: "Write",
+	    preview: "Preview",
+	    submit: "Submit",
+	    reply: "Reply",
+	    loadMore: "Load More",
+	    loadEnd: "Load completed"
 	  }
 	};
 
 	function i18n$1 (lang) {
-	  var langObj = i18n[lang] || i18n["zh"];
+	  var langObj = i18n[lang] || i18n["zh-CN"];
 	  return function (key) {
-	    var val = _getValue_3_0_1_getValue(langObj, key, {
-	      default: "unmatch: " + key
-	    });
-	    return _objToString_1_0_1_objToString(val);
+	    return langObj[key];
 	  };
 	}
 
@@ -2506,7 +2374,8 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
-	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n          <a href=\"#\" class=\"gt-counts fl\">900 \u6761\u8BC4\u8BBA</a>\n          <div class=\"gt-mate fr clearfix\">\n              <a href=\"#\" class=\"fl\">\u6CE8\u9500</a>\n              <a href=\"#\" class=\"fl\" target=\"_blank\">Gitting 1.0.0</a>\n          </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n            <img src=\"https://avatars0.githubusercontent.com/u/5907357?s=88&v=4\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor gt-mode-load\">\n            <div class=\"gt-textarea-preview markdown-body\">Leave a comment</div>\n            <textarea placeholder=\"Leave a comment\" class=\"gt-textarea\" maxlength=\"300\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">Styling\n                    with Markdown is supported</a>\n                <span class=\"fr\">123 / 300</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">Write</span>\n                    <span class=\"gt-preview gt-btn fl\">Preview</span>\n                </div>\n                <button class=\"gt-send fr\">Submit</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"https://avatars0.githubusercontent.com/u/5907357?s=88&v=4\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">\u53D1\u8868\u4E8E3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">Reply</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">\u52A0\u8F7D\u66F4\u591A</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">\u52A0\u8F7D\u5B8C\u6BD5</div>\n      </div>\n    ");
+	      var avatar = 'https://avatars0.githubusercontent.com/u/5907357?s=88&v=4';
+	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n          <a href=\"#\" class=\"gt-counts fl\"><span>900</span> " + this.i('counts') + "</a>\n          <div class=\"gt-mate fr clearfix\">\n              <a href=\"#\" class=\"fl\">" + this.i('logout') + "</a>\n              <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting 1.0.0</a>\n          </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor gt-mode-load\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i('leave') + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i('styling') + "</a>\n                <span class=\"fr\">123 / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i('write') + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i('preview') + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i('submit') + "</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">\u53D1\u8868\u4E8E3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i('reply') + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i('loadMore') + "</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">" + this.i('loadEnd') + "</div>\n      </div>\n    ");
 	    }
 	  }, {
 	    key: "errorHandle",
@@ -2533,6 +2402,7 @@
 	        body: '',
 	        language: 'zh-CN',
 	        perPage: 10,
+	        maxlength: 500,
 	        proxy: 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token'
 	      };
 	    }

@@ -37,8 +37,6 @@
   },
   "dependencies": {
     "dayjs": "^1.7.5",
-    "get-value": "^3.0.1",
-    "obj-to-string": "^1.0.1",
     "primer-markdown": "^3.7.9"
   }
 }

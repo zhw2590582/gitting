@@ -1,21 +1,35 @@
-import get from "get-value";
-import objToString from "obj-to-string";
-
 const i18n = {
   'zh-CN': {
-    init: "初始化一个评论"
+    init: "初始化一个评论",
+    counts: "条评论",
+    logout: "注销",
+    leave: "发表评论",
+    styling: "支持使用Markdown进行样式设置",
+    write: "编写",
+    preview: "预览",
+    submit: "提交",
+    reply: "回复",
+    loadMore: "加载更多",
+    loadEnd: "加载完毕"
   },
   en: {
-    init: "Initialize A Comment"
+    init: "Initialize A Comment",
+    counts: "comments",
+    logout: "Logout",
+    leave: "Leave a comment",
+    styling: "Styling with Markdown is supported",
+    write: "Write",
+    preview: "Preview",
+    submit: "Submit",
+    reply: "Reply",
+    loadMore: "Load More",
+    loadEnd: "Load completed"
   }
 };
 
 export default function(lang) {
-  const langObj = i18n[lang] || i18n["zh"];
+  const langObj = i18n[lang] || i18n["zh-CN"];
   return function(key) {
-    const val = get(langObj, key, {
-      default: `unmatch: ${key}`
-    });
-    return objToString(val);
+    return langObj[key];
   };
 }
