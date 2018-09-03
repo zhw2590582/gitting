@@ -2374,6 +2374,17 @@
 	  localStorage.removeItem(key);
 	};
 
+	// 选择元素
+	var query = function query(selector) {
+	  return document.querySelector(selector);
+	};
+
+	// 删除dom元素
+	var removeElement = function removeElement(selector) {
+	  el = query(selector);
+	  el && el.parentNode && el.parentNode.removeChild(el);
+	};
+
 	// 请求
 	var request = function request(method, url, body) {
 	  method = method.toUpperCase();
@@ -2416,13 +2427,14 @@
 	    _classCallCheck(this, Gitting);
 
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
+	    this.isLogin = false;
 	    this.i = i18n$1(this.option.language);
 	  }
 
 	  _createClass(Gitting, [{
 	    key: "render",
 	    value: function render(el) {
-	      this.container = el instanceof Element ? el : document.querySelector(el);
+	      this.container = el instanceof Element ? el : query(el);
 	      this.creatGitting();
 	      // this.getUserInfo(utils.getQueryString('code'))
 	    }
@@ -2430,19 +2442,19 @@
 	    key: "getUserInfo",
 	    value: function () {
 	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(code, callback) {
-	        var query, data, userInfo;
+	        var query$$1, data, userInfo;
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
-	                query = {
+	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
 	                  code: code,
 	                  redirect_uri: location.href
 	                };
 	                _context.next = 3;
-	                return getToken(this.option.proxy + "?" + queryStringify(query));
+	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
 
 	              case 3:
 	                data = _context.sent;
@@ -2476,19 +2488,20 @@
 	  }, {
 	    key: "logout",
 	    value: function logout() {
+	      this.isLogin = false;
 	      delStorage('gitting-token');
 	      delStorage('gitting-userInfo');
 	    }
 	  }, {
 	    key: "creatInit",
 	    value: function creatInit() {
-	      var query = {
+	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query) + "\"\n          >\n            " + this.i('init') + "\n          </a>\n      </div>\n    ");
+	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n          >\n            " + this.i('init') + "\n          </a>\n      </div>\n    ");
 	    }
 	  }, {
 	    key: "creatGitting",
@@ -2499,6 +2512,7 @@
 	    key: "errorHandle",
 	    value: function errorHandle(condition, err, callback) {
 	      if (!condition) return;
+	      removeElement('.gt-error');
 	      this.container.insertAdjacentHTML('afterbegin', "<div class=\"gt-error\">" + err + "</div>");
 	      callback && callback();
 	      throw new TypeError(err);

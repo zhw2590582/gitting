@@ -7,6 +7,7 @@ import * as utils from "./utils";
 class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
+    this.isLogin = false;
     this.i = i18n(this.option.language);
   }
 
@@ -29,7 +30,7 @@ class Gitting {
   }
 
   render(el) {
-    this.container = el instanceof Element ? el : document.querySelector(el);
+    this.container = el instanceof Element ? el : utils.query(el);
     this.creatGitting()
     // this.getUserInfo(utils.getQueryString('code'))
   }
@@ -51,6 +52,7 @@ class Gitting {
   }
 
   logout() {
+    this.isLogin = false;
     utils.delStorage('gitting-token');
     utils.delStorage('gitting-userInfo');
   }
@@ -146,6 +148,7 @@ class Gitting {
 
   errorHandle(condition, err, callback) {
     if (!condition) return;
+    utils.removeElement('.gt-error');
     this.container.insertAdjacentHTML('afterbegin', `<div class="gt-error">${err}</div>`);
     callback && callback();
     throw new TypeError(err);

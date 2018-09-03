@@ -29,6 +29,17 @@ export const delStorage = (key) => {
   localStorage.removeItem(key)
 }
 
+// 选择元素
+export const query = selector => {
+  return document.querySelector(selector);
+}
+
+// 删除dom元素
+export const removeElement = selector => {
+  el = query(selector);
+  el && el.parentNode && el.parentNode.removeChild(el);
+}
+
 // 请求
 export const request = (method, url, body) => {
   method = method.toUpperCase();
