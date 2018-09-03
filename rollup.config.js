@@ -23,8 +23,9 @@ export default {
 		nodeResolve(),
 		commonjs(),
 		babel({
+			runtimeHelpers: true,
 			exclude: 'node_modules/**',
-			plugins: ["external-helpers"]
+			plugins: ["external-helpers", "transform-runtime"]
 		}),
 		replace({
 			exclude: 'node_modules/**',

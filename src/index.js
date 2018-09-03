@@ -30,11 +30,7 @@ class Gitting {
 
   render(el) {
     this.container = el instanceof Element ? el : document.querySelector(el);
-    this.creatInit();
-  }
-
-  getCode() {
-    return utils.getQueryString('code');
+    // this.getUserInfo(utils.getQueryString('code'))
   }
 
   async getUserInfo(code, callback) {
@@ -45,13 +41,17 @@ class Gitting {
       redirect_uri: location.href
     }
     const data = await api.getToken(`${this.option.proxy}?${utils.queryStringify(query)}`);
-    utils.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
+    this.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
+    utils.setStorage('gitting-token', data.access_token);
     const userInfo = await api.getUserInfo(data.access_token);
-    utils.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
+    this.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
+    utils.setStorage('gitting-userInfo', userInfo);
+    callback && callback();
   }
 
   logout() {
-    //
+    utils.delStorage('gitting-token');
+    utils.delStorage('gitting-userInfo');
   }
 
   creatInit() {
@@ -65,7 +65,8 @@ class Gitting {
       <div class="gt-init">
           <a
             class="gt-init-btn"
-            href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}">
+            href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}"
+          >
             ${this.i('init')}
           </a>
       </div>
@@ -74,6 +75,13 @@ class Gitting {
 
   creatGitting() {
 
+  }
+
+  errorHandle(condition, err, callback) {
+    if (!condition) return;
+    this.container.insertAdjacentHTML('afterbegin', `<div class="gt-error">${err}</div>`);
+    callback && callback();
+    throw new TypeError(err);
   }
 
 }
