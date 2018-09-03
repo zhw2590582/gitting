@@ -1,9 +1,22 @@
 import { request } from "./utils";
 
-// 授权
+// 获取token
+export function getToken(url) {
+    return request('get', url);
+}
+
+// 获取用户信息
+export function getUserInfo(token) {
+    return request('get', `https://api.github.com/user?access_token=${token}`);
+}
+
+// 获取所有issue
+export function getAllIssue(name, repos) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/`);
+}
 
 // 获取某条issues
-export function getIssues(name, repos, issue) {
+export function getIssue(name, repos, issue) {
     return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${issue}`);
 }
 

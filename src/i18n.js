@@ -2,11 +2,11 @@ import get from "get-value";
 import objToString from "obj-to-string";
 
 const i18n = {
-  zh: {
-    name: "中文"
+  'zh-CN': {
+    init: "初始化一个评论"
   },
   en: {
-    name: "English"
+    init: "Initialize A Comment"
   }
 };
 

@@ -1,7 +1,7 @@
 {
   "name": "gitting",
   "version": "1.0.0",
-  "description": "自用github issues评论框",
+  "description": "又是一个基于 Github Issue 开发的评论插件",
   "main": "dist/gitting.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",

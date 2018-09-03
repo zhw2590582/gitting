@@ -121,8 +121,14 @@
     }
   }
 
+  .gt-error {
+    color: red;
+    text-align: center;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
   .gt-init {
-    display: none;
     font-size: 13px;
     text-align: center;
     a {
@@ -132,9 +138,6 @@
       vertical-align: top;
       border-radius: 3px;
       border: 1px solid #c3c8cf;
-    }
-    .gt-init-ing {
-      display: none;
     }
   }
 

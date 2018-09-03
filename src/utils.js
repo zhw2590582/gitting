@@ -1,5 +1,5 @@
 // 请求
-export function request(method, url, body) {
+export const request = (method, url, body) => {
   method = method.toUpperCase();
   body = body && JSON.stringify(body);
   let headers = {
@@ -20,9 +20,24 @@ export function request(method, url, body) {
 }
 
 // 查询url参数
-export function getQueryString(name) {
+export const getQueryString = name => {
   const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
   const r = window.location.search.substr(1).match(reg);
   if (r != null) return unescape(r[2]);
   return null;
 };
+
+// 从参数生成url
+export const queryStringify = query => {
+  const queryString = Object.keys(query)
+    .map(key => `${key}=${encodeURIComponent(query[key] || '')}`)
+    .join('&')
+  return queryString
+}
+
+export const errorHandle = (condition, err, callback) => {
+  if (!condition) return;
+  this.container.insertAdjacentHTML('afterbegin', `<div class="gt-error">${err}</div>`);
+  callback && callback();
+  throw new TypeError(err);
+}
