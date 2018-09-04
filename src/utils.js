@@ -1,10 +1,10 @@
 // 查询url参数
-export const getQueryString = name => {
-  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-  const r = window.location.search.substr(1).match(reg);
-  if (r != null) return unescape(r[2]);
-  return null;
-};
+export const getURLParameters = () => {
+  var url = window.location.href;
+  return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function(a, v) {
+    return (a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1)), a;
+  }, {});
+}
 
 // 从参数生成url
 export const queryStringify = query => {
@@ -21,7 +21,7 @@ export const setStorage = (key, val) => {
 
 // 获取storage
 export const getStorage = (key) => {
-  JSON.parse(localStorage.getItem(key));
+  return JSON.parse(localStorage.getItem(key));
 }
 
 // 删除storage
@@ -38,6 +38,23 @@ export const query = selector => {
 export const removeElement = selector => {
   const el = document.querySelector(selector);
   el && el.parentNode && el.parentNode.removeChild(el);
+}
+
+// 创建loading
+export const loading = selector => {
+  const el = document.querySelector(selector);
+  const loadingEl = document.createElement('div');
+  loadingEl.classList.add('gt-loading');
+  loadingEl.innerHTML = `
+    <div class="lds-ellipsis">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  `;
+  el.appendChild(loadingEl);
+  return () => el.removeChild(loadingEl);
 }
 
 // 请求

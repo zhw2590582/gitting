@@ -6,6 +6,7 @@ const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const replace = require("rollup-plugin-replace");
 const { uglify } = require("rollup-plugin-uglify");
+const json = require('rollup-plugin-json');
 const isProd = process.env.NODE_ENV === "production";
 
 export default {
@@ -16,6 +17,7 @@ export default {
 		format: "umd"
 	},
 	plugins: [
+		json(),
 		postcss({
             plugins: [autoprefixer, cssnano],
             extract: isProd ? "dist/gitting.css" : "docs/css/gitting.css"

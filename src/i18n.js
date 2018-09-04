@@ -2,6 +2,7 @@ const i18n = {
   'zh-CN': {
     init: "初始化一个评论",
     counts: "条评论",
+    login: "登录",
     logout: "注销",
     leave: "发表评论",
     styling: "支持使用Markdown进行样式设置",
@@ -16,6 +17,7 @@ const i18n = {
   en: {
     init: "Initialize A Issue",
     counts: "comments",
+    login: "Login",
     logout: "Logout",
     leave: "Leave a comment",
     styling: "Styling with Markdown is supported",

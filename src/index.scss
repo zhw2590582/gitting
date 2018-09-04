@@ -1,5 +1,6 @@
 #gitting-container {
   position: relative;
+  min-height: 200px;
 
   *,
   ::after,
@@ -126,6 +127,13 @@
     text-align: center;
     font-size: 13px;
     margin-bottom: 20px;
+  }
+
+  .gt-loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -32px 0 0 -32px;
   }
 
   .gt-init {

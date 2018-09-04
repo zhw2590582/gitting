@@ -12,6 +12,352 @@
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
 	}
 
+	// 7.2.1 RequireObjectCoercible(argument)
+	var _defined = function (it) {
+	  if (it == undefined) throw TypeError("Can't call method on  " + it);
+	  return it;
+	};
+
+	// 7.1.13 ToObject(argument)
+
+	var _toObject = function (it) {
+	  return Object(_defined(it));
+	};
+
+	var hasOwnProperty = {}.hasOwnProperty;
+	var _has = function (it, key) {
+	  return hasOwnProperty.call(it, key);
+	};
+
+	var toString = {}.toString;
+
+	var _cof = function (it) {
+	  return toString.call(it).slice(8, -1);
+	};
+
+	// fallback for non-array-like ES3 and non-enumerable old V8 strings
+
+	// eslint-disable-next-line no-prototype-builtins
+	var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
+	  return _cof(it) == 'String' ? it.split('') : Object(it);
+	};
+
+	// to indexed object, toObject with fallback for non-array-like ES3 strings
+
+
+	var _toIobject = function (it) {
+	  return _iobject(_defined(it));
+	};
+
+	// 7.1.4 ToInteger
+	var ceil = Math.ceil;
+	var floor = Math.floor;
+	var _toInteger = function (it) {
+	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+	};
+
+	// 7.1.15 ToLength
+
+	var min = Math.min;
+	var _toLength = function (it) {
+	  return it > 0 ? min(_toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+	};
+
+	var max = Math.max;
+	var min$1 = Math.min;
+	var _toAbsoluteIndex = function (index, length) {
+	  index = _toInteger(index);
+	  return index < 0 ? max(index + length, 0) : min$1(index, length);
+	};
+
+	// false -> Array#indexOf
+	// true  -> Array#includes
+
+
+
+	var _arrayIncludes = function (IS_INCLUDES) {
+	  return function ($this, el, fromIndex) {
+	    var O = _toIobject($this);
+	    var length = _toLength(O.length);
+	    var index = _toAbsoluteIndex(fromIndex, length);
+	    var value;
+	    // Array#includes uses SameValueZero equality algorithm
+	    // eslint-disable-next-line no-self-compare
+	    if (IS_INCLUDES && el != el) while (length > index) {
+	      value = O[index++];
+	      // eslint-disable-next-line no-self-compare
+	      if (value != value) return true;
+	    // Array#indexOf ignores holes, Array#includes - not
+	    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
+	      if (O[index] === el) return IS_INCLUDES || index || 0;
+	    } return !IS_INCLUDES && -1;
+	  };
+	};
+
+	var _core = createCommonjsModule(function (module) {
+	var core = module.exports = { version: '2.5.7' };
+	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+	});
+	var _core_1 = _core.version;
+
+	var _global = createCommonjsModule(function (module) {
+	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+	var global = module.exports = typeof window != 'undefined' && window.Math == Math
+	  ? window : typeof self != 'undefined' && self.Math == Math ? self
+	  // eslint-disable-next-line no-new-func
+	  : Function('return this')();
+	if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+	});
+
+	var _library = true;
+
+	var _shared = createCommonjsModule(function (module) {
+	var SHARED = '__core-js_shared__';
+	var store = _global[SHARED] || (_global[SHARED] = {});
+
+	(module.exports = function (key, value) {
+	  return store[key] || (store[key] = value !== undefined ? value : {});
+	})('versions', []).push({
+	  version: _core.version,
+	  mode: 'pure',
+	  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+	});
+	});
+
+	var id = 0;
+	var px = Math.random();
+	var _uid = function (key) {
+	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+	};
+
+	var shared = _shared('keys');
+
+	var _sharedKey = function (key) {
+	  return shared[key] || (shared[key] = _uid(key));
+	};
+
+	var arrayIndexOf = _arrayIncludes(false);
+	var IE_PROTO = _sharedKey('IE_PROTO');
+
+	var _objectKeysInternal = function (object, names) {
+	  var O = _toIobject(object);
+	  var i = 0;
+	  var result = [];
+	  var key;
+	  for (key in O) if (key != IE_PROTO) _has(O, key) && result.push(key);
+	  // Don't enum bug & hidden keys
+	  while (names.length > i) if (_has(O, key = names[i++])) {
+	    ~arrayIndexOf(result, key) || result.push(key);
+	  }
+	  return result;
+	};
+
+	// IE 8- don't enum bug keys
+	var _enumBugKeys = (
+	  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+	).split(',');
+
+	// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+
+
+
+	var _objectKeys = Object.keys || function keys(O) {
+	  return _objectKeysInternal(O, _enumBugKeys);
+	};
+
+	var _aFunction = function (it) {
+	  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+	  return it;
+	};
+
+	// optional / simple context binding
+
+	var _ctx = function (fn, that, length) {
+	  _aFunction(fn);
+	  if (that === undefined) return fn;
+	  switch (length) {
+	    case 1: return function (a) {
+	      return fn.call(that, a);
+	    };
+	    case 2: return function (a, b) {
+	      return fn.call(that, a, b);
+	    };
+	    case 3: return function (a, b, c) {
+	      return fn.call(that, a, b, c);
+	    };
+	  }
+	  return function (/* ...args */) {
+	    return fn.apply(that, arguments);
+	  };
+	};
+
+	var _isObject = function (it) {
+	  return typeof it === 'object' ? it !== null : typeof it === 'function';
+	};
+
+	var _anObject = function (it) {
+	  if (!_isObject(it)) throw TypeError(it + ' is not an object!');
+	  return it;
+	};
+
+	var _fails = function (exec) {
+	  try {
+	    return !!exec();
+	  } catch (e) {
+	    return true;
+	  }
+	};
+
+	// Thank's IE8 for his funny defineProperty
+	var _descriptors = !_fails(function () {
+	  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+	});
+
+	var document$1 = _global.document;
+	// typeof document.createElement is 'object' in old IE
+	var is = _isObject(document$1) && _isObject(document$1.createElement);
+	var _domCreate = function (it) {
+	  return is ? document$1.createElement(it) : {};
+	};
+
+	var _ie8DomDefine = !_descriptors && !_fails(function () {
+	  return Object.defineProperty(_domCreate('div'), 'a', { get: function () { return 7; } }).a != 7;
+	});
+
+	// 7.1.1 ToPrimitive(input [, PreferredType])
+
+	// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+	// and the second argument - flag - preferred type is a string
+	var _toPrimitive = function (it, S) {
+	  if (!_isObject(it)) return it;
+	  var fn, val;
+	  if (S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
+	  if (typeof (fn = it.valueOf) == 'function' && !_isObject(val = fn.call(it))) return val;
+	  if (!S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
+	  throw TypeError("Can't convert object to primitive value");
+	};
+
+	var dP = Object.defineProperty;
+
+	var f = _descriptors ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+	  _anObject(O);
+	  P = _toPrimitive(P, true);
+	  _anObject(Attributes);
+	  if (_ie8DomDefine) try {
+	    return dP(O, P, Attributes);
+	  } catch (e) { /* empty */ }
+	  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
+	  if ('value' in Attributes) O[P] = Attributes.value;
+	  return O;
+	};
+
+	var _objectDp = {
+		f: f
+	};
+
+	var _propertyDesc = function (bitmap, value) {
+	  return {
+	    enumerable: !(bitmap & 1),
+	    configurable: !(bitmap & 2),
+	    writable: !(bitmap & 4),
+	    value: value
+	  };
+	};
+
+	var _hide = _descriptors ? function (object, key, value) {
+	  return _objectDp.f(object, key, _propertyDesc(1, value));
+	} : function (object, key, value) {
+	  object[key] = value;
+	  return object;
+	};
+
+	var PROTOTYPE = 'prototype';
+
+	var $export = function (type, name, source) {
+	  var IS_FORCED = type & $export.F;
+	  var IS_GLOBAL = type & $export.G;
+	  var IS_STATIC = type & $export.S;
+	  var IS_PROTO = type & $export.P;
+	  var IS_BIND = type & $export.B;
+	  var IS_WRAP = type & $export.W;
+	  var exports = IS_GLOBAL ? _core : _core[name] || (_core[name] = {});
+	  var expProto = exports[PROTOTYPE];
+	  var target = IS_GLOBAL ? _global : IS_STATIC ? _global[name] : (_global[name] || {})[PROTOTYPE];
+	  var key, own, out;
+	  if (IS_GLOBAL) source = name;
+	  for (key in source) {
+	    // contains in native
+	    own = !IS_FORCED && target && target[key] !== undefined;
+	    if (own && _has(exports, key)) continue;
+	    // export native or passed
+	    out = own ? target[key] : source[key];
+	    // prevent global pollution for namespaces
+	    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+	    // bind timers to global for call from export context
+	    : IS_BIND && own ? _ctx(out, _global)
+	    // wrap global constructors for prevent change them in library
+	    : IS_WRAP && target[key] == out ? (function (C) {
+	      var F = function (a, b, c) {
+	        if (this instanceof C) {
+	          switch (arguments.length) {
+	            case 0: return new C();
+	            case 1: return new C(a);
+	            case 2: return new C(a, b);
+	          } return new C(a, b, c);
+	        } return C.apply(this, arguments);
+	      };
+	      F[PROTOTYPE] = C[PROTOTYPE];
+	      return F;
+	    // make static versions for prototype methods
+	    })(out) : IS_PROTO && typeof out == 'function' ? _ctx(Function.call, out) : out;
+	    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
+	    if (IS_PROTO) {
+	      (exports.virtual || (exports.virtual = {}))[key] = out;
+	      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
+	      if (type & $export.R && expProto && !expProto[key]) _hide(expProto, key, out);
+	    }
+	  }
+	};
+	// type bitmap
+	$export.F = 1;   // forced
+	$export.G = 2;   // global
+	$export.S = 4;   // static
+	$export.P = 8;   // proto
+	$export.B = 16;  // bind
+	$export.W = 32;  // wrap
+	$export.U = 64;  // safe
+	$export.R = 128; // real proto method for `library`
+	var _export = $export;
+
+	// most Object methods by ES6 should accept primitives
+
+
+
+	var _objectSap = function (KEY, exec) {
+	  var fn = (_core.Object || {})[KEY] || Object[KEY];
+	  var exp = {};
+	  exp[KEY] = exec(fn);
+	  _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+	};
+
+	// 19.1.2.14 Object.keys(O)
+
+
+
+	_objectSap('keys', function () {
+	  return function keys(it) {
+	    return _objectKeys(_toObject(it));
+	  };
+	});
+
+	var keys = _core.Object.keys;
+
+	var keys$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": keys, __esModule: true };
+	});
+
+	var _Object$keys = unwrapExports(keys$1);
+
 	var runtime = createCommonjsModule(function (module) {
 	/**
 	 * Copyright (c) 2014-present, Facebook, Inc.
@@ -777,19 +1123,6 @@
 
 	var regenerator = runtimeModule;
 
-	// 7.1.4 ToInteger
-	var ceil = Math.ceil;
-	var floor = Math.floor;
-	var _toInteger = function (it) {
-	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-	};
-
-	// 7.2.1 RequireObjectCoercible(argument)
-	var _defined = function (it) {
-	  if (it == undefined) throw TypeError("Can't call method on  " + it);
-	  return it;
-	};
-
 	// true  -> String#at
 	// false -> String#codePointAt
 	var _stringAt = function (TO_STRING) {
@@ -806,307 +1139,9 @@
 	  };
 	};
 
-	var _library = true;
-
-	var _global = createCommonjsModule(function (module) {
-	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-	var global = module.exports = typeof window != 'undefined' && window.Math == Math
-	  ? window : typeof self != 'undefined' && self.Math == Math ? self
-	  // eslint-disable-next-line no-new-func
-	  : Function('return this')();
-	if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-	});
-
-	var _core = createCommonjsModule(function (module) {
-	var core = module.exports = { version: '2.5.7' };
-	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-	});
-	var _core_1 = _core.version;
-
-	var _aFunction = function (it) {
-	  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-	  return it;
-	};
-
-	// optional / simple context binding
-
-	var _ctx = function (fn, that, length) {
-	  _aFunction(fn);
-	  if (that === undefined) return fn;
-	  switch (length) {
-	    case 1: return function (a) {
-	      return fn.call(that, a);
-	    };
-	    case 2: return function (a, b) {
-	      return fn.call(that, a, b);
-	    };
-	    case 3: return function (a, b, c) {
-	      return fn.call(that, a, b, c);
-	    };
-	  }
-	  return function (/* ...args */) {
-	    return fn.apply(that, arguments);
-	  };
-	};
-
-	var _isObject = function (it) {
-	  return typeof it === 'object' ? it !== null : typeof it === 'function';
-	};
-
-	var _anObject = function (it) {
-	  if (!_isObject(it)) throw TypeError(it + ' is not an object!');
-	  return it;
-	};
-
-	var _fails = function (exec) {
-	  try {
-	    return !!exec();
-	  } catch (e) {
-	    return true;
-	  }
-	};
-
-	// Thank's IE8 for his funny defineProperty
-	var _descriptors = !_fails(function () {
-	  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-	});
-
-	var document$1 = _global.document;
-	// typeof document.createElement is 'object' in old IE
-	var is = _isObject(document$1) && _isObject(document$1.createElement);
-	var _domCreate = function (it) {
-	  return is ? document$1.createElement(it) : {};
-	};
-
-	var _ie8DomDefine = !_descriptors && !_fails(function () {
-	  return Object.defineProperty(_domCreate('div'), 'a', { get: function () { return 7; } }).a != 7;
-	});
-
-	// 7.1.1 ToPrimitive(input [, PreferredType])
-
-	// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-	// and the second argument - flag - preferred type is a string
-	var _toPrimitive = function (it, S) {
-	  if (!_isObject(it)) return it;
-	  var fn, val;
-	  if (S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
-	  if (typeof (fn = it.valueOf) == 'function' && !_isObject(val = fn.call(it))) return val;
-	  if (!S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
-	  throw TypeError("Can't convert object to primitive value");
-	};
-
-	var dP = Object.defineProperty;
-
-	var f = _descriptors ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-	  _anObject(O);
-	  P = _toPrimitive(P, true);
-	  _anObject(Attributes);
-	  if (_ie8DomDefine) try {
-	    return dP(O, P, Attributes);
-	  } catch (e) { /* empty */ }
-	  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
-	  if ('value' in Attributes) O[P] = Attributes.value;
-	  return O;
-	};
-
-	var _objectDp = {
-		f: f
-	};
-
-	var _propertyDesc = function (bitmap, value) {
-	  return {
-	    enumerable: !(bitmap & 1),
-	    configurable: !(bitmap & 2),
-	    writable: !(bitmap & 4),
-	    value: value
-	  };
-	};
-
-	var _hide = _descriptors ? function (object, key, value) {
-	  return _objectDp.f(object, key, _propertyDesc(1, value));
-	} : function (object, key, value) {
-	  object[key] = value;
-	  return object;
-	};
-
-	var hasOwnProperty = {}.hasOwnProperty;
-	var _has = function (it, key) {
-	  return hasOwnProperty.call(it, key);
-	};
-
-	var PROTOTYPE = 'prototype';
-
-	var $export = function (type, name, source) {
-	  var IS_FORCED = type & $export.F;
-	  var IS_GLOBAL = type & $export.G;
-	  var IS_STATIC = type & $export.S;
-	  var IS_PROTO = type & $export.P;
-	  var IS_BIND = type & $export.B;
-	  var IS_WRAP = type & $export.W;
-	  var exports = IS_GLOBAL ? _core : _core[name] || (_core[name] = {});
-	  var expProto = exports[PROTOTYPE];
-	  var target = IS_GLOBAL ? _global : IS_STATIC ? _global[name] : (_global[name] || {})[PROTOTYPE];
-	  var key, own, out;
-	  if (IS_GLOBAL) source = name;
-	  for (key in source) {
-	    // contains in native
-	    own = !IS_FORCED && target && target[key] !== undefined;
-	    if (own && _has(exports, key)) continue;
-	    // export native or passed
-	    out = own ? target[key] : source[key];
-	    // prevent global pollution for namespaces
-	    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-	    // bind timers to global for call from export context
-	    : IS_BIND && own ? _ctx(out, _global)
-	    // wrap global constructors for prevent change them in library
-	    : IS_WRAP && target[key] == out ? (function (C) {
-	      var F = function (a, b, c) {
-	        if (this instanceof C) {
-	          switch (arguments.length) {
-	            case 0: return new C();
-	            case 1: return new C(a);
-	            case 2: return new C(a, b);
-	          } return new C(a, b, c);
-	        } return C.apply(this, arguments);
-	      };
-	      F[PROTOTYPE] = C[PROTOTYPE];
-	      return F;
-	    // make static versions for prototype methods
-	    })(out) : IS_PROTO && typeof out == 'function' ? _ctx(Function.call, out) : out;
-	    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
-	    if (IS_PROTO) {
-	      (exports.virtual || (exports.virtual = {}))[key] = out;
-	      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
-	      if (type & $export.R && expProto && !expProto[key]) _hide(expProto, key, out);
-	    }
-	  }
-	};
-	// type bitmap
-	$export.F = 1;   // forced
-	$export.G = 2;   // global
-	$export.S = 4;   // static
-	$export.P = 8;   // proto
-	$export.B = 16;  // bind
-	$export.W = 32;  // wrap
-	$export.U = 64;  // safe
-	$export.R = 128; // real proto method for `library`
-	var _export = $export;
-
 	var _redefine = _hide;
 
 	var _iterators = {};
-
-	var toString = {}.toString;
-
-	var _cof = function (it) {
-	  return toString.call(it).slice(8, -1);
-	};
-
-	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-	// eslint-disable-next-line no-prototype-builtins
-	var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-	  return _cof(it) == 'String' ? it.split('') : Object(it);
-	};
-
-	// to indexed object, toObject with fallback for non-array-like ES3 strings
-
-
-	var _toIobject = function (it) {
-	  return _iobject(_defined(it));
-	};
-
-	// 7.1.15 ToLength
-
-	var min = Math.min;
-	var _toLength = function (it) {
-	  return it > 0 ? min(_toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-	};
-
-	var max = Math.max;
-	var min$1 = Math.min;
-	var _toAbsoluteIndex = function (index, length) {
-	  index = _toInteger(index);
-	  return index < 0 ? max(index + length, 0) : min$1(index, length);
-	};
-
-	// false -> Array#indexOf
-	// true  -> Array#includes
-
-
-
-	var _arrayIncludes = function (IS_INCLUDES) {
-	  return function ($this, el, fromIndex) {
-	    var O = _toIobject($this);
-	    var length = _toLength(O.length);
-	    var index = _toAbsoluteIndex(fromIndex, length);
-	    var value;
-	    // Array#includes uses SameValueZero equality algorithm
-	    // eslint-disable-next-line no-self-compare
-	    if (IS_INCLUDES && el != el) while (length > index) {
-	      value = O[index++];
-	      // eslint-disable-next-line no-self-compare
-	      if (value != value) return true;
-	    // Array#indexOf ignores holes, Array#includes - not
-	    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
-	      if (O[index] === el) return IS_INCLUDES || index || 0;
-	    } return !IS_INCLUDES && -1;
-	  };
-	};
-
-	var _shared = createCommonjsModule(function (module) {
-	var SHARED = '__core-js_shared__';
-	var store = _global[SHARED] || (_global[SHARED] = {});
-
-	(module.exports = function (key, value) {
-	  return store[key] || (store[key] = value !== undefined ? value : {});
-	})('versions', []).push({
-	  version: _core.version,
-	  mode: 'pure',
-	  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
-	});
-	});
-
-	var id = 0;
-	var px = Math.random();
-	var _uid = function (key) {
-	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-	};
-
-	var shared = _shared('keys');
-
-	var _sharedKey = function (key) {
-	  return shared[key] || (shared[key] = _uid(key));
-	};
-
-	var arrayIndexOf = _arrayIncludes(false);
-	var IE_PROTO = _sharedKey('IE_PROTO');
-
-	var _objectKeysInternal = function (object, names) {
-	  var O = _toIobject(object);
-	  var i = 0;
-	  var result = [];
-	  var key;
-	  for (key in O) if (key != IE_PROTO) _has(O, key) && result.push(key);
-	  // Don't enum bug & hidden keys
-	  while (names.length > i) if (_has(O, key = names[i++])) {
-	    ~arrayIndexOf(result, key) || result.push(key);
-	  }
-	  return result;
-	};
-
-	// IE 8- don't enum bug keys
-	var _enumBugKeys = (
-	  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
-	).split(',');
-
-	// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-
-
-
-	var _objectKeys = Object.keys || function keys(O) {
-	  return _objectKeysInternal(O, _enumBugKeys);
-	};
 
 	var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
 	  _anObject(O);
@@ -1193,12 +1228,6 @@
 	var _iterCreate = function (Constructor, NAME, next) {
 	  Constructor.prototype = _objectCreate(IteratorPrototype, { next: _propertyDesc(1, next) });
 	  _setToStringTag(Constructor, NAME + ' Iterator');
-	};
-
-	// 7.1.13 ToObject(argument)
-
-	var _toObject = function (it) {
-	  return Object(_defined(it));
 	};
 
 	// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
@@ -2147,6 +2176,7 @@
 	  'zh-CN': {
 	    init: "初始化一个评论",
 	    counts: "条评论",
+	    login: "登录",
 	    logout: "注销",
 	    leave: "发表评论",
 	    styling: "支持使用Markdown进行样式设置",
@@ -2161,6 +2191,7 @@
 	  en: {
 	    init: "Initialize A Issue",
 	    counts: "comments",
+	    login: "Login",
 	    logout: "Logout",
 	    leave: "Leave a comment",
 	    styling: "Styling with Markdown is supported",
@@ -2192,39 +2223,18 @@
 
 	var _JSON$stringify = unwrapExports(stringify$1);
 
-	// most Object methods by ES6 should accept primitives
-
-
-
-	var _objectSap = function (KEY, exec) {
-	  var fn = (_core.Object || {})[KEY] || Object[KEY];
-	  var exp = {};
-	  exp[KEY] = exec(fn);
-	  _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+	// 查询url参数
+	var getURLParameters = function getURLParameters() {
+	  var url = window.location.href;
+	  return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function (a, v) {
+	    return a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1), a;
+	  }, {});
 	};
-
-	// 19.1.2.14 Object.keys(O)
-
-
-
-	_objectSap('keys', function () {
-	  return function keys(it) {
-	    return _objectKeys(_toObject(it));
-	  };
-	});
-
-	var keys = _core.Object.keys;
-
-	var keys$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": keys, __esModule: true };
-	});
-
-	var _Object$keys = unwrapExports(keys$1);
 
 	// 从参数生成url
 	var queryStringify = function queryStringify(query) {
 	  var queryString = _Object$keys(query).map(function (key) {
-	    return key + '=' + encodeURIComponent(query[key] || '');
+	    return key + "=" + encodeURIComponent(query[key] || '');
 	  }).join('&');
 	  return queryString;
 	};
@@ -2236,7 +2246,7 @@
 
 	// 获取storage
 	var getStorage = function getStorage(key) {
-	  JSON.parse(localStorage.getItem(key));
+	  return JSON.parse(localStorage.getItem(key));
 	};
 
 	// 删除storage
@@ -2255,6 +2265,18 @@
 	  el && el.parentNode && el.parentNode.removeChild(el);
 	};
 
+	// 创建loading
+	var loading = function loading(selector) {
+	  var el = document.querySelector(selector);
+	  var loadingEl = document.createElement('div');
+	  loadingEl.classList.add('gt-loading');
+	  loadingEl.innerHTML = "\n    <div class=\"lds-ellipsis\">\n      <div></div>\n      <div></div>\n      <div></div>\n      <div></div>\n    </div>\n  ";
+	  el.appendChild(loadingEl);
+	  return function () {
+	    return el.removeChild(loadingEl);
+	  };
+	};
+
 	// 请求
 	var request = function request(method, url, body) {
 	  method = method.toUpperCase();
@@ -2266,7 +2288,7 @@
 
 	  var token = getStorage('gitting-token');
 	  if (token) {
-	    headers.Authorization = 'token ' + token;
+	    headers.Authorization = "token " + token;
 	  }
 
 	  return fetch(url, {
@@ -2293,30 +2315,35 @@
 	}
 
 	// 通过标签获取issue
-	function getIssueByLabel(name, repos, labels) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues?labels=' + labels);
+	function getIssueByLabel(name, repos, query$$1) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues?' + query$$1);
 	}
 
 	// 通过id获取issues
-	function getIssueById(name, repos, id) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id);
+	function getIssueById(name, repos, id, query$$1) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '?' + query$$1);
 	}
 
 	// 获取某条issues下的评论
-	function getComments(name, repos, id) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments');
+	function getComments(name, repos, id, query$$1) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments?' + query$$1);
 	}
+
+	var version = "1.0.0";
 
 	var Gitting = function () {
 	  function Gitting(option) {
 	    _classCallCheck(this, Gitting);
 
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
-	    this.isLogin = !!getStorage('gitting-token');
 	    this.issue = {};
 	    this.comments = [];
+	    this.token = getStorage('gitting-token');
+	    this.userInfo = getStorage('gitting-userInfo');
+	    this.isLogin = !!this.token && !!this.userInfo;
 	    this.i = i18n$1(this.option.language);
 	    this.creatInit = this.creatInit.bind(this);
+	    this.logout = this.logout.bind(this);
 	  }
 
 	  // 默认配置
@@ -2329,50 +2356,78 @@
 	    // 挂载
 	    value: function () {
 	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(el) {
-	        var labels;
+	        var loadend, _utils$getURLParamete, code, query$$1, labels, labelsQuery;
+
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                this.container = el instanceof Element ? el : query(el);
+	                loadend = loading(el);
 
-	                // 获取 issue
+	                // 检查是否需要登录
 
-	                if (!(this.option.number > 0)) {
-	                  _context.next = 8;
+	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
+
+	                if (!code) {
+	                  _context.next = 6;
 	                  break;
 	                }
 
-	                _context.next = 4;
-	                return getIssueById(this.option.owner, this.option.repo, this.option.number);
+	                _context.next = 6;
+	                return this.getUserInfo(code);
 
-	              case 4:
+	              case 6:
+
+	                // 获取 issue
+	                query$$1 = {
+	                  client_id: this.option.clientID,
+	                  client_secret: this.option.clientSecret,
+	                  t: new Date().getTime()
+	                };
+
+	                if (!(this.option.number > 0)) {
+	                  _context.next = 14;
+	                  break;
+	                }
+
+	                _context.next = 10;
+	                return getIssueById(this.option.owner, this.option.repo, this.option.number, queryStringify(query$$1));
+
+	              case 10:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , please check the configuration!");
-	                _context.next = 13;
+	                _context.next = 20;
 	                break;
 
-	              case 8:
-	                labels = this.option.labels.join(',');
-	                _context.next = 11;
-	                return getIssueByLabel(this.option.owner, this.option.repo, labels)[0];
+	              case 14:
+	                labels = (this.option.labels.push(location.href), this.option.labels.join(','));
+	                labelsQuery = _Object$assign({}, query$$1, { labels: labels });
+	                _context.next = 18;
+	                return getIssueByLabel(this.option.owner, this.option.repo, queryStringify(labelsQuery));
 
-	              case 11:
-	                this.issue = _context.sent;
+	              case 18:
+	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 
-	              case 13:
-	                _context.next = 15;
-	                return getComments(this.option.owner, this.option.repo, this.issue.number);
+	              case 20:
+	                _context.next = 22;
+	                return getComments(this.option.owner, this.option.repo, this.issue.number, queryStringify(query$$1));
 
-	              case 15:
+	              case 22:
 	                this.comments = _context.sent;
+
+
+	                loadend();
+
+	                // 创建结构
+	                this.creatGitting();
 
 	                console.log(this);
 
-	              case 17:
+	              case 26:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2392,37 +2447,54 @@
 	  }, {
 	    key: "getUserInfo",
 	    value: function () {
-	      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(code, callback) {
-	        var query$$1, data, userInfo;
+	      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(code) {
+	        var parameters, newUrl, query$$1, data, userInfo;
 	        return regenerator.wrap(function _callee2$(_context2) {
 	          while (1) {
 	            switch (_context2.prev = _context2.next) {
 	              case 0:
+
+	                // 移除code参数
+	                parameters = getURLParameters();
+
+	                delete parameters.code;
+	                newUrl = location.href.split('?')[0] + (_Object$keys(parameters) > 0 ? '?' : '') + queryStringify(parameters);
+
+	                history.replaceState(null, '', newUrl);
+
 	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
 	                  code: code,
 	                  redirect_uri: location.href
+
+	                  // 获取token
 	                };
-	                _context2.next = 3;
+	                _context2.next = 7;
 	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
 
-	              case 3:
+	              case 7:
 	                data = _context2.sent;
 
 	                this.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
-	                setStorage('gitting-token', data.access_token);
-	                _context2.next = 8;
+
+	                // 获取用户信息
+	                _context2.next = 11;
 	                return getUserInfo(data.access_token);
 
-	              case 8:
+	              case 11:
 	                userInfo = _context2.sent;
 
 	                this.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
-	                setStorage('gitting-userInfo', userInfo);
-	                callback && callback();
 
-	              case 12:
+	                // 保存登录信息
+	                this.isLogin = true;
+	                setStorage('gitting-token', data.access_token);
+	                setStorage('gitting-userInfo', userInfo);
+
+	                return _context2.abrupt("return", userInfo);
+
+	              case 17:
 	              case "end":
 	                return _context2.stop();
 	            }
@@ -2430,7 +2502,7 @@
 	        }, _callee2, this);
 	      }));
 
-	      function getUserInfo$$1(_x2, _x3) {
+	      function getUserInfo$$1(_x2) {
 	        return _ref2.apply(this, arguments);
 	      }
 
@@ -2466,8 +2538,7 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
-	      var avatar = 'https://avatars0.githubusercontent.com/u/5907357?s=88&v=4';
-	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n          <a href=\"#\" class=\"gt-counts fl\"><span>900</span> " + this.i('counts') + "</a>\n          <div class=\"gt-mate fr clearfix\">\n              <a href=\"#\" class=\"fl\">" + this.i('logout') + "</a>\n              <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting 1.0.0</a>\n          </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor gt-mode-load\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i('leave') + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i('styling') + "</a>\n                <span class=\"fr\">123 / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i('write') + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i('preview') + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i('submit') + "</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i('published') + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i('reply') + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i('loadMore') + "</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">" + this.i('loadEnd') + "</div>\n      </div>\n    ");
+	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n        <a href=\"#\" class=\"gt-counts fl\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i('counts') + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"logout fl\">" + this.i('logout') + "</a>" : "<a href=\"#\" class=\"login fl\">" + this.i('login') + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i('leave') + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i('styling') + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i('write') + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i('preview') + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i('submit') + "</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + this.option.avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i('published') + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i('reply') + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i('loadMore') + "</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">" + this.i('loadEnd') + "</div>\n      </div>\n    ");
 	    }
 
 	    // 错误处理
@@ -2492,12 +2563,13 @@
 	        admin: [],
 	        id: location.href,
 	        number: -1,
-	        labels: ['Gitting', location.href],
+	        labels: ['Gitting'],
 	        title: document.title,
 	        body: '',
 	        language: 'zh-CN',
 	        perPage: 10,
 	        maxlength: 500,
+	        avatar: "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
 	        proxy: 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token'
 	      };
 	    }

@@ -11,18 +11,18 @@ export function getUserInfo(token) {
 }
 
 // 通过标签获取issue
-export function getIssueByLabel(name, repos, labels) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues?labels=${labels}`);
+export function getIssueByLabel(name, repos, query) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues?${query}`);
 }
 
 // 通过id获取issues
-export function getIssueById(name, repos, id) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}`);
+export function getIssueById(name, repos, id, query) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}?${query}`);
 }
 
 // 获取某条issues下的评论
-export function getComments(name, repos, id) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}/comments`);
+export function getComments(name, repos, id, query) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}/comments?${query}`);
 }
 
 // 创建一条issues
