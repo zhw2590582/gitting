@@ -103,18 +103,18 @@ class Gitting {
     // 获取token
     const data = await api.getToken(`${this.option.proxy}?${utils.queryStringify(query)}`);
     this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
+    utils.setStorage("gitting-token", data.access_token);
+    this.token = data.access_token;
 
     // 获取用户信息
     const userInfo = await api.getUserInfo(data.access_token);
     this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
-
-    // 保存登录信息
-    this.isLogin = true;
-    utils.setStorage("gitting-token", data.access_token);
-    this.token = data.access_token;
     utils.setStorage("gitting-userInfo", userInfo);
     this.userInfo = userInfo;
 
+    // 修改登录状态
+    this.isLogin = true;
+    
     return userInfo;
   }
 

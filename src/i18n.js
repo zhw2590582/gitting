@@ -1,5 +1,5 @@
 const i18n = {
-  'zh-CN': {
+  'zh-cn': {
     init: "初始化一个评论",
     counts: "条评论",
     login: "登录",

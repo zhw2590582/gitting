@@ -2175,7 +2175,7 @@
 	var _createClass = unwrapExports(createClass);
 
 	var i18n = {
-	  'zh-CN': {
+	  'zh-cn': {
 	    init: "初始化一个评论",
 	    counts: "条评论",
 	    login: "登录",
@@ -2495,22 +2495,22 @@
 	                data = _context2.sent;
 
 	                this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
+	                setStorage("gitting-token", data.access_token);
+	                this.token = data.access_token;
 
 	                // 获取用户信息
-	                _context2.next = 11;
+	                _context2.next = 13;
 	                return getUserInfo(data.access_token);
 
-	              case 11:
+	              case 13:
 	                userInfo = _context2.sent;
 
 	                this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
-
-	                // 保存登录信息
-	                this.isLogin = true;
-	                setStorage("gitting-token", data.access_token);
-	                this.token = data.access_token;
 	                setStorage("gitting-userInfo", userInfo);
 	                this.userInfo = userInfo;
+
+	                // 修改登录状态
+	                this.isLogin = true;
 
 	                return _context2.abrupt("return", userInfo);
 
