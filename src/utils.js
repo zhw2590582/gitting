@@ -58,13 +58,17 @@ export const loading = selector => {
 }
 
 // 请求
-export const request = (method, url, body) => {
+export const request = (method, url, body, header) => {
   method = method.toUpperCase();
   body = body && JSON.stringify(body);
   let headers = {
     "Content-Type": "application/json",
-    Accept: "application/vnd.github.v3.full+json"
+    "Accept": "application/json",
   };
+
+  if (header) {
+    headers = Object.assign({}, headers, header);
+  }
 
   const token = getStorage('gitting-token')
   if (token) {

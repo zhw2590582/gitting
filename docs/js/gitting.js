@@ -2283,13 +2283,17 @@
 	};
 
 	// 请求
-	var request = function request(method, url, body) {
+	var request = function request(method, url, body, header) {
 	  method = method.toUpperCase();
 	  body = body && _JSON$stringify(body);
 	  var headers = {
 	    "Content-Type": "application/json",
-	    Accept: "application/vnd.github.v3.full+json"
+	    "Accept": "application/json"
 	  };
+
+	  if (header) {
+	    headers = _Object$assign({}, headers, header);
+	  }
 
 	  var token = getStorage('gitting-token');
 	  if (token) {
@@ -2331,7 +2335,9 @@
 
 	// 获取某条issues下的评论
 	function getComments(name, repos, id, query$$1) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments?' + query$$1);
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments?' + query$$1, null, {
+	        Accept: "application/vnd.github.v3.full+json"
+	    });
 	}
 
 	var version = "1.0.0";

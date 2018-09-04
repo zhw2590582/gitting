@@ -22,7 +22,9 @@ export function getIssueById(name, repos, id, query) {
 
 // 获取某条issues下的评论
 export function getComments(name, repos, id, query) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}/comments?${query}`);
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}/comments?${query}`, null, {
+        Accept: "application/vnd.github.v3.full+json"
+    });
 }
 
 // 创建一条issues
