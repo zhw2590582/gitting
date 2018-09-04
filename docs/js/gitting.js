@@ -4,6 +4,8 @@
 	(global.gitting = factory());
 }(this, (function () { 'use strict';
 
+	var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
 	function unwrapExports (x) {
 		return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 	}
@@ -2286,7 +2288,7 @@
 	  body = body && _JSON$stringify(body);
 	  var headers = {
 	    "Content-Type": "application/json",
-	    Accept: "application/json"
+	    Accept: "application/vnd.github.v3.full+json"
 	  };
 
 	  var token = getStorage('gitting-token');
@@ -2334,6 +2336,20 @@
 
 	var version = "1.0.0";
 
+	var dayjs_min = createCommonjsModule(function (module, exports) {
+	!function(t,e){module.exports=e();}(commonjsGlobal,function(){var t="millisecond",e="second",n="minute",r="hour",s="day",i="week",a="month",u="year",c=/^(\d{4})-?(\d{1,2})-?(\d{0,2})(.*?(\d{1,2}):(\d{1,2}):(\d{1,2}))?.?(\d{1,3})?$/,o=/\[.*?\]|Y{2,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g,h={name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_")},d=function(t,e,n){var r=String(t);return !r||r.length>=e?t:""+Array(e+1-r.length).join(n)+t},$={padStart:d,padZoneStr:function(t){var e=Math.abs(t),n=Math.floor(e/60),r=e%60;return (t<=0?"+":"-")+d(n,2,"0")+":"+d(r,2,"0")},monthDiff:function(t,e){var n=12*(e.year()-t.year())+(e.month()-t.month()),r=t.clone().add(n,"months"),s=e-r<0,i=t.clone().add(n+(s?-1:1),"months");return Number(-(n+(e-r)/(s?r-i:i-r)))},absFloor:function(t){return t<0?Math.ceil(t)||0:Math.floor(t)},prettyUnit:function(c){return {M:a,y:u,w:i,d:s,h:r,m:n,s:e,ms:t}[c]||String(c||"").toLowerCase().replace(/s$/,"")},isUndefined:function(t){return void 0===t}},f="en",l={};l[f]=h;var m=function(t){return t instanceof D},y=function(t,e,n){var r;if(!t)return null;if("string"==typeof t)l[t]&&(r=t),e&&(l[t]=e,r=t);else{var s=t.name;l[s]=t,r=s;}return n||(f=r),r},M=function(t,e){if(m(t))return t.clone();var n=e||{};return n.date=t,new D(n)},S=function(t,e){return M(t,{locale:e.$L})},p=$;p.parseLocale=y,p.isDayjs=m,p.wrapper=S;var D=function(){function h(t){this.parse(t);}var d=h.prototype;return d.parse=function(t){var e,n;this.$d=null===(e=t.date)?new Date(NaN):p.isUndefined(e)?new Date:e instanceof Date?e:"string"==typeof e&&/.*[^Z]$/i.test(e)&&(n=e.match(c))?new Date(n[1],n[2]-1,n[3]||1,n[5]||0,n[6]||0,n[7]||0,n[8]||0):new Date(e),this.init(t);},d.init=function(t){this.$y=this.$d.getFullYear(),this.$M=this.$d.getMonth(),this.$D=this.$d.getDate(),this.$W=this.$d.getDay(),this.$H=this.$d.getHours(),this.$m=this.$d.getMinutes(),this.$s=this.$d.getSeconds(),this.$ms=this.$d.getMilliseconds(),this.$L=this.$L||y(t.locale,null,!0)||f;},d.$utils=function(){return p},d.isValid=function(){return !("Invalid Date"===this.$d.toString())},d.$compare=function(t){return this.valueOf()-M(t).valueOf()},d.isSame=function(t){return 0===this.$compare(t)},d.isBefore=function(t){return this.$compare(t)<0},d.isAfter=function(t){return this.$compare(t)>0},d.year=function(){return this.$y},d.month=function(){return this.$M},d.day=function(){return this.$W},d.date=function(){return this.$D},d.hour=function(){return this.$H},d.minute=function(){return this.$m},d.second=function(){return this.$s},d.millisecond=function(){return this.$ms},d.unix=function(){return Math.floor(this.valueOf()/1e3)},d.valueOf=function(){return this.$d.getTime()},d.startOf=function(t,c){var o=this,h=!!p.isUndefined(c)||c,d=function(t,e){var n=S(new Date(o.$y,e,t),o);return h?n:n.endOf(s)},$=function(t,e){return S(o.toDate()[t].apply(o.toDate(),h?[0,0,0,0].slice(e):[23,59,59,999].slice(e)),o)};switch(p.prettyUnit(t)){case u:return h?d(1,0):d(31,11);case a:return h?d(1,this.$M):d(0,this.$M+1);case i:return d(h?this.$D-this.$W:this.$D+(6-this.$W),this.$M);case s:case"date":return $("setHours",0);case r:return $("setMinutes",1);case n:return $("setSeconds",2);case e:return $("setMilliseconds",3);default:return this.clone()}},d.endOf=function(t){return this.startOf(t,!1)},d.$set=function(i,c){switch(p.prettyUnit(i)){case s:this.$d.setDate(this.$D+(c-this.$W));break;case"date":this.$d.setDate(c);break;case a:this.$d.setMonth(c);break;case u:this.$d.setFullYear(c);break;case r:this.$d.setHours(c);break;case n:this.$d.setMinutes(c);break;case e:this.$d.setSeconds(c);break;case t:this.$d.setMilliseconds(c);}return this.init(),this},d.set=function(t,e){return this.clone().$set(t,e)},d.add=function(t,c){var o=this;t=Number(t);var h,d=p.prettyUnit(c),$=function(e,n){var r=o.set("date",1).set(e,n+t);return r.set("date",Math.min(o.$D,r.daysInMonth()))};if(d===a)return $(a,this.$M);if(d===u)return $(u,this.$y);switch(d){case n:h=6e4;break;case r:h=36e5;break;case s:h=864e5;break;case i:h=6048e5;break;case e:h=1e3;break;default:h=1;}var f=this.valueOf()+t*h;return S(f,this)},d.subtract=function(t,e){return this.add(-1*t,e)},d.format=function(t){var e=this,n=t||"YYYY-MM-DDTHH:mm:ssZ",r=p.padZoneStr(this.$d.getTimezoneOffset()),s=this.$locale(),i=s.weekdays,a=s.months,u=function(t,e,n,r){return t&&t[e]||n[e].substr(0,r)};return n.replace(o,function(t){if(t.indexOf("[")>-1)return t.replace(/\[|\]/g,"");switch(t){case"YY":return String(e.$y).slice(-2);case"YYYY":return String(e.$y);case"M":return String(e.$M+1);case"MM":return p.padStart(e.$M+1,2,"0");case"MMM":return u(s.monthsShort,e.$M,a,3);case"MMMM":return a[e.$M];case"D":return String(e.$D);case"DD":return p.padStart(e.$D,2,"0");case"d":return String(e.$W);case"dd":return u(s.weekdaysMin,e.$W,i,2);case"ddd":return u(s.weekdaysShort,e.$W,i,3);case"dddd":return i[e.$W];case"H":return String(e.$H);case"HH":return p.padStart(e.$H,2,"0");case"h":case"hh":return 0===e.$H?12:p.padStart(e.$H<13?e.$H:e.$H-12,"hh"===t?2:1,"0");case"a":return e.$H<12?"am":"pm";case"A":return e.$H<12?"AM":"PM";case"m":return String(e.$m);case"mm":return p.padStart(e.$m,2,"0");case"s":return String(e.$s);case"ss":return p.padStart(e.$s,2,"0");case"SSS":return p.padStart(e.$ms,3,"0");case"Z":return r;default:return r.replace(":","")}})},d.diff=function(t,c,o){var h=p.prettyUnit(c),d=M(t),$=this-d,f=p.monthDiff(this,d);switch(h){case u:f/=12;break;case a:break;case"quarter":f/=3;break;case i:f=$/6048e5;break;case s:f=$/864e5;break;case r:f=$/36e5;break;case n:f=$/6e4;break;case e:f=$/1e3;break;default:f=$;}return o?f:p.absFloor(f)},d.daysInMonth=function(){return this.endOf(a).$D},d.$locale=function(){return l[this.$L]},d.locale=function(t,e){var n=this.clone();return n.$L=y(t,e,!0),n},d.clone=function(){return S(this.toDate(),this)},d.toDate=function(){return new Date(this.$d)},d.toArray=function(){return [this.$y,this.$M,this.$D,this.$H,this.$m,this.$s,this.$ms]},d.toJSON=function(){return this.toISOString()},d.toISOString=function(){return this.toDate().toISOString()},d.toObject=function(){return {years:this.$y,months:this.$M,date:this.$D,hours:this.$H,minutes:this.$m,seconds:this.$s,milliseconds:this.$ms}},d.toString=function(){return this.$d.toUTCString()},h}();return M.extend=function(t,e){return t(e,D,M),M},M.locale=y,M.isDayjs=m,M.en=l[f],M});
+	});
+
+	var relativeTime = createCommonjsModule(function (module, exports) {
+	!function(e,r){module.exports=r();}(commonjsGlobal,function(){return function(e,r,t){var n=r.prototype;t.en.relativeTime={future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"};var o=function(e,r,n,o){for(var d,i,a=n.$locale().relativeTime,u=[{l:"s",r:44,d:"second"},{l:"m",r:89},{l:"mm",r:44,d:"minute"},{l:"h",r:89},{l:"hh",r:21,d:"hour"},{l:"d",r:35},{l:"dd",r:25,d:"day"},{l:"M",r:45},{l:"MM",r:10,d:"month"},{l:"y",r:17},{l:"yy",d:"year"}],f=u.length,s=0;s<f;s+=1){var l=u[s];l.d&&(d=o?t(e).diff(n,l.d,!0):n.diff(e,l.d,!0));var m=Math.ceil(Math.abs(d));if(m<=l.r||!l.r){i=a[l.l].replace("%d",m);break}}return r?i:(d>0?a.future:a.past).replace("%s",i)};n.to=function(e,r){return o(e,r,this,!0)},n.from=function(e,r){return o(e,r,this)},n.toNow=function(e){return this.to(t(),e)},n.fromNow=function(e){return this.from(t(),e)};}});
+	});
+
+	var zhCn = createCommonjsModule(function (module, exports) {
+	!function(_,e){module.exports=e(dayjs_min);}(commonjsGlobal,function(_){_=_&&_.hasOwnProperty("default")?_.default:_;var e={name:"zh-cn",weekdays:"星期日_星期一_星期二_星期三_星期四_星期五_星期六".split("_"),weekdaysShort:"周日_周一_周二_周三_周四_周五_周六".split("_"),weekdaysMin:"日_一_二_三_四_五_六".split("_"),months:"一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split("_"),monthsShort:"1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月".split("_"),ordinal:function(_){return _+"日"},relativeTime:{future:"%s内",past:"%s前",s:"几秒",m:"1 分钟",mm:"%d 分钟",h:"1 小时",hh:"%d 小时",d:"1 天",dd:"%d 天",M:"1 个月",MM:"%d 个月",y:"1 年",yy:"%d 年"}};return _.locale(e,null,!0),e});
+	});
+
+	dayjs_min.extend(relativeTime);
+
 	var Gitting = function () {
 	  function Gitting(option) {
 	    _classCallCheck(this, Gitting);
@@ -2341,11 +2357,11 @@
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
 	    this.page = 1;
 	    this.issue = {};
-	    this.comments = [];
 	    this.token = getStorage("gitting-token");
 	    this.userInfo = getStorage("gitting-userInfo");
 	    this.isLogin = !!this.token && !!this.userInfo;
 	    this.i = i18n$1(this.option.language);
+	    dayjs_min.locale(this.option.language);
 	    this.creatInit = this.creatInit.bind(this);
 	    this.logout = this.logout.bind(this);
 	  }
@@ -2375,17 +2391,15 @@
 
 	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
 
-	                console.log(code);
-
 	                if (!code) {
-	                  _context.next = 7;
+	                  _context.next = 6;
 	                  break;
 	                }
 
-	                _context.next = 7;
+	                _context.next = 6;
 	                return this.getUserInfo(code);
 
-	              case 7:
+	              case 6:
 	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
@@ -2395,48 +2409,43 @@
 	                // 获取 issue
 
 	                if (!(this.option.number > 0)) {
-	                  _context.next = 15;
+	                  _context.next = 14;
 	                  break;
 	                }
 
-	                _context.next = 11;
+	                _context.next = 10;
 	                return getIssueById(this.option.owner, this.option.repo, this.option.number, queryStringify(query$$1));
 
-	              case 11:
+	              case 10:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , please check the configuration!");
-	                _context.next = 21;
+	                _context.next = 20;
 	                break;
 
-	              case 15:
+	              case 14:
 	                labels = (this.option.labels.push(location.href), this.option.labels.join(","));
 	                labelsQuery = _Object$assign({}, query$$1, { labels: labels });
-	                _context.next = 19;
+	                _context.next = 18;
 	                return getIssueByLabel(this.option.owner, this.option.repo, queryStringify(labelsQuery));
 
-	              case 19:
+	              case 18:
 	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 
-	              case 21:
-	                _context.next = 23;
-	                return getComments(this.option.owner, this.option.repo, this.issue.number, queryStringify(query$$1));
-
-	              case 23:
-	                this.comments = _context.sent;
-
+	              case 20:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
 	                this.creatGitting();
+	                this.creatComment();
 
 	                console.log(this);
 
-	              case 27:
+	              case 24:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2527,7 +2536,6 @@
 	    value: function logout() {
 	      this.page = 1;
 	      this.issue = {};
-	      this.comments = [];
 	      this.isLogin = false;
 	      delStorage("gitting-token");
 	      delStorage("gitting-userInfo");
@@ -2561,7 +2569,7 @@
 	      };
 
 	      this.$container.innerHTML = "";
-	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
 
 	      this.$logout = query(this.$container, '.gt-logout');
 	      this.$markdown = query(this.$container, '.gt-markdown');
@@ -2575,9 +2583,50 @@
 	    }
 	  }, {
 	    key: "creatComment",
-	    value: function creatComment() {
-	      var commentHtml = "\n      <div class=\"comments-item\">\n        <div class=\"gt-avatar\">\n          <img src=\"\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-comment-content caret\">\n          <div class=\"gt-comment-body markdown-body\">\n            markdown-body\n          </div>\n          <div class=\"gt-comment-mate clearfix\">\n            <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n            <span class=\"gt-comment-time fl\">" + this.i("published") + " 3 \u5929\u524D</span>\n            <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i("reply") + "</a>\n          </div>\n        </div>\n      </div>\n    ";
-	    }
+	    value: function () {
+	      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3() {
+	        var _this = this;
+
+	        var query$$1, comments, commentHtml;
+	        return regenerator.wrap(function _callee3$(_context3) {
+	          while (1) {
+	            switch (_context3.prev = _context3.next) {
+	              case 0:
+	                query$$1 = {
+	                  client_id: this.option.clientID,
+	                  client_secret: this.option.clientSecret,
+	                  per_page: this.option.perPage,
+	                  page: this.page
+	                };
+	                _context3.next = 3;
+	                return getComments(this.option.owner, this.option.repo, this.issue.number, queryStringify(query$$1));
+
+	              case 3:
+	                comments = _context3.sent;
+
+	                console.log(comments);
+	                this.page += 1;
+	                commentHtml = comments.map(function (item) {
+	                  return "\n      <div class=\"comments-item\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + item.user.avatar_url + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-comment-content caret\">\n          <div class=\"gt-comment-body markdown-body\">\n            " + item.body_html + "\n          </div>\n          <div class=\"gt-comment-mate clearfix\">\n            <a class=\"gt-comment-name fl\" href=\"" + item.user.html_url + "\" target=\"_blank\">" + item.user.login + "</a>\n            <span class=\"gt-comment-time fl\" data-time=\"" + item.created_at + "\">" + _this.i("published") + " " + dayjs_min(item.created_at).fromNow() + "</span>\n            <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + _this.i("reply") + "</a>\n          </div>\n        </div>\n      </div>\n    ";
+	                }).join('');
+
+
+	                this.$comments.insertAdjacentHTML("beforeend", commentHtml);
+
+	              case 8:
+	              case "end":
+	                return _context3.stop();
+	            }
+	          }
+	        }, _callee3, this);
+	      }));
+
+	      function creatComment() {
+	        return _ref3.apply(this, arguments);
+	      }
+
+	      return creatComment;
+	    }()
 
 	    // 错误处理
 
@@ -2604,7 +2653,7 @@
 	        labels: ["Gitting"],
 	        title: document.title,
 	        body: "",
-	        language: "zh-CN",
+	        language: "zh-cn",
 	        perPage: 10,
 	        maxlength: 500,
 	        avatar: "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",

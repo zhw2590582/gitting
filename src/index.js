@@ -4,17 +4,21 @@ import i18n from "./i18n";
 import * as api from "./api";
 import * as utils from "./utils";
 import { version } from "../package.json";
+import dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn';
+dayjs.extend(relativeTime);
 
 class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
     this.page = 1;
     this.issue = {};
-    this.comments = [];
     this.token = utils.getStorage("gitting-token");
     this.userInfo = utils.getStorage("gitting-userInfo");
     this.isLogin = !!this.token && !!this.userInfo;
     this.i = i18n(this.option.language);
+    dayjs.locale(this.option.language);
     this.creatInit = this.creatInit.bind(this);
     this.logout = this.logout.bind(this);
   }
@@ -32,7 +36,7 @@ class Gitting {
       labels: ["Gitting"],
       title: document.title,
       body: "",
-      language: "zh-CN",
+      language: "zh-cn",
       perPage: 10,
       maxlength: 500,
       avatar: "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
@@ -49,7 +53,6 @@ class Gitting {
 
     // 检查是否需要登录
     const { code } = utils.getURLParameters();
-    console.log(code);
     if (code) {
       await this.getUserInfo(code);
     }
@@ -72,14 +75,12 @@ class Gitting {
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
     }
 
-    // 获取 comments
-    this.comments = await api.getComments(this.option.owner, this.option.repo, this.issue.number, utils.queryStringify(query));
-
     // 初始化结束
     loadend();
 
     // 创建结构
     this.creatGitting();
+    this.creatComment();
 
     console.log(this);
   }
@@ -121,7 +122,6 @@ class Gitting {
   logout() {
     this.page = 1;
     this.issue = {};
-    this.comments = [];
     this.isLogin = false;
     utils.delStorage("gitting-token");
     utils.delStorage("gitting-userInfo");
@@ -164,7 +164,7 @@ class Gitting {
       `
       <div class="gt-header clearfix">
         <a href="${this.issue.html_url}" class="gt-counts fl" target="_blank">
-          <span class="counts">${this.issue.comments}</span> ${this.i("counts")}
+          ${this.issue.comments} ${this.i("counts")}
         </a>
         <div class="gt-mate fr clearfix">
           ${
@@ -184,7 +184,9 @@ class Gitting {
             <textarea placeholder="${this.i("leave")}" class="gt-textarea" maxlength="${this.option.maxlength}"></textarea>
             <div class="gt-tip clearfix">
                 <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">${this.i("styling")}</a>
-                <span class="fr"><span class="counts">0</span> / ${this.option.maxlength}</span>
+                <div class="fr">
+                  <span class="counts">0</span> / ${this.option.maxlength}
+                </div>
             </div>
             <div class="gt-tool clearfix">
                 <div class="gt-switch fl clearfix">
@@ -214,24 +216,38 @@ class Gitting {
     this.$load = utils.query(this.$container, '.gt-comments-load');
   }
 
-  creatComment() {
-    const commentHtml = `
+  async creatComment() {
+    const query = {
+      client_id: this.option.clientID,
+      client_secret: this.option.clientSecret,
+      per_page: this.option.perPage,
+      page: this.page
+    };
+
+    const comments = await api.getComments(this.option.owner, this.option.repo, this.issue.number, utils.queryStringify(query));
+    console.log(comments)
+    this.page += 1;
+    const commentHtml = comments.map(item => {
+      return `
       <div class="comments-item">
         <div class="gt-avatar">
-          <img src="" alt="avatar">
+          <img src="${item.user.avatar_url}" alt="avatar">
         </div>
         <div class="gt-comment-content caret">
           <div class="gt-comment-body markdown-body">
-            markdown-body
+            ${item.body_html}
           </div>
           <div class="gt-comment-mate clearfix">
-            <a class="gt-comment-name fl" href="#" target="_blank">Harvey Zhao</a>
-            <span class="gt-comment-time fl">${this.i("published")} 3 天前</span>
+            <a class="gt-comment-name fl" href="${item.user.html_url}" target="_blank">${item.user.login}</a>
+            <span class="gt-comment-time fl" data-time="${item.created_at}">${this.i("published")} ${dayjs(item.created_at).fromNow()}</span>
             <a class="gt-comment-reply fr" href="#" target="_blank">${this.i("reply")}</a>
           </div>
         </div>
       </div>
     `
+    }).join('');
+
+    this.$comments.insertAdjacentHTML("beforeend", commentHtml);
   }
 
   // 错误处理

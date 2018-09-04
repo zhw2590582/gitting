@@ -63,7 +63,7 @@ export const request = (method, url, body) => {
   body = body && JSON.stringify(body);
   let headers = {
     "Content-Type": "application/json",
-    Accept: "application/json"
+    Accept: "application/vnd.github.v3.full+json"
   };
 
   const token = getStorage('gitting-token')
