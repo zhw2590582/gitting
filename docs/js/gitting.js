@@ -2338,8 +2338,8 @@
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
 	    this.issue = {};
 	    this.comments = [];
-	    this.token = getStorage('gitting-token');
-	    this.userInfo = getStorage('gitting-userInfo');
+	    this.token = getStorage("gitting-token");
+	    this.userInfo = getStorage("gitting-userInfo");
 	    this.isLogin = !!this.token && !!this.userInfo;
 	    this.i = i18n$1(this.option.language);
 	    this.creatInit = this.creatInit.bind(this);
@@ -2363,6 +2363,8 @@
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                this.container = el instanceof Element ? el : query(el);
+
+	                // 初始化开始
 	                loadend = loading(el);
 
 	                // 检查是否需要登录
@@ -2378,13 +2380,13 @@
 	                return this.getUserInfo(code);
 
 	              case 6:
-
-	                // 获取 issue
 	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
 	                  t: new Date().getTime()
 	                };
+
+	                // 获取 issue
 
 	                if (!(this.option.number > 0)) {
 	                  _context.next = 14;
@@ -2402,7 +2404,7 @@
 	                break;
 
 	              case 14:
-	                labels = (this.option.labels.push(location.href), this.option.labels.join(','));
+	                labels = (this.option.labels.push(location.href), this.option.labels.join(","));
 	                labelsQuery = _Object$assign({}, query$$1, { labels: labels });
 	                _context.next = 18;
 	                return getIssueByLabel(this.option.owner, this.option.repo, queryStringify(labelsQuery));
@@ -2420,6 +2422,7 @@
 	                this.comments = _context.sent;
 
 
+	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
@@ -2453,30 +2456,30 @@
 	          while (1) {
 	            switch (_context2.prev = _context2.next) {
 	              case 0:
-
 	                // 移除code参数
 	                parameters = getURLParameters();
 
 	                delete parameters.code;
-	                newUrl = location.href.split('?')[0] + (_Object$keys(parameters) > 0 ? '?' : '') + queryStringify(parameters);
+	                newUrl = location.href.split("?")[0] + (_Object$keys(parameters) > 0 ? "?" : "") + queryStringify(parameters);
 
-	                history.replaceState(null, '', newUrl);
+	                history.replaceState(null, "", newUrl);
 
 	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
 	                  code: code,
 	                  redirect_uri: location.href
-
-	                  // 获取token
 	                };
+
+	                // 获取token
+
 	                _context2.next = 7;
 	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
 
 	              case 7:
 	                data = _context2.sent;
 
-	                this.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
+	                this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
 
 	                // 获取用户信息
 	                _context2.next = 11;
@@ -2485,12 +2488,12 @@
 	              case 11:
 	                userInfo = _context2.sent;
 
-	                this.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
+	                this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
 
 	                // 保存登录信息
 	                this.isLogin = true;
-	                setStorage('gitting-token', data.access_token);
-	                setStorage('gitting-userInfo', userInfo);
+	                setStorage("gitting-token", data.access_token);
+	                setStorage("gitting-userInfo", userInfo);
 
 	                return _context2.abrupt("return", userInfo);
 
@@ -2515,8 +2518,8 @@
 	    key: "logout",
 	    value: function logout() {
 	      this.isLogin = false;
-	      delStorage('gitting-token');
-	      delStorage('gitting-userInfo');
+	      delStorage("gitting-token");
+	      delStorage("gitting-userInfo");
 	    }
 
 	    // 初始化评论
@@ -2530,7 +2533,7 @@
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n          >\n            " + this.i('init') + "\n          </a>\n      </div>\n    ");
+	      this.container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n          >\n            " + this.i("init") + "\n          </a>\n      </div>\n    ");
 	    }
 
 	    // 读取评论
@@ -2538,7 +2541,7 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
-	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n        <a href=\"#\" class=\"gt-counts fl\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i('counts') + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"logout fl\">" + this.i('logout') + "</a>" : "<a href=\"#\" class=\"login fl\">" + this.i('login') + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i('leave') + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i('styling') + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i('write') + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i('preview') + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i('submit') + "</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + this.option.avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i('published') + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i('reply') + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i('loadMore') + "</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">" + this.i('loadEnd') + "</div>\n      </div>\n    ");
+	      this.container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"#\" class=\"gt-counts fl\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"logout fl\">" + this.i("logout") + "</a>" : "<a href=\"#\" class=\"login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + this.option.avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i("published") + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i("reply") + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
 	    }
 
 	    // 错误处理
@@ -2547,8 +2550,8 @@
 	    key: "errorHandle",
 	    value: function errorHandle(condition, err, callback) {
 	      if (!condition) return;
-	      removeElement('.gt-error');
-	      this.container.insertAdjacentHTML('afterbegin', "<div class=\"gt-error\">" + err + "</div>");
+	      removeElement(".gt-error");
+	      this.container.insertAdjacentHTML("afterbegin", "<div class=\"gt-error\">" + err + "</div>");
 	      callback && callback();
 	      throw new TypeError(err);
 	    }
@@ -2556,21 +2559,21 @@
 	    key: "DEFAULTS",
 	    get: function get() {
 	      return {
-	        clientID: '',
-	        clientSecret: '',
-	        repo: '',
-	        owner: '',
+	        clientID: "",
+	        clientSecret: "",
+	        repo: "",
+	        owner: "",
 	        admin: [],
 	        id: location.href,
 	        number: -1,
-	        labels: ['Gitting'],
+	        labels: ["Gitting"],
 	        title: document.title,
-	        body: '',
-	        language: 'zh-CN',
+	        body: "",
+	        language: "zh-CN",
 	        perPage: 10,
 	        maxlength: 500,
 	        avatar: "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
-	        proxy: 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token'
+	        proxy: "https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token"
 	      };
 	    }
 	  }]);
