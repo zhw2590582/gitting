@@ -30,8 +30,8 @@ export const delStorage = (key) => {
 }
 
 // 选择元素
-export const query = selector => {
-  return document.querySelector(selector);
+export const query = (doc = document, selector) => {
+  return doc.querySelector(selector);
 }
 
 // 删除dom元素

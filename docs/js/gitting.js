@@ -2255,8 +2255,11 @@
 	};
 
 	// 选择元素
-	var query = function query(selector) {
-	  return document.querySelector(selector);
+	var query = function query() {
+	  var doc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
+	  var selector = arguments[1];
+
+	  return doc.querySelector(selector);
 	};
 
 	// 删除dom元素
@@ -2336,6 +2339,7 @@
 	    _classCallCheck(this, Gitting);
 
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
+	    this.page = 1;
 	    this.issue = {};
 	    this.comments = [];
 	    this.token = getStorage("gitting-token");
@@ -2362,7 +2366,7 @@
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
-	                this.container = el instanceof Element ? el : query(el);
+	                this.$container = el instanceof Element ? el : query(document, el);
 
 	                // 初始化开始
 	                loadend = loading(el);
@@ -2371,15 +2375,17 @@
 
 	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
 
+	                console.log(code);
+
 	                if (!code) {
-	                  _context.next = 6;
+	                  _context.next = 7;
 	                  break;
 	                }
 
-	                _context.next = 6;
+	                _context.next = 7;
 	                return this.getUserInfo(code);
 
-	              case 6:
+	              case 7:
 	                query$$1 = {
 	                  client_id: this.option.clientID,
 	                  client_secret: this.option.clientSecret,
@@ -2389,36 +2395,36 @@
 	                // 获取 issue
 
 	                if (!(this.option.number > 0)) {
-	                  _context.next = 14;
+	                  _context.next = 15;
 	                  break;
 	                }
 
-	                _context.next = 10;
+	                _context.next = 11;
 	                return getIssueById(this.option.owner, this.option.repo, this.option.number, queryStringify(query$$1));
 
-	              case 10:
+	              case 11:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , please check the configuration!");
-	                _context.next = 20;
+	                _context.next = 21;
 	                break;
 
-	              case 14:
+	              case 15:
 	                labels = (this.option.labels.push(location.href), this.option.labels.join(","));
 	                labelsQuery = _Object$assign({}, query$$1, { labels: labels });
-	                _context.next = 18;
+	                _context.next = 19;
 	                return getIssueByLabel(this.option.owner, this.option.repo, queryStringify(labelsQuery));
 
-	              case 18:
+	              case 19:
 	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 
-	              case 20:
-	                _context.next = 22;
+	              case 21:
+	                _context.next = 23;
 	                return getComments(this.option.owner, this.option.repo, this.issue.number, queryStringify(query$$1));
 
-	              case 22:
+	              case 23:
 	                this.comments = _context.sent;
 
 
@@ -2430,7 +2436,7 @@
 
 	                console.log(this);
 
-	              case 26:
+	              case 27:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2493,11 +2499,13 @@
 	                // 保存登录信息
 	                this.isLogin = true;
 	                setStorage("gitting-token", data.access_token);
+	                this.token = data.access_token;
 	                setStorage("gitting-userInfo", userInfo);
+	                this.userInfo = userInfo;
 
 	                return _context2.abrupt("return", userInfo);
 
-	              case 17:
+	              case 19:
 	              case "end":
 	                return _context2.stop();
 	            }
@@ -2517,9 +2525,13 @@
 	  }, {
 	    key: "logout",
 	    value: function logout() {
+	      this.page = 1;
+	      this.issue = {};
+	      this.comments = [];
 	      this.isLogin = false;
 	      delStorage("gitting-token");
 	      delStorage("gitting-userInfo");
+	      this.creatInit();
 	    }
 
 	    // 初始化评论
@@ -2533,7 +2545,7 @@
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-	      this.container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n          >\n            " + this.i("init") + "\n          </a>\n      </div>\n    ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n            <a\n              class=\"gt-init-btn\"\n              href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n            >\n              " + this.i("init") + "\n            </a>\n        </div>\n      ");
 	    }
 
 	    // 读取评论
@@ -2541,7 +2553,30 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
-	      this.container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"#\" class=\"gt-counts fl\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"logout fl\">" + this.i("logout") + "</a>" : "<a href=\"#\" class=\"login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + this.option.avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i("published") + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i("reply") + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
+	      var query$$1 = {
+	        state: "Gitting",
+	        client_id: this.option.clientID,
+	        redirect_uri: location.href,
+	        scope: "public_repo"
+	      };
+
+	      this.$container.innerHTML = "";
+	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          <span class=\"counts\">" + this.issue.comments + "</span> " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <span class=\"fr\"><span class=\"counts\">0</span> / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
+
+	      this.$logout = query(this.$container, '.gt-logout');
+	      this.$markdown = query(this.$container, '.gt-markdown');
+	      this.$textarea = query(this.$container, '.gt-textarea');
+	      this.$counts = query(this.$container, '.counts');
+	      this.$write = query(this.$container, '.gt-write');
+	      this.$preview = query(this.$container, '.gt-preview');
+	      this.$send = query(this.$container, '.gt-send');
+	      this.$comments = query(this.$container, '.gt-comments');
+	      this.$load = query(this.$container, '.gt-comments-load');
+	    }
+	  }, {
+	    key: "creatComment",
+	    value: function creatComment() {
+	      var commentHtml = "\n      <div class=\"comments-item\">\n        <div class=\"gt-avatar\">\n          <img src=\"\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-comment-content caret\">\n          <div class=\"gt-comment-body markdown-body\">\n            markdown-body\n          </div>\n          <div class=\"gt-comment-mate clearfix\">\n            <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n            <span class=\"gt-comment-time fl\">" + this.i("published") + " 3 \u5929\u524D</span>\n            <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i("reply") + "</a>\n          </div>\n        </div>\n      </div>\n    ";
 	    }
 
 	    // 错误处理
@@ -2551,7 +2586,7 @@
 	    value: function errorHandle(condition, err, callback) {
 	      if (!condition) return;
 	      removeElement(".gt-error");
-	      this.container.insertAdjacentHTML("afterbegin", "<div class=\"gt-error\">" + err + "</div>");
+	      this.$container.insertAdjacentHTML("afterbegin", "<div class=\"gt-error\">" + err + "</div>");
 	      callback && callback();
 	      throw new TypeError(err);
 	    }
