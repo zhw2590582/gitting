@@ -2159,7 +2159,7 @@
 	    published: "发表于"
 	  },
 	  en: {
-	    init: "Initialize A Comment",
+	    init: "Initialize A Issue",
 	    counts: "comments",
 	    logout: "Logout",
 	    leave: "Leave a comment",
@@ -2177,7 +2177,7 @@
 	function i18n$1 (lang) {
 	  var langObj = i18n[lang] || i18n["zh-CN"];
 	  return function (key) {
-	    return langObj[key];
+	    return langObj[key] || "Unmath key: " + key;
 	  };
 	}
 
@@ -2251,7 +2251,7 @@
 
 	// 删除dom元素
 	var removeElement = function removeElement(selector) {
-	  var el = query(selector);
+	  var el = document.querySelector(selector);
 	  el && el.parentNode && el.parentNode.removeChild(el);
 	};
 
@@ -2292,56 +2292,87 @@
 	    return request('get', 'https://api.github.com/user?access_token=' + token);
 	}
 
+	// 通过标签获取issue
+	function getIssueByLabel(name, repos, labels) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues?labels=' + labels);
+	}
+
+	// 通过id获取issues
+	function getIssueById(name, repos, id) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id);
+	}
+
+	// 获取某条issues下的评论
+	function getComments(name, repos, id) {
+	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments');
+	}
+
 	var Gitting = function () {
 	  function Gitting(option) {
 	    _classCallCheck(this, Gitting);
 
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
-	    this.isLogin = false;
+	    this.isLogin = !!getStorage('gitting-token');
+	    this.issue = {};
+	    this.comments = [];
 	    this.i = i18n$1(this.option.language);
+	    this.creatInit = this.creatInit.bind(this);
 	  }
+
+	  // 默认配置
+
 
 	  _createClass(Gitting, [{
 	    key: "render",
-	    value: function render(el) {
-	      this.container = el instanceof Element ? el : query(el);
-	      this.creatGitting();
-	      // this.getUserInfo(utils.getQueryString('code'))
-	    }
-	  }, {
-	    key: "getUserInfo",
+
+
+	    // 挂载
 	    value: function () {
-	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(code, callback) {
-	        var query$$1, data, userInfo;
+	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(el) {
+	        var labels;
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
-	                query$$1 = {
-	                  client_id: this.option.clientID,
-	                  client_secret: this.option.clientSecret,
-	                  code: code,
-	                  redirect_uri: location.href
-	                };
-	                _context.next = 3;
-	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
+	                this.container = el instanceof Element ? el : query(el);
 
-	              case 3:
-	                data = _context.sent;
+	                // 获取 issue
 
-	                this.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
-	                setStorage('gitting-token', data.access_token);
-	                _context.next = 8;
-	                return getUserInfo(data.access_token);
+	                if (!(this.option.number > 0)) {
+	                  _context.next = 8;
+	                  break;
+	                }
+
+	                _context.next = 4;
+	                return getIssueById(this.option.owner, this.option.repo, this.option.number);
+
+	              case 4:
+	                this.issue = _context.sent;
+
+	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , please check the configuration!");
+	                _context.next = 13;
+	                break;
 
 	              case 8:
-	                userInfo = _context.sent;
+	                labels = this.option.labels.join(',');
+	                _context.next = 11;
+	                return getIssueByLabel(this.option.owner, this.option.repo, labels)[0];
 
-	                this.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
-	                setStorage('gitting-userInfo', userInfo);
-	                callback && callback();
+	              case 11:
+	                this.issue = _context.sent;
 
-	              case 12:
+	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
+
+	              case 13:
+	                _context.next = 15;
+	                return getComments(this.option.owner, this.option.repo, this.issue.number);
+
+	              case 15:
+	                this.comments = _context.sent;
+
+	                console.log(this);
+
+	              case 17:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2349,12 +2380,65 @@
 	        }, _callee, this);
 	      }));
 
-	      function getUserInfo$$1(_x, _x2) {
+	      function render(_x) {
 	        return _ref.apply(this, arguments);
+	      }
+
+	      return render;
+	    }()
+
+	    // 获取并保存用户信息
+
+	  }, {
+	    key: "getUserInfo",
+	    value: function () {
+	      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(code, callback) {
+	        var query$$1, data, userInfo;
+	        return regenerator.wrap(function _callee2$(_context2) {
+	          while (1) {
+	            switch (_context2.prev = _context2.next) {
+	              case 0:
+	                query$$1 = {
+	                  client_id: this.option.clientID,
+	                  client_secret: this.option.clientSecret,
+	                  code: code,
+	                  redirect_uri: location.href
+	                };
+	                _context2.next = 3;
+	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
+
+	              case 3:
+	                data = _context2.sent;
+
+	                this.errorHandle(!data.access_token, 'Can not get token, Please login again!', this.logout);
+	                setStorage('gitting-token', data.access_token);
+	                _context2.next = 8;
+	                return getUserInfo(data.access_token);
+
+	              case 8:
+	                userInfo = _context2.sent;
+
+	                this.errorHandle(!userInfo.id, 'Can not get user info, Please login again!', this.logout);
+	                setStorage('gitting-userInfo', userInfo);
+	                callback && callback();
+
+	              case 12:
+	              case "end":
+	                return _context2.stop();
+	            }
+	          }
+	        }, _callee2, this);
+	      }));
+
+	      function getUserInfo$$1(_x2, _x3) {
+	        return _ref2.apply(this, arguments);
 	      }
 
 	      return getUserInfo$$1;
 	    }()
+
+	    // 登出
+
 	  }, {
 	    key: "logout",
 	    value: function logout() {
@@ -2362,6 +2446,9 @@
 	      delStorage('gitting-token');
 	      delStorage('gitting-userInfo');
 	    }
+
+	    // 初始化评论
+
 	  }, {
 	    key: "creatInit",
 	    value: function creatInit() {
@@ -2373,12 +2460,18 @@
 	      };
 	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-init\">\n          <a\n            class=\"gt-init-btn\"\n            href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n          >\n            " + this.i('init') + "\n          </a>\n      </div>\n    ");
 	    }
+
+	    // 读取评论
+
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
 	      var avatar = 'https://avatars0.githubusercontent.com/u/5907357?s=88&v=4';
 	      this.container.insertAdjacentHTML('beforeend', "\n      <div class=\"gt-header clearfix\">\n          <a href=\"#\" class=\"gt-counts fl\"><span>900</span> " + this.i('counts') + "</a>\n          <div class=\"gt-mate fr clearfix\">\n              <a href=\"#\" class=\"fl\">" + this.i('logout') + "</a>\n              <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting 1.0.0</a>\n          </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor gt-mode-load\">\n            <div class=\"gt-textarea-preview markdown-body\"></div>\n            <textarea placeholder=\"" + this.i('leave') + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i('styling') + "</a>\n                <span class=\"fr\">123 / " + this.option.maxlength + "</span>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i('write') + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i('preview') + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i('submit') + "</button>\n            </div>\n            <div class=\"gt-ajax-load\">\n                <div class=\"lds-ellipsis\">\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                    <div></div>\n                </div>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\">\n        <div class=\"comments-item\">\n          <div class=\"gt-avatar\">\n            <img src=\"" + avatar + "\" alt=\"avatar\">\n          </div>\n          <div class=\"gt-comment-content caret\">\n            <div class=\"gt-comment-body markdown-body\">\n              markdown-body\n            </div>\n            <div class=\"gt-comment-mate clearfix\">\n              <a class=\"gt-comment-name fl\" href=\"#\" target=\"_blank\">Harvey Zhao</a>\n              <span class=\"gt-comment-time fl\">" + this.i('published') + " 3 \u5929\u524D</span>\n              <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + this.i('reply') + "</a>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i('loadMore') + "</a>\n          <div class=\"gt-load-state gt-load-ing\">\n              <div class=\"lds-ellipsis\">\n                  <div></div>\n                  <div></div>\n                  <div></div>\n                  <div></div>\n              </div>\n          </div>\n          <div class=\"gt-load-state gt-load-end\">" + this.i('loadEnd') + "</div>\n      </div>\n    ");
 	    }
+
+	    // 错误处理
+
 	  }, {
 	    key: "errorHandle",
 	    value: function errorHandle(condition, err, callback) {
@@ -2399,7 +2492,7 @@
 	        admin: [],
 	        id: location.href,
 	        number: -1,
-	        labels: ['Gitting'],
+	        labels: ['Gitting', location.href],
 	        title: document.title,
 	        body: '',
 	        language: 'zh-CN',

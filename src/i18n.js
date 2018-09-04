@@ -14,7 +14,7 @@ const i18n = {
     published: "发表于"
   },
   en: {
-    init: "Initialize A Comment",
+    init: "Initialize A Issue",
     counts: "comments",
     logout: "Logout",
     leave: "Leave a comment",
@@ -32,6 +32,6 @@ const i18n = {
 export default function(lang) {
   const langObj = i18n[lang] || i18n["zh-CN"];
   return function(key) {
-    return langObj[key];
+    return langObj[key] || `Unmath key: ${key}`;
   };
 }

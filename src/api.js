@@ -10,19 +10,19 @@ export function getUserInfo(token) {
     return request('get', `https://api.github.com/user?access_token=${token}`);
 }
 
-// 获取所有issue
-export function getAllIssue(name, repos) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/`);
+// 通过标签获取issue
+export function getIssueByLabel(name, repos, labels) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues?labels=${labels}`);
 }
 
-// 获取某条issues
-export function getIssue(name, repos, issue) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${issue}`);
+// 通过id获取issues
+export function getIssueById(name, repos, id) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}`);
 }
 
 // 获取某条issues下的评论
-export function getComments(name, repos, issue, comments) {
-    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${issue}/${comments}`);
+export function getComments(name, repos, id) {
+    return request('get', `https://api.github.com/repos/${name}/${repos}/issues/${id}/comments`);
 }
 
 // 创建一条issues

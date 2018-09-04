@@ -7,10 +7,14 @@ import * as utils from "./utils";
 class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
-    this.isLogin = false;
+    this.isLogin = !!utils.getStorage('gitting-token');
+    this.issue = {};
+    this.comments = [];
     this.i = i18n(this.option.language);
+    this.creatInit = this.creatInit.bind(this);
   }
 
+  // 默认配置
   static get DEFAULTS() {
     return {
       clientID: '',
@@ -20,7 +24,7 @@ class Gitting {
       admin: [],
       id: location.href,
       number: -1,
-      labels: ['Gitting'],
+      labels: ['Gitting', location.href],
       title: document.title,
       body: '',
       language: 'zh-CN',
@@ -30,12 +34,26 @@ class Gitting {
     };
   }
 
-  render(el) {
+  // 挂载
+  async render(el) {
     this.container = el instanceof Element ? el : utils.query(el);
-    this.creatGitting()
-    // this.getUserInfo(utils.getQueryString('code'))
+
+    // 获取 issue
+    if (this.option.number > 0) {
+      this.issue = await api.getIssueById(this.option.owner, this.option.repo, this.option.number);
+      this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , please check the configuration!`);
+    } else {
+      const labels = this.option.labels.join(',');
+      this.issue = await api.getIssueByLabel(this.option.owner, this.option.repo, labels)[0];
+      this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
+    }
+
+    // 获取 comments
+    this.comments = await api.getComments(this.option.owner, this.option.repo, this.issue.number);
+    console.log(this);
   }
 
+  // 获取并保存用户信息
   async getUserInfo(code, callback) {
     const query = {
       client_id: this.option.clientID,
@@ -52,12 +70,14 @@ class Gitting {
     callback && callback();
   }
 
+  // 登出
   logout() {
     this.isLogin = false;
     utils.delStorage('gitting-token');
     utils.delStorage('gitting-userInfo');
   }
 
+  // 初始化评论
   creatInit() {
     const query = {
       state: "Gitting",
@@ -77,6 +97,7 @@ class Gitting {
     `)
   }
 
+  // 读取评论
   creatGitting() {
     const avatar = 'https://avatars0.githubusercontent.com/u/5907357?s=88&v=4';
     this.container.insertAdjacentHTML('beforeend', `
@@ -147,6 +168,7 @@ class Gitting {
     `);
   }
 
+  // 错误处理
   errorHandle(condition, err, callback) {
     if (!condition) return;
     utils.removeElement('.gt-error');
