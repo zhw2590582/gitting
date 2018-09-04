@@ -68,8 +68,7 @@ class Gitting {
       this.issue = await api.getIssueById(this.option.owner, this.option.repo, this.option.number, utils.queryStringify(query));
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , please check the configuration!`);
     } else {
-      const labels = (this.option.labels.push(location.href),
-      this.option.labels.join(","));
+      const labels = (this.option.labels.push(location.href), this.option.labels.join(","));
       const labelsQuery = Object.assign({}, query, { labels });
       this.issue = (await api.getIssueByLabel(this.option.owner, this.option.repo, utils.queryStringify(labelsQuery)))[0];
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
@@ -114,7 +113,7 @@ class Gitting {
 
     // 修改登录状态
     this.isLogin = true;
-    
+
     return userInfo;
   }
 
@@ -254,6 +253,7 @@ class Gitting {
   errorHandle(condition, err, callback) {
     if (!condition) return;
     utils.removeElement(".gt-error");
+    utils.removeElement(".gt-loading");
     this.$container.insertAdjacentHTML("afterbegin", `<div class="gt-error">${err}</div>`);
     callback && callback();
     throw new TypeError(err);
