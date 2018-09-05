@@ -15,6 +15,7 @@ class Gitting {
     this.api = creatApi(this.option);
     this.page = 1;
     this.issue = {};
+    this.comments = [];
     this.token = utils.getStorage("gitting-token");
     this.userInfo = utils.getStorage("gitting-userInfo");
     this.isLogin = !!this.token && !!this.userInfo;
@@ -71,13 +72,13 @@ class Gitting {
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
     }
 
+    // 初始化结束
+    loadend();
+
     // 创建结构
     await this.creatGitting();
     await this.creatComment();
     await this.eventBind();
-
-    // 初始化结束
-    loadend();
 
     console.log(this);
   }
@@ -130,7 +131,7 @@ class Gitting {
     );
   }
 
-  // 读取评论
+  // 创建评论
   creatGitting() {
     const query = {
       state: "Gitting",
@@ -148,7 +149,7 @@ class Gitting {
         <div class="gt-mate fr clearfix">
           ${
             this.isLogin
-              ? `<a href="#" class="gt-logout fl">${this.i("logout")}</a>`
+              ? `<a href="${this.userInfo.html_url}" class="gt-name fl">${this.userInfo.name}</a><a href="#" class="gt-logout fl">${this.i("logout")}</a>`
               : `<a href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}" class="gt-login fl">${this.i("login")}</a>`
           }
           <a href="https://github.com/zhw2590582/gitting" class="fl" target="_blank">Gitting ${version}</a>
@@ -181,10 +182,7 @@ class Gitting {
           </div>
       </div>
       <div class="gt-comments"></div>
-      <div class="gt-comments-load">
-          <a class="gt-load-more" href="#">${this.i("loadMore")}</a>
-          <div class="gt-load-end">${this.i("loadEnd")}</div>
-      </div>
+      <div class="gt-comments-load"></div>
     `
     );
 
@@ -201,10 +199,26 @@ class Gitting {
   }
 
   async creatComment() {
-    const comments = await this.api.getComments(this.issue.number, this.page++);
+    this.$commentsLoad.innerHTML = '';
+    const loadend = utils.loading(this.$commentsLoad);
+    const comments = await this.api.getComments(this.issue.number, this.page++)
+    this.comments.push(...comments);
     const commentHtml = comments.map(item => {
-      return `
-      <div class="comments-item">
+      return this.commentTemplate(item);
+    }).join('');
+    this.$comments.insertAdjacentHTML("beforeend", commentHtml);
+    loadend();
+    if (comments.length < this.option.perPage) {
+      this.$commentsLoad.innerHTML = `<div class="gt-load-end">${this.i("loadEnd")}</div>`;
+    } else {
+      this.$commentsLoad.innerHTML = `<a class="gt-load-more" href="#">${this.i("loadMore")}</a>`;
+    }
+    return comments;
+  }
+
+  commentTemplate(item, add = false) {
+    return `
+      <div class="comments-item${add ? ' add' : ''}" data-id="${item.id}">
         <div class="gt-avatar">
           <img src="${item.user.avatar_url}" alt="avatar">
         </div>
@@ -215,20 +229,16 @@ class Gitting {
           <div class="gt-comment-mate clearfix">
             <a class="gt-comment-name fl" href="${item.user.html_url}" target="_blank">${item.user.login}</a>
             <span class="gt-comment-time fl" data-time="${item.created_at}">${this.i("published")} ${dayjs(item.created_at).fromNow()}</span>
-            <a class="gt-comment-reply fr" href="#" target="_blank">${this.i("reply")}</a>
+            <a class="gt-comment-reply fr" href="#" target="_blank" data-id="${item.id}">${this.i("reply")}</a>
           </div>
         </div>
       </div>
     `
-    }).join('');
-    this.$comments.insertAdjacentHTML("beforeend", commentHtml);
-    this.$commentsLoad.classList[comments.length < this.option.perPage ? 'add' : 'remove']('end');
-    return comments;
   }
 
   // 绑定事件
   eventBind() {
-    this.$container.addEventListener('click', e => {
+    this.$container.addEventListener('click', async e => {
       const target = e.target;
       
       // 注销
@@ -240,28 +250,53 @@ class Gitting {
       // 编写
       if (target.classList.contains('gt-write')) {
         this.$editor.classList.remove('gt-mode-preview');
+        this.$markdown.innerHTML = '';
       }
 
       // 预览
       if (target.classList.contains('gt-preview')) {
+        const loadend = utils.loading(this.$markdown);
         this.$editor.classList.add('gt-mode-preview');
+        const text = this.$textarea.value;
+        if (text.trim()) {
+          const html = await this.api.mdToHtml(text);
+          loadend();
+          this.$markdown.innerHTML = html;
+        } else {
+          loadend();
+        }
       }
 
       // 发送
       if (target.classList.contains('gt-send')) {
-        console.log('gt-send')
+        const body = this.$textarea.value;
+        if (!body.trim()) return;
+        const loadend = utils.loading(this.$editor);
+        const item = await this.api.creatComments(this.issue.number, body);
+        loadend();
+        this.errorHandle(!item || !item.id, `Comment failed!`);
+        this.$textarea.value = '';
+        this.$comments.insertAdjacentHTML("beforeend", this.commentTemplate(item, true));
+        const last = utils.query(this.$container, `[data-id='${item.id}']`);
+        utils.smoothScroll(last);
       }
 
       // 回复
       if (target.classList.contains('gt-comment-reply')) {
         e.preventDefault();
-        console.log('gt-comment-reply')
+        const id = target.dataset.id;
+        const comment = this.comments.find(item => item.id == id);
+        const oldValue = this.$textarea.value;
+        const markdowm = `${oldValue ? '\n' : ''}> @${comment.user.login}\n> ${comment.body}\n`;
+        this.$textarea.value = oldValue + markdowm;
+        this.$textarea.focus();
+        utils.smoothScroll(this.$textarea);
       }
 
       // 加载
       if (target.classList.contains('gt-load-more')) {
         e.preventDefault();
-        console.log('gt-load-more')
+        this.creatComment();
       }
 
     });

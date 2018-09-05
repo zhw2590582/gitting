@@ -57,6 +57,14 @@ export const loading = selector => {
   return () => el.removeChild(loadingEl);
 }
 
+export const smoothScroll = (element, offset = 0) => {
+  window.scroll({
+    behavior: 'smooth',
+    left: 0,
+    top: element.getBoundingClientRect().top + window.scrollY + offset
+  });
+}
+
 // 请求
 export const request = (method, url, body, header) => {
   method = method.toUpperCase();
@@ -83,7 +91,11 @@ export const request = (method, url, body, header) => {
     if (res.status === 404) {
       return Promise.reject("Unauthorized.");
     } else {
-      return res.json();
+      if (headers.Accept === 'text/html') {
+        return res.text();
+      } else {
+        return res.json();
+      }
     }
   });
 }
