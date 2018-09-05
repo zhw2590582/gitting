@@ -55,6 +55,7 @@ class Gitting {
 
     // 检查是否需要登录
     const { code } = utils.getURLParameters();
+    console.log(code)
     if (code) {
       await this.getUserInfo(code);
     }
@@ -96,12 +97,14 @@ class Gitting {
 
     // 获取token
     const data = await this.api.getToken(code);
+    console.log(data)
     this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
     utils.setStorage("gitting-token", data.access_token);
     this.token = data.access_token;
 
     // 获取用户信息
     const userInfo = await this.api.getUserInfo(data.access_token);
+    console.log(userInfo)
     this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
     utils.setStorage("gitting-userInfo", userInfo);
     this.userInfo = userInfo;

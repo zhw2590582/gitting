@@ -2535,70 +2535,72 @@
 
 	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
 
+	                console.log(code);
+
 	                if (!code) {
-	                  _context.next = 7;
+	                  _context.next = 8;
 	                  break;
 	                }
 
-	                _context.next = 7;
+	                _context.next = 8;
 	                return this.getUserInfo(code);
 
-	              case 7:
+	              case 8:
 
 	                console.log('q');
 	                // 获取 issue
 
 	                if (!(this.option.number > 0)) {
-	                  _context.next = 16;
+	                  _context.next = 17;
 	                  break;
 	                }
 
-	                _context.next = 11;
+	                _context.next = 12;
 	                return this.api.getIssueById(this.option.number);
 
-	              case 11:
+	              case 12:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
 	                console.log('w');
-	                _context.next = 24;
+	                _context.next = 25;
 	                break;
 
-	              case 16:
+	              case 17:
 	                labels = this.option.labels.concat(this.option.id).join(",");
 
 	                console.log(labels);
-	                _context.next = 20;
+	                _context.next = 21;
 	                return this.api.getIssueByLabel(labels);
 
-	              case 20:
+	              case 21:
 	                this.issue = _context.sent[0];
 
 	                console.log(this.issue);
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 	                console.log('e');
 
-	              case 24:
+	              case 25:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
 	                console.log('r');
-	                _context.next = 28;
+	                _context.next = 29;
 	                return this.creatGitting();
 
-	              case 28:
+	              case 29:
 	                console.log('t');
-	                _context.next = 31;
+	                _context.next = 32;
 	                return this.creatComment();
 
-	              case 31:
+	              case 32:
 	                console.log('y');
-	                _context.next = 34;
+	                _context.next = 35;
 	                return this.eventBind();
 
-	              case 34:
+	              case 35:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2639,17 +2641,19 @@
 	              case 6:
 	                data = _context2.sent;
 
+	                console.log(data);
 	                this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
 	                setStorage("gitting-token", data.access_token);
 	                this.token = data.access_token;
 
 	                // 获取用户信息
-	                _context2.next = 12;
+	                _context2.next = 13;
 	                return this.api.getUserInfo(data.access_token);
 
-	              case 12:
+	              case 13:
 	                userInfo = _context2.sent;
 
+	                console.log(userInfo);
 	                this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
 	                setStorage("gitting-userInfo", userInfo);
 	                this.userInfo = userInfo;
@@ -2659,7 +2663,7 @@
 
 	                return _context2.abrupt("return", userInfo);
 
-	              case 18:
+	              case 20:
 	              case "end":
 	                return _context2.stop();
 	            }
