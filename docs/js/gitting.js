@@ -2693,16 +2693,12 @@
 	        scope: "public_repo"
 	      };
 
-	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"" + this.userInfo.html_url + "\" class=\"gt-name fl\">" + this.userInfo.name + "</a><a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\"></div>\n    ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"" + this.userInfo.html_url + "\" class=\"gt-name fl\" target=\"_blank\">" + this.userInfo.login + "</a><a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"gt-counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\"></div>\n    ");
 
-	      this.$logout = query(this.$container, '.gt-logout');
 	      this.$editor = query(this.$container, '.gt-editor');
 	      this.$markdown = query(this.$container, '.gt-markdown');
 	      this.$textarea = query(this.$container, '.gt-textarea');
-	      this.$counts = query(this.$container, '.counts');
-	      this.$write = query(this.$container, '.gt-write');
-	      this.$preview = query(this.$container, '.gt-preview');
-	      this.$send = query(this.$container, '.gt-send');
+	      this.$counts = query(this.$container, '.gt-counts');
 	      this.$comments = query(this.$container, '.gt-comments');
 	      this.$commentsLoad = query(this.$container, '.gt-comments-load');
 	    }
@@ -2769,9 +2765,17 @@
 	    value: function eventBind() {
 	      var _this2 = this;
 
+	      var inputName = ["propertychange", "change", "click", "keyup", "input", "paste"];
+	      var inputFn = function inputFn(e) {
+	        return _this2.$counts.innerHTML = _this2.$textarea.value.length;
+	      };
+	      inputName.forEach(function (item) {
+	        return _this2.$textarea.addEventListener(item, inputFn);
+	      });
+
 	      this.$container.addEventListener('click', function () {
 	        var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4(e) {
-	          var target, loadend, text, html, body, _loadend, item, last, id, comment, oldValue, markdowm;
+	          var target, loadend, text, html, body, _loadend, item, last, id, comment, oldValue, markdowm, newValue, comments, _last;
 
 	          return regenerator.wrap(function _callee4$(_context4) {
 	            while (1) {
@@ -2855,29 +2859,53 @@
 	                  smoothScroll(last);
 
 	                case 30:
-
-	                  // 回复
-	                  if (target.classList.contains('gt-comment-reply')) {
-	                    e.preventDefault();
-	                    id = target.dataset.id;
-	                    comment = _this2.comments.find(function (item) {
-	                      return item.id == id;
-	                    });
-	                    oldValue = _this2.$textarea.value;
-	                    markdowm = (oldValue ? '\n' : '') + "> @" + comment.user.login + "\n> " + comment.body + "\n";
-
-	                    _this2.$textarea.value = oldValue + markdowm;
-	                    _this2.$textarea.focus();
-	                    smoothScroll(_this2.$textarea);
+	                  if (!target.classList.contains('gt-comment-reply')) {
+	                    _context4.next = 43;
+	                    break;
 	                  }
 
-	                  // 加载
-	                  if (target.classList.contains('gt-load-more')) {
-	                    e.preventDefault();
-	                    _this2.creatComment();
+	                  e.preventDefault();
+	                  id = target.dataset.id;
+	                  comment = _this2.comments.find(function (item) {
+	                    return item.id == id;
+	                  });
+	                  oldValue = _this2.$textarea.value;
+	                  markdowm = (oldValue ? '\n' : '') + "> @" + comment.user.login + "\n> " + comment.body + "\n";
+	                  newValue = oldValue + markdowm;
+
+	                  if (!(newValue.length > _this2.option.maxlength)) {
+	                    _context4.next = 39;
+	                    break;
 	                  }
 
-	                case 32:
+	                  return _context4.abrupt("return");
+
+	                case 39:
+	                  _this2.$textarea.value = newValue;
+	                  inputFn(e);
+	                  _this2.$textarea.focus();
+	                  smoothScroll(_this2.$textarea, -30);
+
+	                case 43:
+	                  if (!target.classList.contains('gt-load-more')) {
+	                    _context4.next = 49;
+	                    break;
+	                  }
+
+	                  e.preventDefault();
+	                  _context4.next = 47;
+	                  return _this2.creatComment();
+
+	                case 47:
+	                  comments = _context4.sent;
+
+	                  if (comments.length) {
+	                    _last = query(_this2.$container, "[data-id='" + comments[0].id + "']");
+
+	                    smoothScroll(_last, -100);
+	                  }
+
+	                case 49:
 	                case "end":
 	                  return _context4.stop();
 	              }

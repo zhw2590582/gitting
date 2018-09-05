@@ -143,13 +143,13 @@ class Gitting {
     this.$container.insertAdjacentHTML("beforeend",
       `
       <div class="gt-header clearfix">
-        <a href="${this.issue.html_url}" class="gt-counts fl" target="_blank">
+        <a href="${this.issue.html_url}" class="fl" target="_blank">
           ${this.issue.comments} ${this.i("counts")}
         </a>
         <div class="gt-mate fr clearfix">
           ${
             this.isLogin
-              ? `<a href="${this.userInfo.html_url}" class="gt-name fl">${this.userInfo.name}</a><a href="#" class="gt-logout fl">${this.i("logout")}</a>`
+              ? `<a href="${this.userInfo.html_url}" class="gt-name fl" target="_blank">${this.userInfo.login}</a><a href="#" class="gt-logout fl">${this.i("logout")}</a>`
               : `<a href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}" class="gt-login fl">${this.i("login")}</a>`
           }
           <a href="https://github.com/zhw2590582/gitting" class="fl" target="_blank">Gitting ${version}</a>
@@ -165,7 +165,7 @@ class Gitting {
             <div class="gt-tip clearfix">
                 <a class="fl" href="https://guides.github.com/features/mastering-markdown/" target="_blank">${this.i("styling")}</a>
                 <div class="fr">
-                  <span class="counts">0</span> / ${this.option.maxlength}
+                  <span class="gt-counts">0</span> / ${this.option.maxlength}
                 </div>
             </div>
             <div class="gt-tool clearfix">
@@ -186,14 +186,10 @@ class Gitting {
     `
     );
 
-    this.$logout = utils.query(this.$container, '.gt-logout');
     this.$editor = utils.query(this.$container, '.gt-editor');
     this.$markdown = utils.query(this.$container, '.gt-markdown');
     this.$textarea = utils.query(this.$container, '.gt-textarea');
-    this.$counts = utils.query(this.$container, '.counts');
-    this.$write = utils.query(this.$container, '.gt-write');
-    this.$preview = utils.query(this.$container, '.gt-preview');
-    this.$send = utils.query(this.$container, '.gt-send');
+    this.$counts = utils.query(this.$container, '.gt-counts');
     this.$comments = utils.query(this.$container, '.gt-comments');
     this.$commentsLoad = utils.query(this.$container, '.gt-comments-load');
   }
@@ -238,6 +234,10 @@ class Gitting {
 
   // 绑定事件
   eventBind() {
+    const inputName = ["propertychange", "change", "click", "keyup", "input", "paste"];
+    const inputFn = e => (this.$counts.innerHTML = this.$textarea.value.length);
+    inputName.forEach(item => this.$textarea.addEventListener(item, inputFn));
+
     this.$container.addEventListener('click', async e => {
       const target = e.target;
       
@@ -288,17 +288,23 @@ class Gitting {
         const comment = this.comments.find(item => item.id == id);
         const oldValue = this.$textarea.value;
         const markdowm = `${oldValue ? '\n' : ''}> @${comment.user.login}\n> ${comment.body}\n`;
-        this.$textarea.value = oldValue + markdowm;
+        const newValue = oldValue + markdowm;
+        if (newValue.length > this.option.maxlength) return;
+        this.$textarea.value = newValue;
+        inputFn(e)
         this.$textarea.focus();
-        utils.smoothScroll(this.$textarea);
+        utils.smoothScroll(this.$textarea, -30);
       }
 
       // 加载
       if (target.classList.contains('gt-load-more')) {
         e.preventDefault();
-        this.creatComment();
+        const comments = await this.creatComment();
+        if (comments.length) {
+          const last = utils.query(this.$container, `[data-id='${comments[0].id}']`);
+          utils.smoothScroll(last, -100);
+        }
       }
-
     });
   }
 
