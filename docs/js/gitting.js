@@ -2670,14 +2670,18 @@
 	    value: function creatInit() {
 	      var _this = this;
 
+	      console.log(1);
 	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
+
+	      console.log(2);
 	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init-btn\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
 
+	      console.log(3);
 	      if (!this.isLogin) return;
 	      this.$init = query(this.$container, '.gt-init-btn');
 	      this.$init.addEventListener('click', function () {
@@ -2722,6 +2726,7 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
+	      console.log(4);
 	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
@@ -2729,8 +2734,14 @@
 	        scope: "public_repo"
 	      };
 
+	      console.log(this);
+	      console.log(this.userInfo);
+	      console.log(this.userInfo.login);
+
+	      console.log(5);
 	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"" + this.userInfo.html_url + "\" class=\"gt-name fl\" target=\"_blank\">" + this.userInfo.login + "</a><a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"@" + this.userInfo.login + "\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"gt-counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\"></div>\n    ");
 
+	      console.log(6);
 	      this.$editor = query(this.$container, '.gt-editor');
 	      this.$markdown = query(this.$container, '.gt-markdown');
 	      this.$textarea = query(this.$container, '.gt-textarea');

@@ -107,12 +107,15 @@ class Gitting {
 
   // 初始化评论
   creatInit() {
+    console.log(1)
     const query = {
       state: "Gitting",
       client_id: this.option.clientID,
       redirect_uri: location.href,
       scope: "public_repo"
     };
+
+    console.log(2)
     this.$container.insertAdjacentHTML("beforeend",
       `
         <div class="gt-init">
@@ -125,6 +128,7 @@ class Gitting {
       `
     );
 
+    console.log(3)
     if (!this.isLogin) return;
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
@@ -143,6 +147,7 @@ class Gitting {
 
   // 创建结构
   creatGitting() {
+    console.log(4)
     const query = {
       state: "Gitting",
       client_id: this.option.clientID,
@@ -150,6 +155,11 @@ class Gitting {
       scope: "public_repo"
     };
 
+    console.log(this)
+    console.log(this.userInfo)
+    console.log(this.userInfo.login)
+
+    console.log(5)
     this.$container.insertAdjacentHTML("beforeend",
       `
       <div class="gt-header clearfix">
@@ -196,6 +206,7 @@ class Gitting {
     `
     );
 
+    console.log(6)
     this.$editor = utils.query(this.$container, '.gt-editor');
     this.$markdown = utils.query(this.$container, '.gt-markdown');
     this.$textarea = utils.query(this.$container, '.gt-textarea');
