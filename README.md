@@ -26,6 +26,7 @@ const gitting = new Gitting({
     clientSecret: 'GitHub Application Client Secret',
     repo: 'GitHub repo',
     owner: 'GitHub repo owner',
+    admin: ['GitHub repo owner and collaborators, only these guys can initialize github issues'],
     id: location.pathname
 });
         
