@@ -32,7 +32,6 @@ class Gitting {
       clientSecret: "",
       repo: "",
       owner: "",
-      admin: [],
       id: location.pathname,
       number: -1,
       labels: ["Gitting"],
@@ -141,7 +140,7 @@ class Gitting {
     });
   }
 
-  // 创建评论
+  // 创建结构
   creatGitting() {
     const query = {
       state: "Gitting",
@@ -204,6 +203,7 @@ class Gitting {
     this.$commentsLoad = utils.query(this.$container, '.gt-comments-load');
   }
 
+  // 加载评论
   async creatComment() {
     this.$commentsLoad.innerHTML = '';
     const loadend = utils.loading(this.$commentsLoad);
@@ -220,6 +220,7 @@ class Gitting {
     return comments;
   }
 
+  // 评论模板
   commentTemplate(item, add = false) {
     return `
       <div class="comments-item${add ? ' add' : ''}" data-id="${item.id}">

@@ -2716,7 +2716,7 @@
 	      }());
 	    }
 
-	    // 创建评论
+	    // 创建结构
 
 	  }, {
 	    key: "creatGitting",
@@ -2737,6 +2737,9 @@
 	      this.$comments = query(this.$container, '.gt-comments');
 	      this.$commentsLoad = query(this.$container, '.gt-comments-load');
 	    }
+
+	    // 加载评论
+
 	  }, {
 	    key: "creatComment",
 	    value: function () {
@@ -2785,6 +2788,9 @@
 
 	      return creatComment;
 	    }()
+
+	    // 评论模板
+
 	  }, {
 	    key: "commentTemplate",
 	    value: function commentTemplate(item) {
@@ -2989,7 +2995,6 @@
 	        clientSecret: "",
 	        repo: "",
 	        owner: "",
-	        admin: [],
 	        id: location.pathname,
 	        number: -1,
 	        labels: ["Gitting"],
