@@ -32,6 +32,7 @@ class Gitting {
       clientSecret: "",
       repo: "",
       owner: "",
+      admin: [],
       id: location.pathname,
       number: -1,
       labels: ["Gitting"],
@@ -124,9 +125,11 @@ class Gitting {
       `
     );
 
+    if (this.isLogin) return;
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();
+      this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
       const loadend = utils.loading(this.$container);
       const detail = {
         title: this.option.title,
