@@ -2544,50 +2544,59 @@
 	                return this.getUserInfo(code);
 
 	              case 7:
+
+	                console.log('q');
+	                // 获取 issue
+
 	                if (!(this.option.number > 0)) {
-	                  _context.next = 14;
+	                  _context.next = 16;
 	                  break;
 	                }
 
-	                _context.next = 10;
+	                _context.next = 11;
 	                return this.api.getIssueById(this.option.number);
 
-	              case 10:
+	              case 11:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
-	                _context.next = 20;
+	                console.log('w');
+	                _context.next = 23;
 	                break;
 
-	              case 14:
+	              case 16:
 	                labelsArr = this.option.labels.concat(this.option.id);
 	                labels = labelsArr.join(",");
-	                _context.next = 18;
+	                _context.next = 20;
 	                return this.api.getIssueByLabel(labels);
 
-	              case 18:
+	              case 20:
 	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
+	                console.log('e');
 
-	              case 20:
+	              case 23:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
-	                _context.next = 23;
+	                console.log('r');
+	                _context.next = 27;
 	                return this.creatGitting();
 
-	              case 23:
-	                _context.next = 25;
+	              case 27:
+	                console.log('t');
+	                _context.next = 30;
 	                return this.creatComment();
 
-	              case 25:
-	                _context.next = 27;
+	              case 30:
+	                console.log('y');
+	                _context.next = 33;
 	                return this.eventBind();
 
-	              case 27:
+	              case 33:
 	              case "end":
 	                return _context.stop();
 	            }

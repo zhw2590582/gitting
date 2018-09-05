@@ -59,23 +59,29 @@ class Gitting {
       await this.getUserInfo(code);
     }
 
+    console.log('q')
     // 获取 issue
     if (this.option.number > 0) {
       this.issue = await this.api.getIssueById(this.option.number);
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
+      console.log('w')
     } else {
       const labelsArr = this.option.labels.concat(this.option.id);
       const labels = labelsArr.join(",");
       this.issue = (await this.api.getIssueByLabel(labels))[0];
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
+      console.log('e')
     }
 
     // 初始化结束
     loadend();
 
     // 创建结构
+    console.log('r')
     await this.creatGitting();
+    console.log('t')
     await this.creatComment();
+    console.log('y')
     await this.eventBind();
   }
 
