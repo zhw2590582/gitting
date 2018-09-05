@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0,minimal-ui">
     <meta name="keywords" content="gitting">
     <meta name="description" content="gitting">
+    <link rel="shortcut icon" href="./img/favicon.ico">
     <link rel="stylesheet" href="./css/normalize.css">
     <link rel="stylesheet" href="./css/app.css">
     <link rel="stylesheet" href="./css/gitting.css">
@@ -15,6 +16,15 @@
 
 <body>
     <div class="app">
+        <div class="logo">
+            <img src="./img/logo.png" alt="">
+        </div>
+        <div class="description">
+            又一个基于 Github Issue 开发的评论插件
+        </div>
+        <div class="github">
+            <a href="https://github.com/zhw2590582/gitting" target="_blank">GITHUB</a>
+        </div>
         <div id="gitting-container"></div>
     </div>
     <script src="./js/gitting.js"></script>
@@ -26,7 +36,7 @@
             owner: 'zhw2590582',
             id: location.pathname
         });
-        
+
         gitting.render('#gitting-container');
     </script>
 </body>
