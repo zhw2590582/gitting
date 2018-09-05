@@ -166,7 +166,7 @@ class Gitting {
       </div>
       <div class="gt-body">
         <div class="gt-avatar">
-          <img src="${this.isLogin ? this.userInfo.avatar_url : this.option.avatar}" alt="avatar">
+          <img src="${this.isLogin ? this.userInfo.avatar_url : this.option.avatar}" alt="@${this.userInfo.login}">
         </div>
         <div class="gt-editor">
             <div class="gt-markdown markdown-body"></div>
@@ -225,7 +225,7 @@ class Gitting {
     return `
       <div class="comments-item${add ? ' add' : ''}" data-id="${item.id}">
         <div class="gt-avatar">
-          <img src="${item.user.avatar_url}" alt="avatar">
+          <img src="${item.user.avatar_url}" alt="@${item.user.login}">
         </div>
         <div class="gt-comment-content caret">
           <div class="gt-comment-body markdown-body">
