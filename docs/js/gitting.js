@@ -484,6 +484,8 @@
 	    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
+	      // fix for some old engines
+	      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -492,7 +494,7 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+	  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
 	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
@@ -2475,7 +2477,7 @@
 	    };
 	}
 
-	var version = "1.0.1";
+	var version = "1.0.2";
 
 	var dayjs_min = createCommonjsModule(function (module, exports) {
 	!function(t,e){module.exports=e();}(commonjsGlobal,function(){var t="millisecond",e="second",n="minute",r="hour",s="day",i="week",a="month",u="year",c=/^(\d{4})-?(\d{1,2})-?(\d{0,2})(.*?(\d{1,2}):(\d{1,2}):(\d{1,2}))?.?(\d{1,3})?$/,o=/\[.*?\]|Y{2,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g,h={name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_")},d=function(t,e,n){var r=String(t);return !r||r.length>=e?t:""+Array(e+1-r.length).join(n)+t},$={padStart:d,padZoneStr:function(t){var e=Math.abs(t),n=Math.floor(e/60),r=e%60;return (t<=0?"+":"-")+d(n,2,"0")+":"+d(r,2,"0")},monthDiff:function(t,e){var n=12*(e.year()-t.year())+(e.month()-t.month()),r=t.clone().add(n,"months"),s=e-r<0,i=t.clone().add(n+(s?-1:1),"months");return Number(-(n+(e-r)/(s?r-i:i-r)))},absFloor:function(t){return t<0?Math.ceil(t)||0:Math.floor(t)},prettyUnit:function(c){return {M:a,y:u,w:i,d:s,h:r,m:n,s:e,ms:t}[c]||String(c||"").toLowerCase().replace(/s$/,"")},isUndefined:function(t){return void 0===t}},f="en",l={};l[f]=h;var m=function(t){return t instanceof D},y=function(t,e,n){var r;if(!t)return null;if("string"==typeof t)l[t]&&(r=t),e&&(l[t]=e,r=t);else{var s=t.name;l[s]=t,r=s;}return n||(f=r),r},M=function(t,e){if(m(t))return t.clone();var n=e||{};return n.date=t,new D(n)},S=function(t,e){return M(t,{locale:e.$L})},p=$;p.parseLocale=y,p.isDayjs=m,p.wrapper=S;var D=function(){function h(t){this.parse(t);}var d=h.prototype;return d.parse=function(t){var e,n;this.$d=null===(e=t.date)?new Date(NaN):p.isUndefined(e)?new Date:e instanceof Date?e:"string"==typeof e&&/.*[^Z]$/i.test(e)&&(n=e.match(c))?new Date(n[1],n[2]-1,n[3]||1,n[5]||0,n[6]||0,n[7]||0,n[8]||0):new Date(e),this.init(t);},d.init=function(t){this.$y=this.$d.getFullYear(),this.$M=this.$d.getMonth(),this.$D=this.$d.getDate(),this.$W=this.$d.getDay(),this.$H=this.$d.getHours(),this.$m=this.$d.getMinutes(),this.$s=this.$d.getSeconds(),this.$ms=this.$d.getMilliseconds(),this.$L=this.$L||y(t.locale,null,!0)||f;},d.$utils=function(){return p},d.isValid=function(){return !("Invalid Date"===this.$d.toString())},d.$compare=function(t){return this.valueOf()-M(t).valueOf()},d.isSame=function(t){return 0===this.$compare(t)},d.isBefore=function(t){return this.$compare(t)<0},d.isAfter=function(t){return this.$compare(t)>0},d.year=function(){return this.$y},d.month=function(){return this.$M},d.day=function(){return this.$W},d.date=function(){return this.$D},d.hour=function(){return this.$H},d.minute=function(){return this.$m},d.second=function(){return this.$s},d.millisecond=function(){return this.$ms},d.unix=function(){return Math.floor(this.valueOf()/1e3)},d.valueOf=function(){return this.$d.getTime()},d.startOf=function(t,c){var o=this,h=!!p.isUndefined(c)||c,d=function(t,e){var n=S(new Date(o.$y,e,t),o);return h?n:n.endOf(s)},$=function(t,e){return S(o.toDate()[t].apply(o.toDate(),h?[0,0,0,0].slice(e):[23,59,59,999].slice(e)),o)};switch(p.prettyUnit(t)){case u:return h?d(1,0):d(31,11);case a:return h?d(1,this.$M):d(0,this.$M+1);case i:return d(h?this.$D-this.$W:this.$D+(6-this.$W),this.$M);case s:case"date":return $("setHours",0);case r:return $("setMinutes",1);case n:return $("setSeconds",2);case e:return $("setMilliseconds",3);default:return this.clone()}},d.endOf=function(t){return this.startOf(t,!1)},d.$set=function(i,c){switch(p.prettyUnit(i)){case s:this.$d.setDate(this.$D+(c-this.$W));break;case"date":this.$d.setDate(c);break;case a:this.$d.setMonth(c);break;case u:this.$d.setFullYear(c);break;case r:this.$d.setHours(c);break;case n:this.$d.setMinutes(c);break;case e:this.$d.setSeconds(c);break;case t:this.$d.setMilliseconds(c);}return this.init(),this},d.set=function(t,e){return this.clone().$set(t,e)},d.add=function(t,c){var o=this;t=Number(t);var h,d=p.prettyUnit(c),$=function(e,n){var r=o.set("date",1).set(e,n+t);return r.set("date",Math.min(o.$D,r.daysInMonth()))};if(d===a)return $(a,this.$M);if(d===u)return $(u,this.$y);switch(d){case n:h=6e4;break;case r:h=36e5;break;case s:h=864e5;break;case i:h=6048e5;break;case e:h=1e3;break;default:h=1;}var f=this.valueOf()+t*h;return S(f,this)},d.subtract=function(t,e){return this.add(-1*t,e)},d.format=function(t){var e=this,n=t||"YYYY-MM-DDTHH:mm:ssZ",r=p.padZoneStr(this.$d.getTimezoneOffset()),s=this.$locale(),i=s.weekdays,a=s.months,u=function(t,e,n,r){return t&&t[e]||n[e].substr(0,r)};return n.replace(o,function(t){if(t.indexOf("[")>-1)return t.replace(/\[|\]/g,"");switch(t){case"YY":return String(e.$y).slice(-2);case"YYYY":return String(e.$y);case"M":return String(e.$M+1);case"MM":return p.padStart(e.$M+1,2,"0");case"MMM":return u(s.monthsShort,e.$M,a,3);case"MMMM":return a[e.$M];case"D":return String(e.$D);case"DD":return p.padStart(e.$D,2,"0");case"d":return String(e.$W);case"dd":return u(s.weekdaysMin,e.$W,i,2);case"ddd":return u(s.weekdaysShort,e.$W,i,3);case"dddd":return i[e.$W];case"H":return String(e.$H);case"HH":return p.padStart(e.$H,2,"0");case"h":case"hh":return 0===e.$H?12:p.padStart(e.$H<13?e.$H:e.$H-12,"hh"===t?2:1,"0");case"a":return e.$H<12?"am":"pm";case"A":return e.$H<12?"AM":"PM";case"m":return String(e.$m);case"mm":return p.padStart(e.$m,2,"0");case"s":return String(e.$s);case"ss":return p.padStart(e.$s,2,"0");case"SSS":return p.padStart(e.$ms,3,"0");case"Z":return r;default:return r.replace(":","")}})},d.diff=function(t,c,o){var h=p.prettyUnit(c),d=M(t),$=this-d,f=p.monthDiff(this,d);switch(h){case u:f/=12;break;case a:break;case"quarter":f/=3;break;case i:f=$/6048e5;break;case s:f=$/864e5;break;case r:f=$/36e5;break;case n:f=$/6e4;break;case e:f=$/1e3;break;default:f=$;}return o?f:p.absFloor(f)},d.daysInMonth=function(){return this.endOf(a).$D},d.$locale=function(){return l[this.$L]},d.locale=function(t,e){var n=this.clone();return n.$L=y(t,e,!0),n},d.clone=function(){return S(this.toDate(),this)},d.toDate=function(){return new Date(this.$d)},d.toArray=function(){return [this.$y,this.$M,this.$D,this.$H,this.$m,this.$s,this.$ms]},d.toJSON=function(){return this.toISOString()},d.toISOString=function(){return this.toDate().toISOString()},d.toObject=function(){return {years:this.$y,months:this.$M,date:this.$D,hours:this.$H,minutes:this.$m,seconds:this.$s,milliseconds:this.$ms}},d.toString=function(){return this.$d.toUTCString()},h}();return M.extend=function(t,e){return t(e,D,M),M},M.locale=y,M.isDayjs=m,M.en=l[f],M});
@@ -2535,72 +2537,58 @@
 
 	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
 
-	                console.log(code);
-
 	                if (!code) {
-	                  _context.next = 8;
+	                  _context.next = 7;
 	                  break;
 	                }
 
-	                _context.next = 8;
+	                _context.next = 7;
 	                return this.getUserInfo(code);
 
-	              case 8:
-
-	                console.log('q');
-	                // 获取 issue
-
+	              case 7:
 	                if (!(this.option.number > 0)) {
-	                  _context.next = 17;
+	                  _context.next = 14;
 	                  break;
 	                }
 
-	                _context.next = 12;
+	                _context.next = 10;
 	                return this.api.getIssueById(this.option.number);
 
-	              case 12:
+	              case 10:
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
-	                console.log('w');
-	                _context.next = 25;
+	                _context.next = 19;
 	                break;
 
-	              case 17:
+	              case 14:
 	                labels = this.option.labels.concat(this.option.id).join(",");
-
-	                console.log(labels);
-	                _context.next = 21;
+	                _context.next = 17;
 	                return this.api.getIssueByLabel(labels);
 
-	              case 21:
+	              case 17:
 	                this.issue = _context.sent[0];
 
-	                console.log(this.issue);
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
-	                console.log('e');
 
-	              case 25:
+	              case 19:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
-	                console.log('r');
-	                _context.next = 29;
+	                _context.next = 22;
 	                return this.creatGitting();
 
-	              case 29:
-	                console.log('t');
-	                _context.next = 32;
+	              case 22:
+	                _context.next = 24;
 	                return this.creatComment();
 
-	              case 32:
-	                console.log('y');
-	                _context.next = 35;
+	              case 24:
+	                _context.next = 26;
 	                return this.eventBind();
 
-	              case 35:
+	              case 26:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2641,19 +2629,17 @@
 	              case 6:
 	                data = _context2.sent;
 
-	                console.log(data);
 	                this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
 	                setStorage("gitting-token", data.access_token);
 	                this.token = data.access_token;
 
 	                // 获取用户信息
-	                _context2.next = 13;
+	                _context2.next = 12;
 	                return this.api.getUserInfo(data.access_token);
 
-	              case 13:
+	              case 12:
 	                userInfo = _context2.sent;
 
-	                console.log(userInfo);
 	                this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
 	                setStorage("gitting-userInfo", userInfo);
 	                this.userInfo = userInfo;
@@ -2663,7 +2649,7 @@
 
 	                return _context2.abrupt("return", userInfo);
 
-	              case 20:
+	              case 18:
 	              case "end":
 	                return _context2.stop();
 	            }
@@ -2685,19 +2671,14 @@
 	    value: function creatInit() {
 	      var _this = this;
 
-	      console.log(1);
 	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-
-	      console.log(2);
 	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init-btn\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
 
-	      console.log(3);
-	      if (!this.isLogin) return;
 	      this.$init = query(this.$container, '.gt-init-btn');
 	      this.$init.addEventListener('click', function () {
 	        var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(e) {
@@ -2741,7 +2722,6 @@
 	  }, {
 	    key: "creatGitting",
 	    value: function creatGitting() {
-	      console.log(4);
 	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
@@ -2749,14 +2729,8 @@
 	        scope: "public_repo"
 	      };
 
-	      console.log(this);
-	      console.log(this.userInfo);
-	      console.log(this.userInfo.login);
+	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"" + this.userInfo.html_url + "\" class=\"gt-name fl\" target=\"_blank\">" + this.userInfo.login + "</a><a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"@" + (this.isLogin ? this.userInfo.login : 'github') + "\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"gt-counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\"></div>\n    ");
 
-	      console.log(5);
-	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"" + this.userInfo.html_url + "\" class=\"gt-name fl\" target=\"_blank\">" + this.userInfo.login + "</a><a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"@" + this.userInfo.login + "\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"gt-counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\"></div>\n    ");
-
-	      console.log(6);
 	      this.$editor = query(this.$container, '.gt-editor');
 	      this.$markdown = query(this.$container, '.gt-markdown');
 	      this.$textarea = query(this.$container, '.gt-textarea');

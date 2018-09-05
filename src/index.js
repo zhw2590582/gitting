@@ -55,35 +55,26 @@ class Gitting {
 
     // 检查是否需要登录
     const { code } = utils.getURLParameters();
-    console.log(code)
     if (code) {
       await this.getUserInfo(code);
     }
 
-    console.log('q')
     // 获取 issue
     if (this.option.number > 0) {
       this.issue = await this.api.getIssueById(this.option.number);
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
-      console.log('w')
     } else {
       const labels = this.option.labels.concat(this.option.id).join(",");
-      console.log(labels)
       this.issue = (await this.api.getIssueByLabel(labels))[0];
-      console.log(this.issue)
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
-      console.log('e')
     }
 
     // 初始化结束
     loadend();
 
     // 创建结构
-    console.log('r')
     await this.creatGitting();
-    console.log('t')
     await this.creatComment();
-    console.log('y')
     await this.eventBind();
   }
 
@@ -97,14 +88,12 @@ class Gitting {
 
     // 获取token
     const data = await this.api.getToken(code);
-    console.log(data)
     this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
     utils.setStorage("gitting-token", data.access_token);
     this.token = data.access_token;
 
     // 获取用户信息
     const userInfo = await this.api.getUserInfo(data.access_token);
-    console.log(userInfo)
     this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
     utils.setStorage("gitting-userInfo", userInfo);
     this.userInfo = userInfo;
@@ -117,15 +106,12 @@ class Gitting {
 
   // 初始化评论
   creatInit() {
-    console.log(1)
     const query = {
       state: "Gitting",
       client_id: this.option.clientID,
       redirect_uri: location.href,
       scope: "public_repo"
     };
-
-    console.log(2)
     this.$container.insertAdjacentHTML("beforeend",
       `
         <div class="gt-init">
@@ -138,8 +124,6 @@ class Gitting {
       `
     );
 
-    console.log(3)
-    if (!this.isLogin) return;
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();
@@ -157,7 +141,6 @@ class Gitting {
 
   // 创建结构
   creatGitting() {
-    console.log(4)
     const query = {
       state: "Gitting",
       client_id: this.option.clientID,
@@ -165,11 +148,6 @@ class Gitting {
       scope: "public_repo"
     };
 
-    console.log(this)
-    console.log(this.userInfo)
-    console.log(this.userInfo.login)
-
-    console.log(5)
     this.$container.insertAdjacentHTML("beforeend",
       `
       <div class="gt-header clearfix">
@@ -187,7 +165,7 @@ class Gitting {
       </div>
       <div class="gt-body">
         <div class="gt-avatar">
-          <img src="${this.isLogin ? this.userInfo.avatar_url : this.option.avatar}" alt="@${this.userInfo.login}">
+          <img src="${this.isLogin ? this.userInfo.avatar_url : this.option.avatar}" alt="@${this.isLogin ? this.userInfo.login : 'github'}">
         </div>
         <div class="gt-editor">
             <div class="gt-markdown markdown-body"></div>
@@ -216,7 +194,6 @@ class Gitting {
     `
     );
 
-    console.log(6)
     this.$editor = utils.query(this.$container, '.gt-editor');
     this.$markdown = utils.query(this.$container, '.gt-markdown');
     this.$textarea = utils.query(this.$container, '.gt-textarea');
