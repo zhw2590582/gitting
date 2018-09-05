@@ -1,7 +1,7 @@
 import "./index.scss";
 import "./primer-markdown.css";
 import i18n from "./i18n";
-import * as api from "./api";
+import creatApi from "./creatApi";
 import * as utils from "./utils";
 import { version } from "../package.json";
 import dayjs from "dayjs";
@@ -12,15 +12,16 @@ dayjs.extend(relativeTime);
 class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
+    this.api = creatApi(this.option);
     this.page = 1;
     this.issue = {};
     this.token = utils.getStorage("gitting-token");
     this.userInfo = utils.getStorage("gitting-userInfo");
     this.isLogin = !!this.token && !!this.userInfo;
     this.i = i18n(this.option.language);
-    dayjs.locale(this.option.language);
     this.creatInit = this.creatInit.bind(this);
     this.logout = this.logout.bind(this);
+    dayjs.locale(this.option.language);
   }
 
   // 默认配置
@@ -31,11 +32,11 @@ class Gitting {
       repo: "",
       owner: "",
       admin: [],
-      id: location.href,
+      id: location.pathname,
       number: -1,
       labels: ["Gitting"],
       title: document.title,
-      body: "",
+      body: `${document.title}\n${location.href}`,
       language: "zh-cn",
       perPage: 10,
       maxlength: 500,
@@ -47,6 +48,7 @@ class Gitting {
   // 挂载
   async render(el) {
     this.$container = el instanceof Element ? el : utils.query(document, el);
+    this.$container.innerHTML = '';
 
     // 初始化开始
     const loadend = utils.loading(el);
@@ -57,29 +59,25 @@ class Gitting {
       await this.getUserInfo(code);
     }
 
-    const query = {
-      client_id: this.option.clientID,
-      client_secret: this.option.clientSecret,
-      t: new Date().getTime()
-    };
-
     // 获取 issue
     if (this.option.number > 0) {
-      this.issue = await api.getIssueById(this.option.owner, this.option.repo, this.option.number, utils.queryStringify(query));
-      this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , please check the configuration!`);
+      this.issue = await this.api.getIssueById(this.option.number);
+      this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
     } else {
-      const labels = (this.option.labels.push(location.href), this.option.labels.join(","));
-      const labelsQuery = Object.assign({}, query, { labels });
-      this.issue = (await api.getIssueByLabel(this.option.owner, this.option.repo, utils.queryStringify(labelsQuery)))[0];
+      const labelsArr = this.option.labels.slice();
+      labelsArr.push(this.option.id);
+      const labels = labelsArr.join(",");
+      this.issue = (await this.api.getIssueByLabel(labels))[0];
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
     }
 
+    // 创建结构
+    await this.creatGitting();
+    await this.creatComment();
+    await this.eventBind();
+
     // 初始化结束
     loadend();
-
-    // 创建结构
-    this.creatGitting();
-    this.creatComment();
 
     console.log(this);
   }
@@ -92,21 +90,14 @@ class Gitting {
     const newUrl = location.href.split("?")[0] + (Object.keys(parameters) > 0 ? "?" : "") + utils.queryStringify(parameters);
     history.replaceState(null, "", newUrl);
 
-    const query = {
-      client_id: this.option.clientID,
-      client_secret: this.option.clientSecret,
-      code: code,
-      redirect_uri: location.href
-    };
-
     // 获取token
-    const data = await api.getToken(`${this.option.proxy}?${utils.queryStringify(query)}`);
+    const data = await this.api.getToken(code);
     this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
     utils.setStorage("gitting-token", data.access_token);
     this.token = data.access_token;
 
     // 获取用户信息
-    const userInfo = await api.getUserInfo(data.access_token);
+    const userInfo = await this.api.getUserInfo(data.access_token);
     this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
     utils.setStorage("gitting-userInfo", userInfo);
     this.userInfo = userInfo;
@@ -115,16 +106,6 @@ class Gitting {
     this.isLogin = true;
 
     return userInfo;
-  }
-
-  // 登出
-  logout() {
-    this.page = 1;
-    this.issue = {};
-    this.isLogin = false;
-    utils.delStorage("gitting-token");
-    utils.delStorage("gitting-userInfo");
-    this.creatInit();
   }
 
   // 初始化评论
@@ -158,7 +139,6 @@ class Gitting {
       scope: "public_repo"
     };
 
-    this.$container.innerHTML = ``;
     this.$container.insertAdjacentHTML("beforeend",
       `
       <div class="gt-header clearfix">
@@ -192,19 +172,24 @@ class Gitting {
                     <span class="gt-write gt-btn fl active">${this.i("write")}</span>
                     <span class="gt-preview gt-btn fl">${this.i("preview")}</span>
                 </div>
-                <button class="gt-send fr">${this.i("submit")}</button>
+                ${
+                  this.isLogin
+                    ? `<button class="gt-send fr">${this.i("submit")}</button>`
+                    : `<a class="gt-send fr" href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}">${this.i("login")}</a>`
+                }
             </div>
           </div>
       </div>
       <div class="gt-comments"></div>
       <div class="gt-comments-load">
-          <a class="gt-load-state gt-load-more" href="#">${this.i("loadMore")}</a>
-          <div class="gt-load-state gt-load-end">${this.i("loadEnd")}</div>
+          <a class="gt-load-more" href="#">${this.i("loadMore")}</a>
+          <div class="gt-load-end">${this.i("loadEnd")}</div>
       </div>
     `
     );
 
     this.$logout = utils.query(this.$container, '.gt-logout');
+    this.$editor = utils.query(this.$container, '.gt-editor');
     this.$markdown = utils.query(this.$container, '.gt-markdown');
     this.$textarea = utils.query(this.$container, '.gt-textarea');
     this.$counts = utils.query(this.$container, '.counts');
@@ -212,20 +197,11 @@ class Gitting {
     this.$preview = utils.query(this.$container, '.gt-preview');
     this.$send = utils.query(this.$container, '.gt-send');
     this.$comments = utils.query(this.$container, '.gt-comments');
-    this.$load = utils.query(this.$container, '.gt-comments-load');
+    this.$commentsLoad = utils.query(this.$container, '.gt-comments-load');
   }
 
   async creatComment() {
-    const query = {
-      client_id: this.option.clientID,
-      client_secret: this.option.clientSecret,
-      per_page: this.option.perPage,
-      page: this.page
-    };
-
-    const comments = await api.getComments(this.option.owner, this.option.repo, this.issue.number, utils.queryStringify(query));
-    console.log(comments)
-    this.page += 1;
+    const comments = await this.api.getComments(this.issue.number, this.page++);
     const commentHtml = comments.map(item => {
       return `
       <div class="comments-item">
@@ -245,8 +221,59 @@ class Gitting {
       </div>
     `
     }).join('');
-
     this.$comments.insertAdjacentHTML("beforeend", commentHtml);
+    this.$commentsLoad.classList[comments.length < this.option.perPage ? 'add' : 'remove']('end');
+    return comments;
+  }
+
+  // 绑定事件
+  eventBind() {
+    this.$container.addEventListener('click', e => {
+      const target = e.target;
+      
+      // 注销
+      if (target.classList.contains('gt-logout')) {
+        e.preventDefault();
+        this.logout();
+      }
+
+      // 编写
+      if (target.classList.contains('gt-write')) {
+        this.$editor.classList.remove('gt-mode-preview');
+      }
+
+      // 预览
+      if (target.classList.contains('gt-preview')) {
+        this.$editor.classList.add('gt-mode-preview');
+      }
+
+      // 发送
+      if (target.classList.contains('gt-send')) {
+        console.log('gt-send')
+      }
+
+      // 回复
+      if (target.classList.contains('gt-comment-reply')) {
+        e.preventDefault();
+        console.log('gt-comment-reply')
+      }
+
+      // 加载
+      if (target.classList.contains('gt-load-more')) {
+        e.preventDefault();
+        console.log('gt-load-more')
+      }
+
+    });
+  }
+
+  // 登出
+  logout() {
+    this.page = 1;
+    this.isLogin = false;
+    utils.delStorage("gitting-token");
+    utils.delStorage("gitting-userInfo");
+    this.render(this.$container);
   }
 
   // 错误处理

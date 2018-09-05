@@ -131,6 +131,7 @@
 
   .gt-loading {
     position: absolute;
+    z-index: 9;
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.5);
@@ -143,15 +144,21 @@
   }
 
   .gt-init {
-    font-size: 13px;
     text-align: center;
+    margin-bottom: 50px;
+    font-size: 13px;
+    color: #808080;
     a {
-      color: #3e6fbf;
+      color: #808080;
       padding: 10px 15px;
       display: inline-block;
       vertical-align: top;
       border-radius: 3px;
       border: 1px solid #c3c8cf;
+      &:hover {
+        color: #333;
+        background: #f6f6f6;
+      }
     }
   }
 
@@ -160,15 +167,6 @@
     padding-bottom: 15px;
     margin-bottom: 15px;
     border-bottom: 1px dashed #c3c8cf;
-
-    a {
-      color: #a5a5a5;
-      text-decoration: none;
-      &:hover {
-        color: #797979;
-      }
-    }
-
     .gt-mate {
       a {
         display: inline-block;
@@ -183,7 +181,7 @@
     border-bottom: 1px dashed #c3c8cf;
     display: flex;
     .gt-editor {
-        position: relative;
+      position: relative;
       flex: 1;
       .gt-textarea {
         width: 100%;
@@ -299,7 +297,7 @@
         .gt-tip {
           display: none;
         }
-        .gt-textarea-preview {
+        .gt-markdown {
           display: block;
         }
         .gt-write {
@@ -308,11 +306,6 @@
         .gt-preview {
           background-image: linear-gradient(-180deg, #e4e4e4, #f5f5f5 90%);
         }
-      }
-      &.gt-mode-load {
-          .gt-ajax-load {
-              display: flex;
-          }
       }
     }
   }
@@ -358,9 +351,30 @@
     margin-bottom: 50px;
     font-size: 13px;
     color: #808080;
-  }
+    .gt-load-more {
+      color: #808080;
+      padding: 10px 15px;
+      display: inline-block;
+      vertical-align: top;
+      border-radius: 3px;
+      border: 1px solid #c3c8cf;
+      &:hover {
+        color: #333;
+        background: #f6f6f6;
+      }
+    }
 
-  .gt-ajax-load {
-      text-align: center;
+    .gt-load-end {
+      display: none;
+    }
+
+    &.end {
+      .gt-load-more {
+        display: none;
+      }
+      .gt-load-end {
+        display: inline-block;
+      }
+    }
   }
 }

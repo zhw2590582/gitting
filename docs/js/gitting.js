@@ -2272,7 +2272,7 @@
 
 	// 创建loading
 	var loading = function loading(selector) {
-	  var el = document.querySelector(selector);
+	  var el = selector instanceof Element ? selector : document.querySelector(selector);
 	  var loadingEl = document.createElement('div');
 	  loadingEl.classList.add('gt-loading');
 	  loadingEl.innerHTML = "\n    <div class=\"lds-ellipsis\">\n      <div></div>\n      <div></div>\n      <div></div>\n      <div></div>\n    </div>\n  ";
@@ -2313,31 +2313,75 @@
 	  });
 	};
 
-	// 获取token
-	function getToken(url) {
-	    return request('get', url);
-	}
+	function creatApi(option) {
+	    var issuesApi = 'https://api.github.com/repos/' + option.owner + '/' + option.repo + '/issues';
 
-	// 获取用户信息
-	function getUserInfo(token) {
-	    return request('get', 'https://api.github.com/user?access_token=' + token);
-	}
+	    var baseQuery = {
+	        client_id: option.clientID,
+	        client_secret: option.clientSecret
+	    };
 
-	// 通过标签获取issue
-	function getIssueByLabel(name, repos, query$$1) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues?' + query$$1);
-	}
+	    return {
+	        // 获取token
+	        getToken: function getToken(code) {
+	            var query$$1 = _Object$assign({}, baseQuery, {
+	                code: code,
+	                redirect_uri: location.href
+	            });
+	            return request('get', option.proxy + '?' + queryStringify(query$$1));
+	        },
 
-	// 通过id获取issues
-	function getIssueById(name, repos, id, query$$1) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '?' + query$$1);
-	}
 
-	// 获取某条issues下的评论
-	function getComments(name, repos, id, query$$1) {
-	    return request('get', 'https://api.github.com/repos/' + name + '/' + repos + '/issues/' + id + '/comments?' + query$$1, null, {
-	        Accept: "application/vnd.github.v3.full+json"
-	    });
+	        // 获取用户信息
+	        getUserInfo: function getUserInfo(token) {
+	            return request('get', 'https://api.github.com/user?access_token=' + token);
+	        },
+
+
+	        // 通过标签获取issue
+	        getIssueByLabel: function getIssueByLabel(labels) {
+	            var query$$1 = _Object$assign({}, baseQuery, {
+	                labels: labels
+	            });
+	            return request('get', issuesApi + '?' + queryStringify(query$$1));
+	        },
+
+
+	        // 通过id获取issues
+	        getIssueById: function getIssueById(id) {
+	            return request('get', issuesApi + '/' + id + '?' + queryStringify(baseQuery));
+	        },
+
+
+	        // 获取某条issues下的评论
+	        getComments: function getComments(id, page) {
+	            var query$$1 = _Object$assign({}, baseQuery, {
+	                option: option.perPage,
+	                page: page
+	            });
+	            return request('get', issuesApi + '/' + id + '/comments?' + queryStringify(query$$1), null, {
+	                Accept: "application/vnd.github.v3.full+json"
+	            });
+	        },
+
+
+	        // 创建一条issues
+	        creatIssues: function creatIssues(issue) {
+	            return request('post', issuesApi, issue);
+	        },
+
+
+	        // 创建一条评论
+	        creatComments: function creatComments(id, comment) {
+	            return request('post', issuesApi + '/' + id + '/comments', comment);
+	        },
+
+
+	        // 解析markdown
+	        mdToHtml: function mdToHtml(markdown) {
+	            return request('post', 'https://developer.github.com/v3/markdown/', markdown);
+	        }
+	    };
 	}
 
 	var version = "1.0.0";
@@ -2361,15 +2405,16 @@
 	    _classCallCheck(this, Gitting);
 
 	    this.option = _Object$assign({}, Gitting.DEFAULTS, option);
+	    this.api = creatApi(this.option);
 	    this.page = 1;
 	    this.issue = {};
 	    this.token = getStorage("gitting-token");
 	    this.userInfo = getStorage("gitting-userInfo");
 	    this.isLogin = !!this.token && !!this.userInfo;
 	    this.i = i18n$1(this.option.language);
-	    dayjs_min.locale(this.option.language);
 	    this.creatInit = this.creatInit.bind(this);
 	    this.logout = this.logout.bind(this);
+	    dayjs_min.locale(this.option.language);
 	  }
 
 	  // 默认配置
@@ -2382,13 +2427,14 @@
 	    // 挂载
 	    value: function () {
 	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(el) {
-	        var loadend, _utils$getURLParamete, code, query$$1, labels, labelsQuery;
+	        var loadend, _utils$getURLParamete, code, labelsArr, labels;
 
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
 	            switch (_context.prev = _context.next) {
 	              case 0:
 	                this.$container = el instanceof Element ? el : query(document, el);
+	                this.$container.innerHTML = '';
 
 	                // 初始化开始
 	                loadend = loading(el);
@@ -2398,60 +2444,62 @@
 	                _utils$getURLParamete = getURLParameters(), code = _utils$getURLParamete.code;
 
 	                if (!code) {
-	                  _context.next = 6;
+	                  _context.next = 7;
 	                  break;
 	                }
 
-	                _context.next = 6;
+	                _context.next = 7;
 	                return this.getUserInfo(code);
 
-	              case 6:
-	                query$$1 = {
-	                  client_id: this.option.clientID,
-	                  client_secret: this.option.clientSecret,
-	                  t: new Date().getTime()
-	                };
-
-	                // 获取 issue
-
+	              case 7:
 	                if (!(this.option.number > 0)) {
 	                  _context.next = 14;
 	                  break;
 	                }
 
 	                _context.next = 10;
-	                return getIssueById(this.option.owner, this.option.repo, this.option.number, queryStringify(query$$1));
+	                return this.api.getIssueById(this.option.number);
 
 	              case 10:
 	                this.issue = _context.sent;
 
-	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , please check the configuration!");
-	                _context.next = 20;
+	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
+	                _context.next = 21;
 	                break;
 
 	              case 14:
-	                labels = (this.option.labels.push(location.href), this.option.labels.join(","));
-	                labelsQuery = _Object$assign({}, query$$1, { labels: labels });
-	                _context.next = 18;
-	                return getIssueByLabel(this.option.owner, this.option.repo, queryStringify(labelsQuery));
+	                labelsArr = this.option.labels.slice();
 
-	              case 18:
+	                labelsArr.push(this.option.id);
+	                labels = labelsArr.join(",");
+	                _context.next = 19;
+	                return this.api.getIssueByLabel(labels);
+
+	              case 19:
 	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 
-	              case 20:
+	              case 21:
+	                _context.next = 23;
+	                return this.creatGitting();
+
+	              case 23:
+	                _context.next = 25;
+	                return this.creatComment();
+
+	              case 25:
+	                _context.next = 27;
+	                return this.eventBind();
+
+	              case 27:
 
 	                // 初始化结束
 	                loadend();
 
-	                // 创建结构
-	                this.creatGitting();
-	                this.creatComment();
-
 	                console.log(this);
 
-	              case 24:
+	              case 29:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2472,7 +2520,7 @@
 	    key: "getUserInfo",
 	    value: function () {
 	      var _ref2 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(code) {
-	        var parameters, newUrl, query$$1, data, userInfo;
+	        var parameters, newUrl, data, userInfo;
 	        return regenerator.wrap(function _callee2$(_context2) {
 	          while (1) {
 	            switch (_context2.prev = _context2.next) {
@@ -2485,19 +2533,11 @@
 
 	                history.replaceState(null, "", newUrl);
 
-	                query$$1 = {
-	                  client_id: this.option.clientID,
-	                  client_secret: this.option.clientSecret,
-	                  code: code,
-	                  redirect_uri: location.href
-	                };
-
 	                // 获取token
+	                _context2.next = 6;
+	                return this.api.getToken(code);
 
-	                _context2.next = 7;
-	                return getToken(this.option.proxy + "?" + queryStringify(query$$1));
-
-	              case 7:
+	              case 6:
 	                data = _context2.sent;
 
 	                this.errorHandle(!data.access_token, "Can not get token, Please login again!", this.logout);
@@ -2505,10 +2545,10 @@
 	                this.token = data.access_token;
 
 	                // 获取用户信息
-	                _context2.next = 13;
-	                return getUserInfo(data.access_token);
+	                _context2.next = 12;
+	                return this.api.getUserInfo(data.access_token);
 
-	              case 13:
+	              case 12:
 	                userInfo = _context2.sent;
 
 	                this.errorHandle(!userInfo.id, "Can not get user info, Please login again!", this.logout);
@@ -2520,7 +2560,7 @@
 
 	                return _context2.abrupt("return", userInfo);
 
-	              case 19:
+	              case 18:
 	              case "end":
 	                return _context2.stop();
 	            }
@@ -2528,25 +2568,12 @@
 	        }, _callee2, this);
 	      }));
 
-	      function getUserInfo$$1(_x2) {
+	      function getUserInfo(_x2) {
 	        return _ref2.apply(this, arguments);
 	      }
 
-	      return getUserInfo$$1;
+	      return getUserInfo;
 	    }()
-
-	    // 登出
-
-	  }, {
-	    key: "logout",
-	    value: function logout() {
-	      this.page = 1;
-	      this.issue = {};
-	      this.isLogin = false;
-	      delStorage("gitting-token");
-	      delStorage("gitting-userInfo");
-	      this.creatInit();
-	    }
 
 	    // 初始化评论
 
@@ -2574,10 +2601,10 @@
 	        scope: "public_repo"
 	      };
 
-	      this.$container.innerHTML = "";
-	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                <button class=\"gt-send fr\">" + this.i("submit") + "</button>\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-state gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-state gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n      <div class=\"gt-header clearfix\">\n        <a href=\"" + this.issue.html_url + "\" class=\"gt-counts fl\" target=\"_blank\">\n          " + this.issue.comments + " " + this.i("counts") + "\n        </a>\n        <div class=\"gt-mate fr clearfix\">\n          " + (this.isLogin ? "<a href=\"#\" class=\"gt-logout fl\">" + this.i("logout") + "</a>" : "<a href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\" class=\"gt-login fl\">" + this.i("login") + "</a>") + "\n          <a href=\"https://github.com/zhw2590582/gitting\" class=\"fl\" target=\"_blank\">Gitting " + version + "</a>\n        </div>\n      </div>\n      <div class=\"gt-body\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + (this.isLogin ? this.userInfo.avatar_url : this.option.avatar) + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-editor\">\n            <div class=\"gt-markdown markdown-body\"></div>\n            <textarea placeholder=\"" + this.i("leave") + "\" class=\"gt-textarea\" maxlength=\"" + this.option.maxlength + "\"></textarea>\n            <div class=\"gt-tip clearfix\">\n                <a class=\"fl\" href=\"https://guides.github.com/features/mastering-markdown/\" target=\"_blank\">" + this.i("styling") + "</a>\n                <div class=\"fr\">\n                  <span class=\"counts\">0</span> / " + this.option.maxlength + "\n                </div>\n            </div>\n            <div class=\"gt-tool clearfix\">\n                <div class=\"gt-switch fl clearfix\">\n                    <span class=\"gt-write gt-btn fl active\">" + this.i("write") + "</span>\n                    <span class=\"gt-preview gt-btn fl\">" + this.i("preview") + "</span>\n                </div>\n                " + (this.isLogin ? "<button class=\"gt-send fr\">" + this.i("submit") + "</button>" : "<a class=\"gt-send fr\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i("login") + "</a>") + "\n            </div>\n          </div>\n      </div>\n      <div class=\"gt-comments\"></div>\n      <div class=\"gt-comments-load\">\n          <a class=\"gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>\n          <div class=\"gt-load-end\">" + this.i("loadEnd") + "</div>\n      </div>\n    ");
 
 	      this.$logout = query(this.$container, '.gt-logout');
+	      this.$editor = query(this.$container, '.gt-editor');
 	      this.$markdown = query(this.$container, '.gt-markdown');
 	      this.$textarea = query(this.$container, '.gt-textarea');
 	      this.$counts = query(this.$container, '.counts');
@@ -2585,7 +2612,7 @@
 	      this.$preview = query(this.$container, '.gt-preview');
 	      this.$send = query(this.$container, '.gt-send');
 	      this.$comments = query(this.$container, '.gt-comments');
-	      this.$load = query(this.$container, '.gt-comments-load');
+	      this.$commentsLoad = query(this.$container, '.gt-comments-load');
 	    }
 	  }, {
 	    key: "creatComment",
@@ -2593,33 +2620,25 @@
 	      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3() {
 	        var _this = this;
 
-	        var query$$1, comments, commentHtml;
+	        var comments, commentHtml;
 	        return regenerator.wrap(function _callee3$(_context3) {
 	          while (1) {
 	            switch (_context3.prev = _context3.next) {
 	              case 0:
-	                query$$1 = {
-	                  client_id: this.option.clientID,
-	                  client_secret: this.option.clientSecret,
-	                  per_page: this.option.perPage,
-	                  page: this.page
-	                };
-	                _context3.next = 3;
-	                return getComments(this.option.owner, this.option.repo, this.issue.number, queryStringify(query$$1));
+	                _context3.next = 2;
+	                return this.api.getComments(this.issue.number, this.page++);
 
-	              case 3:
+	              case 2:
 	                comments = _context3.sent;
-
-	                console.log(comments);
-	                this.page += 1;
 	                commentHtml = comments.map(function (item) {
 	                  return "\n      <div class=\"comments-item\">\n        <div class=\"gt-avatar\">\n          <img src=\"" + item.user.avatar_url + "\" alt=\"avatar\">\n        </div>\n        <div class=\"gt-comment-content caret\">\n          <div class=\"gt-comment-body markdown-body\">\n            " + item.body_html + "\n          </div>\n          <div class=\"gt-comment-mate clearfix\">\n            <a class=\"gt-comment-name fl\" href=\"" + item.user.html_url + "\" target=\"_blank\">" + item.user.login + "</a>\n            <span class=\"gt-comment-time fl\" data-time=\"" + item.created_at + "\">" + _this.i("published") + " " + dayjs_min(item.created_at).fromNow() + "</span>\n            <a class=\"gt-comment-reply fr\" href=\"#\" target=\"_blank\">" + _this.i("reply") + "</a>\n          </div>\n        </div>\n      </div>\n    ";
 	                }).join('');
 
-
 	                this.$comments.insertAdjacentHTML("beforeend", commentHtml);
+	                this.$commentsLoad.classList[comments.length < this.option.perPage ? 'add' : 'remove']('end');
+	                return _context3.abrupt("return", comments);
 
-	              case 8:
+	              case 7:
 	              case "end":
 	                return _context3.stop();
 	            }
@@ -2634,6 +2653,63 @@
 	      return creatComment;
 	    }()
 
+	    // 绑定事件
+
+	  }, {
+	    key: "eventBind",
+	    value: function eventBind() {
+	      var _this2 = this;
+
+	      this.$container.addEventListener('click', function (e) {
+	        var target = e.target;
+
+	        // 注销
+	        if (target.classList.contains('gt-logout')) {
+	          e.preventDefault();
+	          _this2.logout();
+	        }
+
+	        // 编写
+	        if (target.classList.contains('gt-write')) {
+	          _this2.$editor.classList.remove('gt-mode-preview');
+	        }
+
+	        // 预览
+	        if (target.classList.contains('gt-preview')) {
+	          _this2.$editor.classList.add('gt-mode-preview');
+	        }
+
+	        // 发送
+	        if (target.classList.contains('gt-send')) {
+	          console.log('gt-send');
+	        }
+
+	        // 回复
+	        if (target.classList.contains('gt-comment-reply')) {
+	          e.preventDefault();
+	          console.log('gt-comment-reply');
+	        }
+
+	        // 加载
+	        if (target.classList.contains('gt-load-more')) {
+	          e.preventDefault();
+	          console.log('gt-load-more');
+	        }
+	      });
+	    }
+
+	    // 登出
+
+	  }, {
+	    key: "logout",
+	    value: function logout() {
+	      this.page = 1;
+	      this.isLogin = false;
+	      delStorage("gitting-token");
+	      delStorage("gitting-userInfo");
+	      this.render(this.$container);
+	    }
+
 	    // 错误处理
 
 	  }, {
@@ -2641,6 +2717,7 @@
 	    value: function errorHandle(condition, err, callback) {
 	      if (!condition) return;
 	      removeElement(".gt-error");
+	      removeElement(".gt-loading");
 	      this.$container.insertAdjacentHTML("afterbegin", "<div class=\"gt-error\">" + err + "</div>");
 	      callback && callback();
 	      throw new TypeError(err);
@@ -2654,11 +2731,11 @@
 	        repo: "",
 	        owner: "",
 	        admin: [],
-	        id: location.href,
+	        id: location.pathname,
 	        number: -1,
 	        labels: ["Gitting"],
 	        title: document.title,
-	        body: "",
+	        body: document.title + "\n" + location.href,
 	        language: "zh-cn",
 	        perPage: 10,
 	        maxlength: 500,

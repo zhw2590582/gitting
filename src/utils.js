@@ -42,7 +42,7 @@ export const removeElement = selector => {
 
 // 创建loading
 export const loading = selector => {
-  const el = document.querySelector(selector);
+  const el = selector instanceof Element ? selector : document.querySelector(selector);
   const loadingEl = document.createElement('div');
   loadingEl.classList.add('gt-loading');
   loadingEl.innerHTML = `
