@@ -65,8 +65,7 @@ class Gitting {
       this.issue = await this.api.getIssueById(this.option.number);
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
     } else {
-      const labelsArr = this.option.labels.slice();
-      labelsArr.push(this.option.id);
+      const labelsArr = this.option.labels.concat(this.option.id);
       const labels = labelsArr.join(",");
       this.issue = (await this.api.getIssueByLabel(labels))[0];
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
@@ -79,8 +78,6 @@ class Gitting {
     await this.creatGitting();
     await this.creatComment();
     await this.eventBind();
-
-    console.log(this);
   }
 
   // 获取并保存用户信息
@@ -120,15 +117,28 @@ class Gitting {
     this.$container.insertAdjacentHTML("beforeend",
       `
         <div class="gt-init">
-            <a
-              class="gt-init-btn"
-              href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}"
-            >
-              ${this.i("init")}
-            </a>
+          ${
+            this.isLogin
+              ? `<a class="gt-init" href="#">${this.i('init')}</a>`
+              : `<a class="gt-login" href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}">${this.i('login')}</a>`
+          }
         </div>
       `
     );
+
+    this.$init = utils.query(this.$container, '.gt-init');
+    this.$init.addEventListener('click', async e => {
+      e.preventDefault();
+      const loadend = utils.loading(this.$container);
+      const detail = {
+        title: this.option.title,
+        body: this.option.body,
+        labels: this.option.labels.concat(this.option.id)
+      };
+      const issue = await this.api.creatIssues(detail);
+      this.errorHandle(!issue || !issue.number, `Create issue failed: ${JSON.stringify(detail)}`, loadend);
+      location.reload();
+    });
   }
 
   // 创建评论
@@ -199,9 +209,7 @@ class Gitting {
     const loadend = utils.loading(this.$commentsLoad);
     const comments = await this.api.getComments(this.issue.number, this.page++)
     this.comments.push(...comments);
-    const commentHtml = comments.map(item => {
-      return this.commentTemplate(item);
-    }).join('');
+    const commentHtml = comments.map(item => this.commentTemplate(item)).join('');
     this.$comments.insertAdjacentHTML("beforeend", commentHtml);
     loadend();
     if (comments.length < this.option.perPage) {
@@ -234,10 +242,12 @@ class Gitting {
 
   // 绑定事件
   eventBind() {
+    // change事件
     const inputName = ["propertychange", "change", "click", "keyup", "input", "paste"];
     const inputFn = e => (this.$counts.innerHTML = this.$textarea.value.length);
     inputName.forEach(item => this.$textarea.addEventListener(item, inputFn));
 
+    // 点击事件
     this.$container.addEventListener('click', async e => {
       const target = e.target;
       
@@ -263,6 +273,7 @@ class Gitting {
           loadend();
           this.$markdown.innerHTML = html;
         } else {
+          this.$markdown.innerHTML = this.i('noPreview');
           loadend();
         }
       }

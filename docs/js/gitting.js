@@ -669,6 +669,17 @@
 
 	var _toConsumableArray = unwrapExports(toConsumableArray);
 
+	var $JSON = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
+	var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
+
+	var stringify$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": stringify, __esModule: true };
+	});
+
+	var _JSON$stringify = unwrapExports(stringify$1);
+
 	// most Object methods by ES6 should accept primitives
 
 
@@ -2250,6 +2261,7 @@
 	    styling: "支持使用Markdown进行样式设置",
 	    write: "编写",
 	    preview: "预览",
+	    noPreview: "无预览内容",
 	    submit: "提交",
 	    reply: "回复",
 	    loadMore: "加载更多",
@@ -2265,6 +2277,7 @@
 	    styling: "Styling with Markdown is supported",
 	    write: "Write",
 	    preview: "Preview",
+	    noPreview: "Nothing to preview",
 	    submit: "Submit",
 	    reply: "Reply",
 	    loadMore: "Load More",
@@ -2279,17 +2292,6 @@
 	    return langObj[key] || "Unmath key: " + key;
 	  };
 	}
-
-	var $JSON = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
-	var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-	var stringify$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": stringify, __esModule: true };
-	});
-
-	var _JSON$stringify = unwrapExports(stringify$1);
 
 	// 查询url参数
 	var getURLParameters = function getURLParameters() {
@@ -2554,44 +2556,38 @@
 	                this.issue = _context.sent;
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
-	                _context.next = 21;
+	                _context.next = 20;
 	                break;
 
 	              case 14:
-	                labelsArr = this.option.labels.slice();
-
-	                labelsArr.push(this.option.id);
+	                labelsArr = this.option.labels.concat(this.option.id);
 	                labels = labelsArr.join(",");
-	                _context.next = 19;
+	                _context.next = 18;
 	                return this.api.getIssueByLabel(labels);
 
-	              case 19:
+	              case 18:
 	                this.issue = _context.sent[0];
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 
-	              case 21:
+	              case 20:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
-	                _context.next = 24;
+	                _context.next = 23;
 	                return this.creatGitting();
 
-	              case 24:
-	                _context.next = 26;
+	              case 23:
+	                _context.next = 25;
 	                return this.creatComment();
 
-	              case 26:
-	                _context.next = 28;
+	              case 25:
+	                _context.next = 27;
 	                return this.eventBind();
 
-	              case 28:
-
-	                console.log(this);
-
-	              case 29:
+	              case 27:
 	              case "end":
 	                return _context.stop();
 	            }
@@ -2672,13 +2668,52 @@
 	  }, {
 	    key: "creatInit",
 	    value: function creatInit() {
+	      var _this = this;
+
 	      var query$$1 = {
 	        state: "Gitting",
 	        client_id: this.option.clientID,
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n            <a\n              class=\"gt-init-btn\"\n              href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\"\n            >\n              " + this.i("init") + "\n            </a>\n        </div>\n      ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
+
+	      this.$init = query(this.$container, '.gt-init');
+	      this.$init.addEventListener('click', function () {
+	        var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(e) {
+	          var loadend, detail, issue;
+	          return regenerator.wrap(function _callee3$(_context3) {
+	            while (1) {
+	              switch (_context3.prev = _context3.next) {
+	                case 0:
+	                  e.preventDefault();
+	                  loadend = loading(_this.$container);
+	                  detail = {
+	                    title: _this.option.title,
+	                    body: _this.option.body,
+	                    labels: _this.option.labels.concat(_this.option.id)
+	                  };
+	                  _context3.next = 5;
+	                  return _this.api.creatIssues(detail);
+
+	                case 5:
+	                  issue = _context3.sent;
+
+	                  _this.errorHandle(!issue || !issue.number, "Create issue failed: " + _JSON$stringify(detail), loadend);
+	                  location.reload();
+
+	                case 8:
+	                case "end":
+	                  return _context3.stop();
+	              }
+	            }
+	          }, _callee3, _this);
+	        }));
+
+	        return function (_x3) {
+	          return _ref3.apply(this, arguments);
+	        };
+	      }());
 	    }
 
 	    // 创建评论
@@ -2705,26 +2740,26 @@
 	  }, {
 	    key: "creatComment",
 	    value: function () {
-	      var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3() {
+	      var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4() {
 	        var _comments,
-	            _this = this;
+	            _this2 = this;
 
 	        var loadend, comments, commentHtml;
-	        return regenerator.wrap(function _callee3$(_context3) {
+	        return regenerator.wrap(function _callee4$(_context4) {
 	          while (1) {
-	            switch (_context3.prev = _context3.next) {
+	            switch (_context4.prev = _context4.next) {
 	              case 0:
 	                this.$commentsLoad.innerHTML = '';
 	                loadend = loading(this.$commentsLoad);
-	                _context3.next = 4;
+	                _context4.next = 4;
 	                return this.api.getComments(this.issue.number, this.page++);
 
 	              case 4:
-	                comments = _context3.sent;
+	                comments = _context4.sent;
 
 	                (_comments = this.comments).push.apply(_comments, _toConsumableArray(comments));
 	                commentHtml = comments.map(function (item) {
-	                  return _this.commentTemplate(item);
+	                  return _this2.commentTemplate(item);
 	                }).join('');
 
 	                this.$comments.insertAdjacentHTML("beforeend", commentHtml);
@@ -2734,18 +2769,18 @@
 	                } else {
 	                  this.$commentsLoad.innerHTML = "<a class=\"gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>";
 	                }
-	                return _context3.abrupt("return", comments);
+	                return _context4.abrupt("return", comments);
 
 	              case 11:
 	              case "end":
-	                return _context3.stop();
+	                return _context4.stop();
 	            }
 	          }
-	        }, _callee3, this);
+	        }, _callee4, this);
 	      }));
 
 	      function creatComment() {
-	        return _ref3.apply(this, arguments);
+	        return _ref4.apply(this, arguments);
 	      }
 
 	      return creatComment;
@@ -2763,23 +2798,25 @@
 	  }, {
 	    key: "eventBind",
 	    value: function eventBind() {
-	      var _this2 = this;
+	      var _this3 = this;
 
+	      // change事件
 	      var inputName = ["propertychange", "change", "click", "keyup", "input", "paste"];
 	      var inputFn = function inputFn(e) {
-	        return _this2.$counts.innerHTML = _this2.$textarea.value.length;
+	        return _this3.$counts.innerHTML = _this3.$textarea.value.length;
 	      };
 	      inputName.forEach(function (item) {
-	        return _this2.$textarea.addEventListener(item, inputFn);
+	        return _this3.$textarea.addEventListener(item, inputFn);
 	      });
 
+	      // 点击事件
 	      this.$container.addEventListener('click', function () {
-	        var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4(e) {
+	        var _ref5 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee5(e) {
 	          var target, loadend, text, html, body, _loadend, item, last, id, comment, oldValue, markdowm, newValue, comments, _last;
 
-	          return regenerator.wrap(function _callee4$(_context4) {
+	          return regenerator.wrap(function _callee5$(_context5) {
 	            while (1) {
-	              switch (_context4.prev = _context4.next) {
+	              switch (_context5.prev = _context5.next) {
 	                case 0:
 	                  target = e.target;
 
@@ -2787,134 +2824,135 @@
 
 	                  if (target.classList.contains('gt-logout')) {
 	                    e.preventDefault();
-	                    _this2.logout();
+	                    _this3.logout();
 	                  }
 
 	                  // 编写
 	                  if (target.classList.contains('gt-write')) {
-	                    _this2.$editor.classList.remove('gt-mode-preview');
-	                    _this2.$markdown.innerHTML = '';
+	                    _this3.$editor.classList.remove('gt-mode-preview');
+	                    _this3.$markdown.innerHTML = '';
 	                  }
 
 	                  // 预览
 
 	                  if (!target.classList.contains('gt-preview')) {
-	                    _context4.next = 16;
+	                    _context5.next = 17;
 	                    break;
 	                  }
 
-	                  loadend = loading(_this2.$markdown);
+	                  loadend = loading(_this3.$markdown);
 
-	                  _this2.$editor.classList.add('gt-mode-preview');
-	                  text = _this2.$textarea.value;
+	                  _this3.$editor.classList.add('gt-mode-preview');
+	                  text = _this3.$textarea.value;
 
 	                  if (!text.trim()) {
-	                    _context4.next = 15;
+	                    _context5.next = 15;
 	                    break;
 	                  }
 
-	                  _context4.next = 10;
-	                  return _this2.api.mdToHtml(text);
+	                  _context5.next = 10;
+	                  return _this3.api.mdToHtml(text);
 
 	                case 10:
-	                  html = _context4.sent;
+	                  html = _context5.sent;
 
 	                  loadend();
-	                  _this2.$markdown.innerHTML = html;
-	                  _context4.next = 16;
+	                  _this3.$markdown.innerHTML = html;
+	                  _context5.next = 17;
 	                  break;
 
 	                case 15:
+	                  _this3.$markdown.innerHTML = _this3.i('noPreview');
 	                  loadend();
 
-	                case 16:
+	                case 17:
 	                  if (!target.classList.contains('gt-send')) {
-	                    _context4.next = 30;
+	                    _context5.next = 31;
 	                    break;
 	                  }
 
-	                  body = _this2.$textarea.value;
+	                  body = _this3.$textarea.value;
 
 	                  if (body.trim()) {
-	                    _context4.next = 20;
+	                    _context5.next = 21;
 	                    break;
 	                  }
 
-	                  return _context4.abrupt("return");
+	                  return _context5.abrupt("return");
 
-	                case 20:
-	                  _loadend = loading(_this2.$editor);
-	                  _context4.next = 23;
-	                  return _this2.api.creatComments(_this2.issue.number, body);
+	                case 21:
+	                  _loadend = loading(_this3.$editor);
+	                  _context5.next = 24;
+	                  return _this3.api.creatComments(_this3.issue.number, body);
 
-	                case 23:
-	                  item = _context4.sent;
+	                case 24:
+	                  item = _context5.sent;
 
 	                  _loadend();
-	                  _this2.errorHandle(!item || !item.id, "Comment failed!");
-	                  _this2.$textarea.value = '';
-	                  _this2.$comments.insertAdjacentHTML("beforeend", _this2.commentTemplate(item, true));
-	                  last = query(_this2.$container, "[data-id='" + item.id + "']");
+	                  _this3.errorHandle(!item || !item.id, "Comment failed!");
+	                  _this3.$textarea.value = '';
+	                  _this3.$comments.insertAdjacentHTML("beforeend", _this3.commentTemplate(item, true));
+	                  last = query(_this3.$container, "[data-id='" + item.id + "']");
 
 	                  smoothScroll(last);
 
-	                case 30:
+	                case 31:
 	                  if (!target.classList.contains('gt-comment-reply')) {
-	                    _context4.next = 43;
+	                    _context5.next = 44;
 	                    break;
 	                  }
 
 	                  e.preventDefault();
 	                  id = target.dataset.id;
-	                  comment = _this2.comments.find(function (item) {
+	                  comment = _this3.comments.find(function (item) {
 	                    return item.id == id;
 	                  });
-	                  oldValue = _this2.$textarea.value;
+	                  oldValue = _this3.$textarea.value;
 	                  markdowm = (oldValue ? '\n' : '') + "> @" + comment.user.login + "\n> " + comment.body + "\n";
 	                  newValue = oldValue + markdowm;
 
-	                  if (!(newValue.length > _this2.option.maxlength)) {
-	                    _context4.next = 39;
+	                  if (!(newValue.length > _this3.option.maxlength)) {
+	                    _context5.next = 40;
 	                    break;
 	                  }
 
-	                  return _context4.abrupt("return");
+	                  return _context5.abrupt("return");
 
-	                case 39:
-	                  _this2.$textarea.value = newValue;
+	                case 40:
+	                  _this3.$textarea.value = newValue;
 	                  inputFn(e);
-	                  _this2.$textarea.focus();
-	                  smoothScroll(_this2.$textarea, -30);
+	                  _this3.$textarea.focus();
+	                  smoothScroll(_this3.$textarea, -30);
 
-	                case 43:
+	                case 44:
 	                  if (!target.classList.contains('gt-load-more')) {
-	                    _context4.next = 49;
+	                    _context5.next = 50;
 	                    break;
 	                  }
 
 	                  e.preventDefault();
-	                  _context4.next = 47;
-	                  return _this2.creatComment();
+	                  _context5.next = 48;
+	                  return _this3.creatComment();
 
-	                case 47:
-	                  comments = _context4.sent;
+	                case 48:
+	                  comments = _context5.sent;
 
 	                  if (comments.length) {
-	                    _last = query(_this2.$container, "[data-id='" + comments[0].id + "']");
+	                    _last = query(_this3.$container, "[data-id='" + comments[0].id + "']");
 
 	                    smoothScroll(_last, -100);
 	                  }
 
-	                case 49:
+	                case 50:
 	                case "end":
-	                  return _context4.stop();
+	                  return _context5.stop();
 	              }
 	            }
-	          }, _callee4, _this2);
+	          }, _callee5, _this3);
 	        }));
 
-	        return function (_x4) {
-	          return _ref4.apply(this, arguments);
+	        return function (_x5) {
+	          return _ref5.apply(this, arguments);
 	        };
 	      }());
 	    }
