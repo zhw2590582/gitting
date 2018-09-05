@@ -2519,7 +2519,7 @@
 	    // 挂载
 	    value: function () {
 	      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(el) {
-	        var loadend, _utils$getURLParamete, code, labelsArr, labels;
+	        var loadend, _utils$getURLParamete, code, labels;
 
 	        return regenerator.wrap(function _callee$(_context) {
 	          while (1) {
@@ -2561,42 +2561,44 @@
 
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by id [" + this.option.number + "] , Do you want to initialize an new issue?", this.creatInit);
 	                console.log('w');
-	                _context.next = 23;
+	                _context.next = 24;
 	                break;
 
 	              case 16:
-	                labelsArr = this.option.labels.concat(this.option.id);
-	                labels = labelsArr.join(",");
+	                labels = this.option.labels.concat(this.option.id).join(",");
+
+	                console.log(labels);
 	                _context.next = 20;
 	                return this.api.getIssueByLabel(labels);
 
 	              case 20:
 	                this.issue = _context.sent[0];
 
+	                console.log(this.issue);
 	                this.errorHandle(!this.issue || !this.issue.number, "Failed to get issue by labels [" + labels + "] , Do you want to initialize an new issue?", this.creatInit);
 	                console.log('e');
 
-	              case 23:
+	              case 24:
 
 	                // 初始化结束
 	                loadend();
 
 	                // 创建结构
 	                console.log('r');
-	                _context.next = 27;
+	                _context.next = 28;
 	                return this.creatGitting();
 
-	              case 27:
+	              case 28:
 	                console.log('t');
-	                _context.next = 30;
+	                _context.next = 31;
 	                return this.creatComment();
 
-	              case 30:
+	              case 31:
 	                console.log('y');
-	                _context.next = 33;
+	                _context.next = 34;
 	                return this.eventBind();
 
-	              case 33:
+	              case 34:
 	              case "end":
 	                return _context.stop();
 	            }

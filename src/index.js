@@ -66,9 +66,10 @@ class Gitting {
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
       console.log('w')
     } else {
-      const labelsArr = this.option.labels.concat(this.option.id);
-      const labels = labelsArr.join(",");
+      const labels = this.option.labels.concat(this.option.id).join(",");
+      console.log(labels)
       this.issue = (await this.api.getIssueByLabel(labels))[0];
+      console.log(this.issue)
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`, this.creatInit);
       console.log('e')
     }
