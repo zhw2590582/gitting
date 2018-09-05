@@ -1,7 +1,7 @@
 {
   "name": "gitting",
   "version": "1.0.1",
-  "description": "又是一个基于 Github Issue 开发的评论插件",
+  "description": "Gitting is a modern comment component based on Github Issue. ",
   "main": "dist/gitting.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",
