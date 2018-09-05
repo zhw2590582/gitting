@@ -1,6 +1,6 @@
 {
   "name": "gitting",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "又是一个基于 Github Issue 开发的评论插件",
   "main": "dist/gitting.js",
   "scripts": {

@@ -2676,9 +2676,9 @@
 	        redirect_uri: location.href,
 	        scope: "public_repo"
 	      };
-	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
+	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init-btn\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
 
-	      this.$init = query(this.$container, '.gt-init');
+	      this.$init = query(this.$container, '.gt-init-btn');
 	      this.$init.addEventListener('click', function () {
 	        var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(e) {
 	          var loadend, detail, issue;

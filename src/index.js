@@ -118,14 +118,14 @@ class Gitting {
         <div class="gt-init">
           ${
             this.isLogin
-              ? `<a class="gt-init" href="#">${this.i('init')}</a>`
+              ? `<a class="gt-init-btn" href="#">${this.i('init')}</a>`
               : `<a class="gt-login" href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}">${this.i('login')}</a>`
           }
         </div>
       `
     );
 
-    this.$init = utils.query(this.$container, '.gt-init');
+    this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();
       const loadend = utils.loading(this.$container);
