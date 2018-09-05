@@ -125,6 +125,7 @@ class Gitting {
       `
     );
 
+    if (!this.isLogin) return;
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();

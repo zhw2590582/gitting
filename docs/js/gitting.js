@@ -484,8 +484,6 @@
 	    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
-	      // fix for some old engines
-	      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -494,7 +492,7 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+	  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
 	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
@@ -2680,6 +2678,7 @@
 	      };
 	      this.$container.insertAdjacentHTML("beforeend", "\n        <div class=\"gt-init\">\n          " + (this.isLogin ? "<a class=\"gt-init-btn\" href=\"#\">" + this.i('init') + "</a>" : "<a class=\"gt-login\" href=\"http://github.com/login/oauth/authorize?client_id=" + queryStringify(query$$1) + "\">" + this.i('login') + "</a>") + "\n        </div>\n      ");
 
+	      if (!this.isLogin) return;
 	      this.$init = query(this.$container, '.gt-init-btn');
 	      this.$init.addEventListener('click', function () {
 	        var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(e) {
