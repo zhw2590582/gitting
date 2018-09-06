@@ -129,17 +129,24 @@ export default class Gitting {
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();
-      this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
-      const loadend = utils.loading(this.$container);
-      const detail = {
-        title: this.option.title,
-        body: this.option.body,
-        labels: this.option.labels.concat(this.option.id)
-      };
-      const issue = await this.api.creatIssues(detail);
-      this.errorHandle(!issue || !issue.number, `Create issue failed: ${JSON.stringify(detail)}`, loadend);
-      location.reload();
+      this.initIssue();
     });
+  }
+
+  // 初始化接口
+  initIssue(option = {}) {
+    this.errorHandle(!this.userInfo.login, `You have not logged in yet`);
+    this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
+    const loadend = utils.loading(this.$container);
+    const detail = {
+      title: this.option.title,
+      body: this.option.body,
+      labels: this.option.labels.concat(this.option.id),
+      ...option
+    };
+    const issue = await this.api.creatIssues(detail);
+    this.errorHandle(!issue || !issue.number, `Initialize issue failed: ${JSON.stringify(detail)}`, loadend);
+    location.reload();
   }
 
   // 创建结构
