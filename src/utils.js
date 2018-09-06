@@ -36,7 +36,7 @@ export const query = (doc = document, selector) => {
 
 // 删除dom元素
 export const removeElement = selector => {
-  const el = document.querySelector(selector);
+  const el = selector instanceof Element ? selector : document.querySelector(selector);
   el && el.parentNode && el.parentNode.removeChild(el);
 }
 

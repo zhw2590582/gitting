@@ -340,8 +340,8 @@ export default class Gitting {
   // 错误处理
   errorHandle(condition, err, callback) {
     if (!condition) return;
-    utils.removeElement(".gt-error");
-    utils.removeElement(".gt-loading");
+    utils.removeElement(utils.query(this.$container, ".gt-error"));
+    utils.removeElement(utils.query(this.$container, ".gt-loading"));
     this.$container.insertAdjacentHTML("afterbegin", `<div class="gt-error">${err}</div>`);
     callback && callback();
     throw new TypeError(err);
