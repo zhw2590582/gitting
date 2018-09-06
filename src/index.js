@@ -9,7 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
 dayjs.extend(relativeTime);
 
-class Gitting {
+export default class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
     this.api = creatApi(this.option);
@@ -129,17 +129,24 @@ class Gitting {
     this.$init = utils.query(this.$container, '.gt-init-btn');
     this.$init.addEventListener('click', async e => {
       e.preventDefault();
-      this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
-      const loadend = utils.loading(this.$container);
-      const detail = {
-        title: this.option.title,
-        body: this.option.body,
-        labels: this.option.labels.concat(this.option.id)
-      };
-      const issue = await this.api.creatIssues(detail);
-      this.errorHandle(!issue || !issue.number, `Create issue failed: ${JSON.stringify(detail)}`, loadend);
-      location.reload();
+      this.initIssue();
     });
+  }
+
+  // 初始化接口
+  initIssue(option = {}) {
+    this.errorHandle(!this.userInfo.login, `You have not logged in yet`);
+    this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
+    const loadend = utils.loading(this.$container);
+    const detail = {
+      title: this.option.title,
+      body: this.option.body,
+      labels: this.option.labels.concat(this.option.id),
+      ...option
+    };
+    const issue = await this.api.creatIssues(detail);
+    this.errorHandle(!issue || !issue.number, `Initialize issue failed: ${JSON.stringify(detail)}`, loadend);
+    location.reload();
   }
 
   // 创建结构
@@ -273,12 +280,11 @@ class Gitting {
         const text = this.$textarea.value;
         if (text.trim()) {
           const html = await this.api.mdToHtml(text);
-          loadend();
           this.$markdown.innerHTML = html;
         } else {
           this.$markdown.innerHTML = this.i('noPreview');
-          loadend();
         }
+        loadend();
       }
 
       // 发送
@@ -334,13 +340,10 @@ class Gitting {
   // 错误处理
   errorHandle(condition, err, callback) {
     if (!condition) return;
-    utils.removeElement(".gt-error");
-    utils.removeElement(".gt-loading");
+    utils.removeElement(utils.query(this.$container, ".gt-error"));
+    utils.removeElement(utils.query(this.$container, ".gt-loading"));
     this.$container.insertAdjacentHTML("afterbegin", `<div class="gt-error">${err}</div>`);
     callback && callback();
     throw new TypeError(err);
   }
 }
-
-window.Gitting = Gitting;
-export default Gitting;
