@@ -90,6 +90,10 @@ export const request = (method, url, body, header) => {
   }).then(res => {
     if (res.status === 404) {
       return Promise.reject("Unauthorized.");
+    } else if(res.status === 401) {
+      delStorage("gitting-token");
+      delStorage("gitting-userInfo");
+      location.reload();
     } else {
       if (headers.Accept === 'text/html') {
         return res.text();
