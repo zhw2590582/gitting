@@ -9,7 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
 dayjs.extend(relativeTime);
 
-class Gitting {
+export default class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
     this.api = creatApi(this.option);
@@ -273,12 +273,11 @@ class Gitting {
         const text = this.$textarea.value;
         if (text.trim()) {
           const html = await this.api.mdToHtml(text);
-          loadend();
           this.$markdown.innerHTML = html;
         } else {
           this.$markdown.innerHTML = this.i('noPreview');
-          loadend();
         }
+        loadend();
       }
 
       // 发送
@@ -341,6 +340,3 @@ class Gitting {
     throw new TypeError(err);
   }
 }
-
-window.Gitting = Gitting;
-export default Gitting;
