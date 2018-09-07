@@ -9,7 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
 dayjs.extend(relativeTime);
 
-export default class Gitting {
+class Gitting {
   constructor(option) {
     this.option = Object.assign({}, Gitting.DEFAULTS, option);
     this.api = creatApi(this.option);
@@ -23,7 +23,6 @@ export default class Gitting {
     this.creatInit = this.creatInit.bind(this);
     this.logout = this.logout.bind(this);
     dayjs.locale(this.option.language);
-    window.Gitting = Gitting;
   }
 
   // 默认配置
@@ -345,3 +344,6 @@ export default class Gitting {
     throw new TypeError(err);
   }
 }
+
+window.Gitting = Gitting;
+export default Gitting;
