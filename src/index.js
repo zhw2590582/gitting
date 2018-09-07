@@ -23,6 +23,7 @@ export default class Gitting {
     this.creatInit = this.creatInit.bind(this);
     this.logout = this.logout.bind(this);
     dayjs.locale(this.option.language);
+    window.Gitting = Gitting;
   }
 
   // 默认配置

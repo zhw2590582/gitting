@@ -2513,6 +2513,7 @@
 	    this.creatInit = this.creatInit.bind(this);
 	    this.logout = this.logout.bind(this);
 	    dayjs_min.locale(this.option.language);
+	    window.Gitting = Gitting;
 	  }
 
 	  // 默认配置
