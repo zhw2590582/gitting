@@ -2289,7 +2289,7 @@
 	};
 
 	function i18n$1 (lang) {
-	  var langObj = i18n[lang] || i18n["zh-CN"];
+	  var langObj = i18n[lang] || i18n["zh-cn"];
 	  return function (key) {
 	    return langObj[key] || "Unmath key: " + key;
 	  };
@@ -2336,7 +2336,7 @@
 
 	// 删除dom元素
 	var removeElement = function removeElement(selector) {
-	  var el = document.querySelector(selector);
+	  var el = selector instanceof Element ? selector : document.querySelector(selector);
 	  el && el.parentNode && el.parentNode.removeChild(el);
 	};
 
@@ -2683,29 +2683,14 @@
 	      this.$init = query(this.$container, '.gt-init-btn');
 	      this.$init.addEventListener('click', function () {
 	        var _ref3 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(e) {
-	          var loadend, detail, issue;
 	          return regenerator.wrap(function _callee3$(_context3) {
 	            while (1) {
 	              switch (_context3.prev = _context3.next) {
 	                case 0:
 	                  e.preventDefault();
-	                  _this.errorHandle(!_this.option.admin.includes(_this.userInfo.login), "You have no permission to initialize this issue");
-	                  loadend = loading(_this.$container);
-	                  detail = {
-	                    title: _this.option.title,
-	                    body: _this.option.body,
-	                    labels: _this.option.labels.concat(_this.option.id)
-	                  };
-	                  _context3.next = 6;
-	                  return _this.api.creatIssues(detail);
+	                  _this.initIssue();
 
-	                case 6:
-	                  issue = _context3.sent;
-
-	                  _this.errorHandle(!issue || !issue.number, "Create issue failed: " + _JSON$stringify(detail), loadend);
-	                  location.reload();
-
-	                case 9:
+	                case 2:
 	                case "end":
 	                  return _context3.stop();
 	              }
@@ -2718,6 +2703,50 @@
 	        };
 	      }());
 	    }
+
+	    // 初始化接口
+
+	  }, {
+	    key: "initIssue",
+	    value: function () {
+	      var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4() {
+	        var option = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	        var loadend, detail, issue;
+	        return regenerator.wrap(function _callee4$(_context4) {
+	          while (1) {
+	            switch (_context4.prev = _context4.next) {
+	              case 0:
+	                this.errorHandle(!this.userInfo.login, "You have not logged in yet");
+	                this.errorHandle(!this.option.admin.includes(this.userInfo.login), "You have no permission to initialize this issue");
+	                loadend = loading(this.$container);
+	                detail = _Object$assign({}, {
+	                  title: this.option.title,
+	                  body: this.option.body,
+	                  labels: this.option.labels.concat(this.option.id)
+	                }, option);
+	                _context4.next = 6;
+	                return this.api.creatIssues(detail);
+
+	              case 6:
+	                issue = _context4.sent;
+
+	                this.errorHandle(!issue || !issue.number, "Initialize issue failed: " + _JSON$stringify(detail), loadend);
+	                location.reload();
+
+	              case 9:
+	              case "end":
+	                return _context4.stop();
+	            }
+	          }
+	        }, _callee4, this);
+	      }));
+
+	      function initIssue() {
+	        return _ref4.apply(this, arguments);
+	      }
+
+	      return initIssue;
+	    }()
 
 	    // 创建结构
 
@@ -2746,22 +2775,22 @@
 	  }, {
 	    key: "creatComment",
 	    value: function () {
-	      var _ref4 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4() {
+	      var _ref5 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee5() {
 	        var _comments,
 	            _this2 = this;
 
 	        var loadend, comments, commentHtml;
-	        return regenerator.wrap(function _callee4$(_context4) {
+	        return regenerator.wrap(function _callee5$(_context5) {
 	          while (1) {
-	            switch (_context4.prev = _context4.next) {
+	            switch (_context5.prev = _context5.next) {
 	              case 0:
 	                this.$commentsLoad.innerHTML = '';
 	                loadend = loading(this.$commentsLoad);
-	                _context4.next = 4;
+	                _context5.next = 4;
 	                return this.api.getComments(this.issue.number, this.page++);
 
 	              case 4:
-	                comments = _context4.sent;
+	                comments = _context5.sent;
 
 	                (_comments = this.comments).push.apply(_comments, _toConsumableArray(comments));
 	                commentHtml = comments.map(function (item) {
@@ -2775,18 +2804,18 @@
 	                } else {
 	                  this.$commentsLoad.innerHTML = "<a class=\"gt-load-more\" href=\"#\">" + this.i("loadMore") + "</a>";
 	                }
-	                return _context4.abrupt("return", comments);
+	                return _context5.abrupt("return", comments);
 
 	              case 11:
 	              case "end":
-	                return _context4.stop();
+	                return _context5.stop();
 	            }
 	          }
-	        }, _callee4, this);
+	        }, _callee5, this);
 	      }));
 
 	      function creatComment() {
-	        return _ref4.apply(this, arguments);
+	        return _ref5.apply(this, arguments);
 	      }
 
 	      return creatComment;
@@ -2820,12 +2849,12 @@
 
 	      // 点击事件
 	      this.$container.addEventListener('click', function () {
-	        var _ref5 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee5(e) {
+	        var _ref6 = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee6(e) {
 	          var target, loadend, text, html, body, _loadend, item, last, id, comment, oldValue, markdowm, newValue, comments, _last;
 
-	          return regenerator.wrap(function _callee5$(_context5) {
+	          return regenerator.wrap(function _callee6$(_context6) {
 	            while (1) {
-	              switch (_context5.prev = _context5.next) {
+	              switch (_context6.prev = _context6.next) {
 	                case 0:
 	                  target = e.target;
 
@@ -2845,7 +2874,7 @@
 	                  // 预览
 
 	                  if (!target.classList.contains('gt-preview')) {
-	                    _context5.next = 17;
+	                    _context6.next = 16;
 	                    break;
 	                  }
 
@@ -2855,47 +2884,48 @@
 	                  text = _this3.$textarea.value;
 
 	                  if (!text.trim()) {
-	                    _context5.next = 15;
+	                    _context6.next = 14;
 	                    break;
 	                  }
 
-	                  _context5.next = 10;
+	                  _context6.next = 10;
 	                  return _this3.api.mdToHtml(text);
 
 	                case 10:
-	                  html = _context5.sent;
+	                  html = _context6.sent;
 
-	                  loadend();
 	                  _this3.$markdown.innerHTML = html;
-	                  _context5.next = 17;
+	                  _context6.next = 15;
 	                  break;
 
-	                case 15:
+	                case 14:
 	                  _this3.$markdown.innerHTML = _this3.i('noPreview');
+
+	                case 15:
 	                  loadend();
 
-	                case 17:
+	                case 16:
 	                  if (!target.classList.contains('gt-send')) {
-	                    _context5.next = 31;
+	                    _context6.next = 30;
 	                    break;
 	                  }
 
 	                  body = _this3.$textarea.value;
 
 	                  if (body.trim()) {
-	                    _context5.next = 21;
+	                    _context6.next = 20;
 	                    break;
 	                  }
 
-	                  return _context5.abrupt("return");
+	                  return _context6.abrupt("return");
 
-	                case 21:
+	                case 20:
 	                  _loadend = loading(_this3.$editor);
-	                  _context5.next = 24;
+	                  _context6.next = 23;
 	                  return _this3.api.creatComments(_this3.issue.number, body);
 
-	                case 24:
-	                  item = _context5.sent;
+	                case 23:
+	                  item = _context6.sent;
 
 	                  _loadend();
 	                  _this3.errorHandle(!item || !item.id, "Comment failed!");
@@ -2905,9 +2935,9 @@
 
 	                  smoothScroll(last);
 
-	                case 31:
+	                case 30:
 	                  if (!target.classList.contains('gt-comment-reply')) {
-	                    _context5.next = 44;
+	                    _context6.next = 43;
 	                    break;
 	                  }
 
@@ -2921,30 +2951,30 @@
 	                  newValue = oldValue + markdowm;
 
 	                  if (!(newValue.length > _this3.option.maxlength)) {
-	                    _context5.next = 40;
+	                    _context6.next = 39;
 	                    break;
 	                  }
 
-	                  return _context5.abrupt("return");
+	                  return _context6.abrupt("return");
 
-	                case 40:
+	                case 39:
 	                  _this3.$textarea.value = newValue;
 	                  inputFn(e);
 	                  _this3.$textarea.focus();
 	                  smoothScroll(_this3.$textarea, -30);
 
-	                case 44:
+	                case 43:
 	                  if (!target.classList.contains('gt-load-more')) {
-	                    _context5.next = 50;
+	                    _context6.next = 49;
 	                    break;
 	                  }
 
 	                  e.preventDefault();
-	                  _context5.next = 48;
+	                  _context6.next = 47;
 	                  return _this3.creatComment();
 
-	                case 48:
-	                  comments = _context5.sent;
+	                case 47:
+	                  comments = _context6.sent;
 
 	                  if (comments.length) {
 	                    _last = query(_this3.$container, "[data-id='" + comments[0].id + "']");
@@ -2952,16 +2982,16 @@
 	                    smoothScroll(_last, -100);
 	                  }
 
-	                case 50:
+	                case 49:
 	                case "end":
-	                  return _context5.stop();
+	                  return _context6.stop();
 	              }
 	            }
-	          }, _callee5, _this3);
+	          }, _callee6, _this3);
 	        }));
 
-	        return function (_x5) {
-	          return _ref5.apply(this, arguments);
+	        return function (_x6) {
+	          return _ref6.apply(this, arguments);
 	        };
 	      }());
 	    }
@@ -2971,11 +3001,9 @@
 	  }, {
 	    key: "logout",
 	    value: function logout() {
-	      this.page = 1;
-	      this.isLogin = false;
 	      delStorage("gitting-token");
 	      delStorage("gitting-userInfo");
-	      this.render(this.$container);
+	      location.reload();
 	    }
 
 	    // 错误处理
@@ -2984,8 +3012,8 @@
 	    key: "errorHandle",
 	    value: function errorHandle(condition, err, callback) {
 	      if (!condition) return;
-	      removeElement(".gt-error");
-	      removeElement(".gt-loading");
+	      removeElement(query(this.$container, ".gt-error"));
+	      removeElement(query(this.$container, ".gt-loading"));
 	      this.$container.insertAdjacentHTML("afterbegin", "<div class=\"gt-error\">" + err + "</div>");
 	      callback && callback();
 	      throw new TypeError(err);
@@ -3015,8 +3043,6 @@
 
 	  return Gitting;
 	}();
-
-	window.Gitting = Gitting;
 
 	return Gitting;
 

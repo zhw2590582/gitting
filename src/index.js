@@ -134,16 +134,15 @@ export default class Gitting {
   }
 
   // 初始化接口
-  initIssue(option = {}) {
+  async initIssue(option = {}) {
     this.errorHandle(!this.userInfo.login, `You have not logged in yet`);
     this.errorHandle(!this.option.admin.includes(this.userInfo.login), `You have no permission to initialize this issue`);
     const loadend = utils.loading(this.$container);
-    const detail = {
+    const detail = Object.assign({}, {
       title: this.option.title,
       body: this.option.body,
       labels: this.option.labels.concat(this.option.id),
-      ...option
-    };
+    }, option);
     const issue = await this.api.creatIssues(detail);
     this.errorHandle(!issue || !issue.number, `Initialize issue failed: ${JSON.stringify(detail)}`, loadend);
     location.reload();
@@ -330,11 +329,9 @@ export default class Gitting {
 
   // 登出
   logout() {
-    this.page = 1;
-    this.isLogin = false;
     utils.delStorage("gitting-token");
     utils.delStorage("gitting-userInfo");
-    this.render(this.$container);
+    location.reload();
   }
 
   // 错误处理
