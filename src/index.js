@@ -48,6 +48,7 @@ class Gitting {
 
   // 挂载
   async render(el) {
+    this.option.initStart && this.option.initStart();
     this.$container = el instanceof Element ? el : utils.query(document, el);
     this.$container.innerHTML = '';
 
@@ -61,7 +62,7 @@ class Gitting {
     }
 
     // 获取 issue
-    if (this.option.number > 0) {
+    if (Number(this.option.number) > 0) {
       this.issue = await this.api.getIssueById(this.option.number);
       this.errorHandle(!this.issue || !this.issue.number, `Failed to get issue by id [${this.option.number}] , Do you want to initialize an new issue?`, this.creatInit);
     } else {
@@ -77,6 +78,7 @@ class Gitting {
     await this.creatGitting();
     await this.creatComment();
     await this.eventBind();
+    this.option.initEnd && this.option.initEnd();
   }
 
   // 获取并保存用户信息
@@ -257,7 +259,7 @@ class Gitting {
     inputName.forEach(item => this.$textarea.addEventListener(item, inputFn));
 
     // 点击事件
-    this.$container.addEventListener('click', async e => {
+    const clickFn = async e => {
       const target = e.target;
       
       // 注销
@@ -274,16 +276,16 @@ class Gitting {
 
       // 预览
       if (target.classList.contains('gt-preview')) {
-        const loadend = utils.loading(this.$markdown);
         this.$editor.classList.add('gt-mode-preview');
         const text = this.$textarea.value;
         if (text.trim()) {
+          const loadend = utils.loading(this.$markdown);
           const html = await this.api.mdToHtml(text);
+          loadend();
           this.$markdown.innerHTML = html;
         } else {
           this.$markdown.innerHTML = this.i('noPreview');
         }
-        loadend();
       }
 
       // 发送
@@ -324,7 +326,14 @@ class Gitting {
           utils.smoothScroll(last, -100);
         }
       }
-    });
+    }
+    this.$container.addEventListener('click', clickFn);
+
+    // 销毁事件
+    this.destroy = () => {
+      inputName.forEach(item => this.$textarea.removeEventListener(item, inputFn));
+      this.$container.removeEventListener('click', clickFn);
+    }
   }
 
   // 登出
