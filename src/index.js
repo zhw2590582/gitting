@@ -86,7 +86,7 @@ class Gitting {
     // 移除code参数
     const parameters = utils.getURLParameters();
     delete parameters.code;
-    const newUrl = location.href.split("?")[0] + (Object.keys(parameters) > 0 ? "?" : "") + utils.queryStringify(parameters);
+    const newUrl = location.href.split("?")[0] + (Object.keys(parameters).length > 0 ? "?" : "") + utils.queryStringify(parameters);
     history.replaceState(null, "", newUrl);
 
     // 获取token
