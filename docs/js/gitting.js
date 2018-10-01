@@ -2624,7 +2624,7 @@
 	                parameters = getURLParameters();
 
 	                delete parameters.code;
-	                newUrl = location.href.split("?")[0] + (_Object$keys(parameters).length > 0 ? "?" : "") + queryStringify(parameters);
+	                newUrl = location.href.split("?")[0] + (_Object$keys(parameters).length > 0 ? "?" + queryStringify(parameters) : "");
 
 	                history.replaceState(null, "", newUrl);
 
