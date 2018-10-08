@@ -1,5 +1,5 @@
 import "./index.scss";
-import "./primer-markdown.css";
+import "github-markdown-css";
 import i18n from "./i18n";
 import creatApi from "./creatApi";
 import * as utils from "./utils";

@@ -1,6 +1,6 @@
 {
   "name": "gitting",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Gitting is a modern comment component based on Github Issue. ",
   "main": "dist/gitting.js",
   "scripts": {
@@ -37,6 +37,7 @@
     "rollup-plugin-uglify": "^5.0.2"
   },
   "dependencies": {
-    "dayjs": "^1.7.5"
+    "dayjs": "^1.7.5",
+    "github-markdown-css": "^2.10.0"
   }
 }
