@@ -41,7 +41,7 @@ class Gitting {
       language: "zh-cn",
       perPage: 10,
       maxlength: 500,
-      avatar: "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
+      avatar: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
       proxy: "https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token"
     };
   }
