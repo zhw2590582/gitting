@@ -1,11 +1,18 @@
-import "./styles/index.scss";
-import { h, render } from "preact";
-//@jsx h
+import "./style.scss";
+import {
+  h,
+  render
+} from "preact";
 
-render(
-  <div id="foo">
-    <span>Hello, world!</span>
-    <button onClick={e => alert("hi!")}>Click Me</button>
-  </div>,
-  document.querySelector('.gitting')
-);
+class Gitting {
+  constructor(optinos) {
+    this.optinos = Object.assign({}, optinos, Gitting.DEFAULT);
+  }
+
+  static DEFAULT() {
+    return {}
+  }
+}
+
+window.Gitting = Gitting;
+export default Gitting;

@@ -699,7 +699,6 @@
     function render(vnode, parent, merge) {
       return diff(merge, vnode, {}, false, parent, false);
     }
-    //# sourceMappingURL=preact.mjs.map
 
     render(h("div", {
       id: "foo"
