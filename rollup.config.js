@@ -5,32 +5,41 @@ const postcss = require('rollup-plugin-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const replace = require("rollup-plugin-replace");
-const { uglify } = require("rollup-plugin-uglify");
+const {
+  uglify
+} = require("rollup-plugin-uglify");
+const {
+  version
+} = require("./package.json");
 const isProd = process.env.NODE_ENV === "production";
 
 export default {
-	input: "src/index.js",
-	output: {
-		name: "gitting",
-		file: isProd ? "dist/gitting.js" : "docs/js/gitting.js",
-		format: "umd"
-	},
-	plugins: [
-		postcss({
-            plugins: [autoprefixer, cssnano],
-            extract: isProd ? "dist/gitting.css" : "docs/css/gitting.css"
-		}),
-		nodeResolve(),
-		commonjs(),
-		babel({
-			runtimeHelpers: true,
-			exclude: 'node_modules/**',
-			plugins: ["external-helpers", "transform-runtime"]
-		}),
-		replace({
-			exclude: 'node_modules/**',
-			ENV: JSON.stringify(process.env.NODE_ENV || 'development')
-		}),
-		(isProd && uglify())
-	]
+  input: "src/index.js",
+  output: {
+    name: "gitting",
+    file: isProd ? "dist/gitting.js" : "dist/gitting-uncompiled.js",
+    format: "umd"
+  },
+  plugins: [
+    postcss({
+      plugins: [autoprefixer, cssnano],
+      extract: isProd ? "dist/gitting.css" : "dist/gitting-uncompiled.css"
+    }),
+    babel({
+      runtimeHelpers: true,
+      exclude: 'node_modules/**',
+      plugins: [
+        ["@babel/plugin-transform-react-jsx", {
+          "pragma": "h"
+        }], "@babel/plugin-external-helpers", "@babel/plugin-transform-runtime"
+      ]
+	}),
+	nodeResolve(),
+    commonjs(),
+    replace({
+      _ENV_: JSON.stringify(process.env.NODE_ENV || 'development'),
+      _VERSION_: JSON.stringify(version)
+    }),
+    (isProd && uglify())
+  ]
 };
