@@ -1,12 +1,12 @@
 import "./style.scss";
-import {
-  h,
-  render
-} from "preact";
+import optionValidator from 'option-validator';
+import scheme from './scheme';
+import preact from "preact";
 
 class Gitting {
-  constructor(optinos) {
-    this.optinos = Object.assign({}, optinos, Gitting.DEFAULT);
+  constructor(options) {
+    this.options = Object.assign({}, options, Gitting.DEFAULT);
+    optionValidator(this.options, scheme);
   }
 
   static DEFAULT() {
