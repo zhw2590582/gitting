@@ -40,6 +40,7 @@
   "dependencies": {
     "dayjs": "^1.8.12",
     "github-markdown-css": "^3.0.1",
-    "preact": "^8.4.2"
+    "preact": "^8.4.2",
+    "unistore": "^3.4.1"
   }
 }

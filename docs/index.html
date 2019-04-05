@@ -6,13 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../dist/gitting-uncompiled.css">
+    <style>
+        .gitting {
+            width: 500px;
+            margin: 20px auto;
+            background: #999;
+        }
+    </style>
 </head>
 <body>
     <div class="gitting"></div>
     <script src="../dist/gitting-uncompiled.js"></script>
     <script>
         var gitting = new Gitting({
-            
+            clientID: '2fa6841ea796af21b439',
+            clientSecret: '4e2196768a4ce9ce143bf2b2ba378efcbd8081f8',
+            repo: 'gitting',
+            owner: 'zhw2590582',
+            admin: ['zhw2590582'],
+            id: location.pathname
         });
 
         gitting.render('.gitting');

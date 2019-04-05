@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.gitting = factory());
+  (global = global || self, global.Gitting = factory());
 }(this, function () { 'use strict';
 
   function _classCallCheck(instance, Constructor) {
@@ -81,6 +81,8 @@
   	p.attributes = attributes == null ? undefined : attributes;
   	p.key = attributes == null ? undefined : attributes.key;
 
+  	if (options.vnode !== undefined) options.vnode(p);
+
   	return p;
   }
 
@@ -98,13 +100,17 @@
 
   var defer = typeof Promise == 'function' ? Promise.resolve().then.bind(Promise.resolve()) : setTimeout;
 
+  function cloneElement(vnode, props) {
+    return h(vnode.nodeName, extend(extend({}, vnode.attributes), props), arguments.length > 2 ? [].slice.call(arguments, 2) : vnode.children);
+  }
+
   var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
 
   var items = [];
 
   function enqueueRender(component) {
   	if (!component._dirty && (component._dirty = true) && items.push(component) == 1) {
-  		(defer)(rerender);
+  		(options.debounceRendering || defer)(rerender);
   	}
   }
 
@@ -206,7 +212,7 @@
   }
 
   function eventProxy(e) {
-  	return this._listeners[e.type](e);
+  	return this._listeners[e.type](options.event && options.event(e) || e);
   }
 
   var mounts = [];
@@ -220,6 +226,7 @@
   function flushMounts() {
   	var c;
   	while (c = mounts.shift()) {
+  		if (options.afterMount) options.afterMount(c);
   		if (c.componentDidMount) c.componentDidMount();
   	}
   }
@@ -625,6 +632,7 @@
   		if (component.componentDidUpdate) {
   			component.componentDidUpdate(previousProps, previousState, snapshot);
   		}
+  		if (options.afterUpdate) options.afterUpdate(component);
   	}
 
   	while (component._renderCallbacks.length) {
@@ -671,6 +679,7 @@
   }
 
   function unmountComponent(component) {
+  	if (options.beforeUnmount) options.beforeUnmount(component);
 
   	var base = component.base;
 
@@ -726,10 +735,41 @@
   function render(vnode, parent, merge) {
     return diff(merge, vnode, {}, false, parent, false);
   }
+
+  function createRef() {
+  	return {};
+  }
+
+  var preact = {
+  	h: h,
+  	createElement: h,
+  	cloneElement: cloneElement,
+  	createRef: createRef,
+  	Component: Component,
+  	render: render,
+  	rerender: rerender,
+  	options: options
+  };
   //# sourceMappingURL=preact.mjs.map
+
+  var preact$1 = /*#__PURE__*/Object.freeze({
+    default: preact,
+    h: h,
+    createElement: h,
+    cloneElement: cloneElement,
+    createRef: createRef,
+    Component: Component,
+    render: render,
+    rerender: rerender,
+    options: options
+  });
 
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  function getCjsExportFromNamespace (n) {
+  	return n && n['default'] || n;
   }
 
   var _typeof_1 = createCommonjsModule(function (module) {
@@ -813,6 +853,91 @@
 
   var inherits = _inherits;
 
+  var require$$0 = getCjsExportFromNamespace(preact$1);
+
+  var preact$2 = createCommonjsModule(function (module, exports) {
+  var t=require$$0;function n(t,n){for(var r in n)t[r]=n[r];return t}function r(t){this.getChildContext=function(){return {store:t.store}};}r.prototype.render=function(t){return t.children&&t.children[0]||t.children},exports.connect=function(r,e){var o;return "function"!=typeof r&&("string"==typeof(o=r||{})&&(o=o.split(/\s*,\s*/)),r=function(t){for(var n={},r=0;r<o.length;r++)n[o[r]]=t[o[r]];return n}),function(o){function i(i,u){var c=this,f=u.store,s=r(f?f.getState():{},i),a=e?function(t,n){"function"==typeof t&&(t=t(n));var r={};for(var e in t)r[e]=n.action(t[e]);return r}(e,f):{store:f},p=function(){var t=r(f?f.getState():{},i);for(var n in t)if(t[n]!==s[n])return s=t,c.setState({});for(var e in s)if(!(e in t))return s=t,c.setState({})};this.componentWillReceiveProps=function(t){i=t,p();},this.componentDidMount=function(){f.subscribe(p);},this.componentWillUnmount=function(){f.unsubscribe(p);},this.render=function(r){return t.h(o,n(n(n({},a),r),s))};}return (i.prototype=new t.Component).constructor=i}},exports.Provider=r;
+  //# sourceMappingURL=preact.js.map
+  });
+  var preact_1 = preact$2.connect;
+  var preact_2 = preact$2.Provider;
+
+  function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
+  //# sourceMappingURL=unistore.es.js.map
+
+  var store = createStore({
+    issue: {
+      id: 0
+    },
+    comments: []
+  });
+  var actions = function actions(store) {
+    return {
+      increment: function increment(state) {
+        return {
+          issue: {
+            id: state.issue.id + 1
+          }
+        };
+      }
+    };
+  };
+
+  function Enhanced(WrappedComponent) {
+    return preact_1("issue,comments", actions)(
+    /*#__PURE__*/
+    function (_Component) {
+      inherits(_class, _Component);
+
+      function _class() {
+        classCallCheck(this, _class);
+
+        return possibleConstructorReturn(this, getPrototypeOf(_class).apply(this, arguments));
+      }
+
+      createClass(_class, [{
+        key: "render",
+        value: function render(props) {
+          return h(WrappedComponent, props);
+        }
+      }]);
+
+      return _class;
+    }(Component));
+  }
+
+  var Header =
+  /*#__PURE__*/
+  function (_Component) {
+    inherits(Header, _Component);
+
+    function Header() {
+      classCallCheck(this, Header);
+
+      return possibleConstructorReturn(this, getPrototypeOf(Header).apply(this, arguments));
+    }
+
+    createClass(Header, [{
+      key: "render",
+      value: function render(props) {
+        var issue = props.issue,
+            options = props.options,
+            increment = props.increment;
+        return h("header", {
+          "class": "gitting-header",
+          onClick: increment
+        }, h("a", {
+          href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.id),
+          "class": "gitting-number"
+        }, "0 \u6761\u8BC4\u8BBA"));
+      }
+    }]);
+
+    return Header;
+  }(Component);
+
+  var Header$1 = Enhanced(Header);
+
   var _default =
   /*#__PURE__*/
   function (_Component) {
@@ -826,8 +951,13 @@
 
     createClass(_default, [{
       key: "render",
-      value: function render() {
-        return h("div", null, "test");
+      value: function render(_ref) {
+        var options = _ref.options;
+        return h(preact_2, {
+          store: store
+        }, h(Header$1, {
+          options: options
+        }));
       }
     }]);
 
@@ -852,7 +982,9 @@
         this.$container = el instanceof Element ? el : document.querySelector(el);
         this.$container.classList.add("gitting-container");
         this.$container.classList.add("gitting-theme-".concat(this.options.theme));
-        this.$root = render(h(_default, null), this.$container);
+        this.$root = render(h(_default, {
+          options: this.options
+        }), this.$container);
       }
     }, {
       key: "destroy",

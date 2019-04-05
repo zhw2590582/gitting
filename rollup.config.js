@@ -16,7 +16,7 @@ const isProd = process.env.NODE_ENV === "production";
 export default {
   input: "src/index.js",
   output: {
-    name: "gitting",
+    name: "Gitting",
     file: isProd ? "dist/gitting.js" : "dist/gitting-uncompiled.js",
     format: "umd"
   },

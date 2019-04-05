@@ -33,7 +33,7 @@ class Gitting {
     this.$container = el instanceof Element ? el : document.querySelector(el);
     this.$container.classList.add("gitting-container");
     this.$container.classList.add(`gitting-theme-${this.options.theme}`);
-    this.$root = render(<Container />, this.$container);
+    this.$root = render(<Container options={this.options} />, this.$container);
   }
 
   destroy() {
