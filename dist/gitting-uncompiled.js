@@ -1055,7 +1055,7 @@
   }
 
   var state = {
-    isLogin: false,
+    isLogin: getStorage('token') && getStorage('userInfo'),
     api: {},
     i18n: function i18n() {},
     userInfo: {},
@@ -1066,13 +1066,6 @@
   var store = createStore(state);
   var actions = function actions(store) {
     return {
-      init: function init(state) {
-        return {
-          isLogin: getStorage('token') && getStorage('userInfo'),
-          api: creatApi(getStorage('options')),
-          i18n: creatI18n(getStorage('options'))
-        };
-      },
       throwError: function throwError(state, condition, msg) {
         return {
           error: !condition ? '' : msg
@@ -1958,7 +1951,7 @@
       value: function render(props) {
         var issue = props.issue,
             options = props.options,
-            i18n = props.i18n,
+            config = props.config,
             userInfo = props.userInfo,
             isLogin = props.isLogin,
             logout = props.logout,
@@ -1968,7 +1961,7 @@
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
-        }, issue.comments || 0, " ", i18n("counts")), h("div", {
+        }, issue.comments || 0, " ", config.i18n("counts")), h("div", {
           "class": "gitting-mate"
         }, isLogin ? h("span", null, h("a", {
           href: "#"
@@ -1977,12 +1970,12 @@
           onClick: function onClick(e) {
             return logout(e);
           }
-        }, i18n("logout"))) : h("a", {
+        }, config.i18n("logout"))) : h("a", {
           href: "#",
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, i18n("login")), h("a", {
+        }, config.i18n("login")), h("a", {
           href: "https://github.com/zhw2590582/gitting"
         }, "Gitting 2.0.0")));
       }
@@ -2065,7 +2058,7 @@
                   break;
 
                 case 10:
-                  markdown = config.i("noPreview");
+                  markdown = config.i18n("noPreview");
 
                 case 11:
                   this.setState(function () {
@@ -2094,13 +2087,13 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
-          var _this$props, config, issue, throwError, value, item;
+          var _this$props, options, config, issue, throwError, value, item;
 
           return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  _this$props = this.props, config = _this$props.config, issue = _this$props.issue, throwError = _this$props.throwError;
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, issue = _this$props.issue, throwError = _this$props.throwError;
                   value = this.state.input.trim();
 
                   if (value) {
@@ -2111,10 +2104,11 @@
                   return _context2.abrupt("return");
 
                 case 4:
-                  _context2.next = 6;
+                  throwError(value.length <= options.maxlength, "Too many words: ".concat(value.length));
+                  _context2.next = 7;
                   return config.api.creatComments(issue.number, value);
 
-                case 6:
+                case 7:
                   item = _context2.sent;
                   throwError(!item || !item.id, "Comment failed!");
                   this.setState(function () {
@@ -2124,7 +2118,7 @@
                     };
                   });
 
-                case 9:
+                case 10:
                 case "end":
                   return _context2.stop();
               }
@@ -2146,7 +2140,8 @@
         var options = props.options,
             config = props.config,
             userInfo = props.userInfo,
-            login = props.login;
+            login = props.login,
+            isLogin = props.isLogin;
         var input = state.input,
             preview = state.preview,
             markdown = state.markdown;
@@ -2155,8 +2150,8 @@
         }, h("div", {
           "class": "gitting-avatar"
         }, h("img", {
-          src: config.login ? userInfo.avatar_url : options.avatar,
-          alt: "@".concat(config.login ? userInfo.login : "github")
+          src: isLogin ? userInfo.avatar_url : options.avatar,
+          alt: "@".concat(isLogin ? userInfo.login : "github")
         })), h("div", {
           "class": "gitting-editor"
         }, h("div", {
@@ -2172,7 +2167,7 @@
             display: preview ? "none" : ""
           },
           "class": "gitting-textarea",
-          placeholder: config.i("leave"),
+          placeholder: config.i18n("leave"),
           maxlength: options.maxlength,
           spellcheck: false,
           value: input,
@@ -2187,7 +2182,7 @@
         }, h("a", {
           href: "https://guides.github.com/features/mastering-markdown/",
           target: "_blank"
-        }, config.i("styling")), h("span", {
+        }, config.i18n("styling")), h("span", {
           "class": "gitting-counts"
         }, options.maxlength - input.length, " / ", options.maxlength)), h("div", {
           "class": "gitting-tool"
@@ -2198,30 +2193,30 @@
           onClick: function onClick(e) {
             return _this2.onWrite(e);
           }
-        }, config.i("write")), h("span", {
+        }, config.i18n("write")), h("span", {
           "class": preview ? "active" : "",
           onClick: function onClick(e) {
             return _this2.onPreview(e);
           }
-        }, config.i("preview"))), config.login ? h("button", {
+        }, config.i18n("preview"))), isLogin ? h("button", {
           "class": "gitting-send",
           onClick: function onClick(e) {
             return _this2.onSubmit(e);
           }
-        }, config.i("submit")) : h("a", {
+        }, config.i18n("submit")) : h("a", {
           "class": "gitting-send",
           href: "#",
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, config.i("login")))));
+        }, config.i18n("login")))));
       }
     }]);
 
     return Editor;
   }(Component);
 
-  Enhanced(Editor);
+  var Editor$1 = Enhanced(Editor);
 
   var App =
   /*#__PURE__*/
@@ -2240,37 +2235,31 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this = this;
-
-          var _this$props, init, options, throwError, api, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri;
+          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, _issue;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this$props = this.props, init = _this$props.init, options = _this$props.options, throwError = _this$props.throwError, api = _this$props.api, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
-                  init();
-                  setTimeout(function () {
-                    console.log(_this.props);
-                  }, 1000);
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
-                    _context.next = 18;
+                    _context.next = 16;
                     break;
                   }
 
-                  _context.next = 7;
-                  return api.getToken(code);
+                  _context.next = 5;
+                  return config.api.getToken(code);
 
-                case 7:
+                case 5:
                   data = _context.sent;
                   throwError(!data.access_token, "Can not get token, Please login again!");
                   setStorage("token", data.access_token);
-                  _context.next = 12;
-                  return api.getUserInfo(data.access_token);
+                  _context.next = 10;
+                  return config.api.getUserInfo(data.access_token);
 
-                case 12:
+                case 10:
                   userInfo = _context.sent;
                   throwError(!userInfo.id, "Can not get user info, Please login again!");
                   setStorage("userInfo", userInfo);
@@ -2278,27 +2267,35 @@
                   throwError(!redirect_uri, "Can not get redirect url, Please login again!");
                   window.location.href = redirect_uri;
 
-                case 18:
-                  setUserInfo(getStorage("userInfo")); // if (Number(options.number) > 0) {
-                  //   const issue = await api.getIssueById(options.number);
-                  //   throwError(
-                  //     !issue || !issue.number,
-                  //     `Failed to get issue by id [${
-                  //       options.number
-                  //     }] , Do you want to initialize an new issue?`
-                  //   );
-                  //   setIssue(issue);
-                  // } else {
-                  //   const labels = options.labels.concat(options.id).join(",");
-                  //   const issue = (await api.getIssueByLabel(labels))[0];
-                  //   throwError(
-                  //     !issue || !issue.number,
-                  //     `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`
-                  //   );
-                  //   setIssue(issue);
-                  // }
+                case 16:
+                  setUserInfo(getStorage("userInfo"));
 
-                case 19:
+                  if (!(Number(options.number) > 0)) {
+                    _context.next = 25;
+                    break;
+                  }
+
+                  _context.next = 20;
+                  return config.api.getIssueById(options.number);
+
+                case 20:
+                  issue = _context.sent;
+                  throwError(!issue || !issue.number, "Failed to get issue by id [".concat(options.number, "] , Do you want to initialize an new issue?"));
+                  setIssue(issue);
+                  _context.next = 31;
+                  break;
+
+                case 25:
+                  labels = options.labels.concat(options.id).join(",");
+                  _context.next = 28;
+                  return config.api.getIssueByLabel(labels);
+
+                case 28:
+                  _issue = _context.sent[0];
+                  throwError(!_issue || !_issue.number, "Failed to get issue by labels [".concat(labels, "] , Do you want to initialize an new issue?"));
+                  setIssue(_issue);
+
+                case 31:
                 case "end":
                   return _context.stop();
               }
@@ -2315,13 +2312,19 @@
     }, {
       key: "render",
       value: function render(_ref) {
-        var options = _ref.options;
+        var options = _ref.options,
+            config = _ref.config;
         return h("div", {
           "class": "gitting-container gitting-theme-".concat(options.theme)
         }, h(ErrorInfo$1, {
-          options: options
+          options: options,
+          config: config
         }), h(Header$1, {
-          options: options
+          options: options,
+          config: config
+        }), h(Editor$1, {
+          options: options,
+          config: config
         }));
       }
     }]);
@@ -2345,11 +2348,13 @@
     createClass(_default, [{
       key: "render",
       value: function render(_ref) {
-        var options = _ref.options;
+        var options = _ref.options,
+            config = _ref.config;
         return h(preact_2, {
           store: store
         }, h(App$1, {
-          options: options
+          options: options,
+          config: config
         }));
       }
     }]);
@@ -2366,8 +2371,11 @@
       classCallCheck(this, Gitting);
 
       this.options = Object.assign({}, Gitting.DEFAULT, options);
-      setStorage('options', this.options);
       this.$root = null;
+      this.config = {
+        api: creatApi(this.options),
+        i18n: creatI18n(this.options.language)
+      };
     }
 
     createClass(Gitting, [{
@@ -2375,7 +2383,8 @@
       value: function render$1(el) {
         this.$container = el instanceof Element ? el : document.querySelector(el);
         this.$root = render(h(_default, {
-          options: this.options
+          options: this.options,
+          config: this.config
         }), this.$container);
       }
     }, {

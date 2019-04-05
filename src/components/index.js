@@ -4,10 +4,10 @@ import { store } from "../store";
 import App from "./App";
 
 export default class extends Component {
-  render({ options }) {
+  render({ options, config }) {
     return (
       <Provider store={store}>
-        <App options={options} />
+        <App options={options} config={config} />
       </Provider>
     );
   }

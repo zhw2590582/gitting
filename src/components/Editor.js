@@ -1,6 +1,5 @@
 import { h, Component } from "preact";
 import Enhanced from "./Enhanced";
-import { queryStringify, setStorage } from "../utils";
 
 class Editor extends Component {
   constructor(props) {
@@ -42,7 +41,7 @@ class Editor extends Component {
     if (value) {
       markdown = await config.api.mdToHtml(value);
     } else {
-      markdown = config.i("noPreview");
+      markdown = config.i18n("noPreview");
     }
 
     this.setState(() => {
@@ -53,9 +52,10 @@ class Editor extends Component {
   }
 
   async onSubmit(e) {
-    const { config, issue, throwError } = this.props;
+    const { options, config, issue, throwError } = this.props;
     const value = this.state.input.trim();
     if (!value) return;
+    throwError(value.length <= options.maxlength, `Too many words: ${value.length}`);
     const item = await config.api.creatComments(issue.number, value);
     throwError(!item || !item.id, `Comment failed!`);
     this.setState(() => {
@@ -67,14 +67,14 @@ class Editor extends Component {
   }
 
   render(props, state) {
-    const { options, config, userInfo, login } = props;
+    const { options, config, userInfo, login, isLogin } = props;
     const { input, preview, markdown } = state;
     return (
       <div class="gitting-body">
         <div class="gitting-avatar">
           <img
-            src={config.login ? userInfo.avatar_url : options.avatar}
-            alt={`@${config.login ? userInfo.login : "github"}`}
+            src={isLogin ? userInfo.avatar_url : options.avatar}
+            alt={`@${isLogin ? userInfo.login : "github"}`}
           />
         </div>
         <div class="gitting-editor">
@@ -92,7 +92,7 @@ class Editor extends Component {
               display: preview ? "none" : ""
             }}
             class="gitting-textarea"
-            placeholder={config.i("leave")}
+            placeholder={config.i18n("leave")}
             maxlength={options.maxlength}
             spellcheck={false}
             value={input}
@@ -108,7 +108,7 @@ class Editor extends Component {
               href="https://guides.github.com/features/mastering-markdown/"
               target="_blank"
             >
-              {config.i("styling")}
+              {config.i18n("styling")}
             </a>
             <span class="gitting-counts">
               {options.maxlength - input.length} / {options.maxlength}
@@ -120,22 +120,22 @@ class Editor extends Component {
                 class={preview ? "" : "active"}
                 onClick={e => this.onWrite(e)}
               >
-                {config.i("write")}
+                {config.i18n("write")}
               </span>
               <span
                 class={preview ? "active" : ""}
                 onClick={e => this.onPreview(e)}
               >
-                {config.i("preview")}
+                {config.i18n("preview")}
               </span>
             </div>
-            {config.login ? (
+            {isLogin ? (
               <button class="gitting-send" onClick={e => this.onSubmit(e)}>
-                {config.i("submit")}
+                {config.i18n("submit")}
               </button>
             ) : (
               <a class="gitting-send" href="#" onClick={e => login(options, e)}>
-                {config.i("login")}
+                {config.i18n("login")}
               </a>
             )}
           </div>

@@ -9,7 +9,7 @@ import creatApi from './api';
 import creatI18n from './i18n';
 
 export const state = {
-  isLogin: false,
+  isLogin: getStorage('token') && getStorage('userInfo'),
   api: {},
   i18n: () => {},
   userInfo: {},
@@ -21,14 +21,6 @@ export const state = {
 export const store = createStore(state);
 
 export const actions = store => ({
-  init(state) {
-    return {
-      isLogin: getStorage('token') && getStorage('userInfo'),
-      api: creatApi(getStorage('options')),
-      i18n: creatI18n(getStorage('options')),
-    }
-  },
-
   throwError(state, condition, msg) {
     return {
       error: !condition ? '' : msg
