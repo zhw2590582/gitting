@@ -37,8 +37,8 @@ export default {
 	nodeResolve(),
     commonjs(),
     replace({
-      _ENV_: JSON.stringify(process.env.NODE_ENV || 'development'),
-      _VERSION_: JSON.stringify(version)
+      __ENV__: JSON.stringify(process.env.NODE_ENV || 'development'),
+      __VERSION__: JSON.stringify(version)
     }),
     (isProd && uglify())
   ]
