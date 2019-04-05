@@ -1,1 +1,1 @@
-.gitting-container *{margin:0;padding:0;box-sizing:border-box}.gitting-container .gitting-header{display:flex;justify-content:space-between;padding:0 10px}
+.gitting-container{font-size:14px}.gitting-container *{margin:0;padding:0;box-sizing:border-box}.gitting-container .gitting-error{padding:3px 10px;margin-bottom:10px;border-radius:3px;color:red;background:#fbc8c8;border:1px solid #f94a48}.gitting-container .gitting-header{display:flex;justify-content:space-between;padding:0 10px}
