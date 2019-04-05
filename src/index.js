@@ -3,7 +3,6 @@ import "github-markdown-css";
 import i18n from "./i18n";
 import creatApi from "./creatApi";
 import * as utils from "./utils";
-import { version } from "../package.json";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
@@ -171,7 +170,7 @@ class Gitting {
               ? `<a href="${this.userInfo.html_url}" class="gt-name fl" target="_blank">${this.userInfo.login}</a><a href="#" class="gt-logout fl">${this.i("logout")}</a>`
               : `<a href="http://github.com/login/oauth/authorize?client_id=${utils.queryStringify(query)}" class="gt-login fl">${this.i("login")}</a>`
           }
-          <a href="https://github.com/zhw2590582/gitting" class="fl" target="_blank">Gitting ${version}</a>
+          <a href="https://github.com/zhw2590582/gitting" class="fl" target="_blank">Gitting __VERSION__</a>
         </div>
       </div>
       <div class="gt-body">
