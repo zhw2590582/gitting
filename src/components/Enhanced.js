@@ -1,10 +1,10 @@
 import { h, Component } from "preact";
 import { connect } from "unistore/preact";
-import { actions } from "../store";
+import { state, actions } from "../store";
 
 export default function Enhanced(WrappedComponent) {
   return connect(
-    "issue,comments",
+    Object.keys(state).join(','),
     actions
   )(
     class extends Component {

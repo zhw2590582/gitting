@@ -865,12 +865,14 @@
   function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
   //# sourceMappingURL=unistore.es.js.map
 
-  var store = createStore({
+  var state = {
+    isLogin: false,
     issue: {
       id: 0
     },
     comments: []
-  });
+  };
+  var store = createStore(state);
   var actions = function actions(store) {
     return {
       increment: function increment(state) {
@@ -884,7 +886,7 @@
   };
 
   function Enhanced(WrappedComponent) {
-    return preact_1("issue,comments", actions)(
+    return preact_1(Object.keys(state).join(','), actions)(
     /*#__PURE__*/
     function (_Component) {
       inherits(_class, _Component);
@@ -920,8 +922,10 @@
     createClass(Header, [{
       key: "render",
       value: function render(props) {
-        var issue = props.issue,
+        var isLogin = props.isLogin,
+            issue = props.issue,
             options = props.options,
+            config = props.config,
             increment = props.increment;
         return h("header", {
           "class": "gitting-header",
@@ -929,7 +933,17 @@
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.id),
           "class": "gitting-number"
-        }, "0 \u6761\u8BC4\u8BBA"));
+        }, issue.comments || 0, " ", config.i("counts")), h("div", {
+          "class": "gitting-mate"
+        }, isLogin ? h("span", null, h("a", {
+          href: "#"
+        }, "\u7528\u6237\u540D"), h("a", {
+          href: "#"
+        }, config.i("logout"))) : h("a", {
+          href: "#"
+        }, config.i("login")), h("a", {
+          href: "https://github.com/zhw2590582/gitting"
+        }, "Gitting 2.0.0")));
       }
     }]);
 
@@ -952,17 +966,60 @@
     createClass(_default, [{
       key: "render",
       value: function render(_ref) {
-        var options = _ref.options;
+        var options = _ref.options,
+            config = _ref.config;
         return h(preact_2, {
           store: store
         }, h(Header$1, {
-          options: options
+          options: options,
+          config: config
         }));
       }
     }]);
 
     return _default;
   }(Component);
+
+  var i18n = {
+    'zh-cn': {
+      init: "初始化一个评论",
+      counts: "条评论",
+      login: "登录",
+      logout: "注销",
+      leave: "发表评论",
+      styling: "支持使用Markdown进行样式设置",
+      write: "编写",
+      preview: "预览",
+      noPreview: "无预览内容",
+      submit: "提交",
+      reply: "回复",
+      loadMore: "加载更多",
+      loadEnd: "加载完毕",
+      published: "发表于"
+    },
+    en: {
+      init: "Initialize A Issue",
+      counts: "comments",
+      login: "Login",
+      logout: "Logout",
+      leave: "Leave a comment",
+      styling: "Styling with Markdown is supported",
+      write: "Write",
+      preview: "Preview",
+      noPreview: "Nothing to preview",
+      submit: "Submit",
+      reply: "Reply",
+      loadMore: "Load More",
+      loadEnd: "Load completed",
+      published: "Published on"
+    }
+  };
+  function i18n$1 (lang) {
+    var langObj = i18n[lang] || i18n["zh-cn"];
+    return function (key) {
+      return langObj[key] || "Unmath key: ".concat(key);
+    };
+  }
 
   var Gitting =
   /*#__PURE__*/
@@ -974,6 +1031,9 @@
 
       this.options = Object.assign({}, Gitting.DEFAULT, options);
       this.$root = null;
+      this.config = {
+        i: i18n$1(this.options.language)
+      };
     }
 
     createClass(Gitting, [{
@@ -983,7 +1043,8 @@
         this.$container.classList.add("gitting-container");
         this.$container.classList.add("gitting-theme-".concat(this.options.theme));
         this.$root = render(h(_default, {
-          options: this.options
+          options: this.options,
+          config: this.config
         }), this.$container);
       }
     }, {

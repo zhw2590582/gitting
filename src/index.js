@@ -1,11 +1,15 @@
 import "./style.scss";
 import { h, render } from "preact";
 import Container from "./components";
+import i18n from "./i18n";
 
 class Gitting {
   constructor(options = {}) {
     this.options = Object.assign({}, Gitting.DEFAULT, options);
     this.$root = null;
+    this.config = {
+      i: i18n(this.options.language)
+    }
   }
 
   static get DEFAULT() {
@@ -33,7 +37,7 @@ class Gitting {
     this.$container = el instanceof Element ? el : document.querySelector(el);
     this.$container.classList.add("gitting-container");
     this.$container.classList.add(`gitting-theme-${this.options.theme}`);
-    this.$root = render(<Container options={this.options} />, this.$container);
+    this.$root = render(<Container options={this.options} config={this.config} />, this.$container);
   }
 
   destroy() {
