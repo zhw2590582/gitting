@@ -52,26 +52,22 @@ class Editor extends Component {
     });
   }
 
-  onSubmit(e) {
-    
-  }
-
-  login(e) {
-    e.preventDefault();
-    const { options } = this.props;
-    setStorage("redirect_uri", window.location.href);
-    window.location.href = `http://github.com/login/oauth/authorize?${queryStringify(
-      {
-        state: "Gitting",
-        client_id: options.clientID,
-        redirect_uri: window.location.href,
-        scope: "public_repo"
-      }
-    )}`;
+  async onSubmit(e) {
+    const { config, issue, throwError } = this.props;
+    const value = this.state.input.trim();
+    if (!value) return;
+    const item = await config.api.creatComments(issue.number, value);
+    throwError(!item || !item.id, `Comment failed!`);
+    this.setState(() => {
+      return {
+        input: "",
+        markdown: ""
+      };
+    });
   }
 
   render(props, state) {
-    const { options, config, userInfo } = props;
+    const { options, config, userInfo, login } = props;
     const { input, preview, markdown } = state;
     return (
       <div class="gitting-body">
@@ -138,7 +134,7 @@ class Editor extends Component {
                 {config.i("submit")}
               </button>
             ) : (
-              <a class="gitting-send" href="#" onClick={e => this.login(e)}>
+              <a class="gitting-send" href="#" onClick={e => login(options, e)}>
                 {config.i("login")}
               </a>
             )}

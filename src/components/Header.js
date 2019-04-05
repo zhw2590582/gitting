@@ -18,7 +18,7 @@ class Header extends Component {
   }
 
   render(props) {
-    const { issue, options, config, userInfo, logout } = props;
+    const { issue, options, config, userInfo, logout, login } = props;
     return (
       <header class="gitting-header">
         <a
@@ -38,7 +38,7 @@ class Header extends Component {
               </a>
             </span>
           ) : (
-            <a href="#" onClick={e => this.login(e)}>
+            <a href="#" onClick={e => login(options, e)}>
               {config.i("login")}
             </a>
           )}

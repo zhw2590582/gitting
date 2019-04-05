@@ -1,5 +1,9 @@
 import createStore from 'unistore';
-import { cleanStorage } from "./utils";
+import {
+  cleanStorage,
+  setStorage,
+  queryStringify
+} from "./utils";
 
 export const state = {
   userInfo: {},
@@ -33,5 +37,18 @@ export const actions = store => ({
     e.preventDefault();
     cleanStorage();
     window.location.reload();
+  },
+
+  login(state, options, e) {
+    e.preventDefault();
+    setStorage("redirect_uri", window.location.href);
+    window.location.href = `http://github.com/login/oauth/authorize?${queryStringify(
+      {
+        state: "Gitting",
+        client_id: options.clientID,
+        redirect_uri: window.location.href,
+        scope: "public_repo"
+      }
+    )}`;
   }
 })

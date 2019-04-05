@@ -972,6 +972,16 @@
         e.preventDefault();
         cleanStorage();
         window.location.reload();
+      },
+      login: function login(state, options, e) {
+        e.preventDefault();
+        setStorage("redirect_uri", window.location.href);
+        window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
+          state: "Gitting",
+          client_id: options.clientID,
+          redirect_uri: window.location.href,
+          scope: "public_repo"
+        }));
       }
     };
   };
@@ -1839,13 +1849,12 @@
     }, {
       key: "render",
       value: function render(props) {
-        var _this = this;
-
         var issue = props.issue,
             options = props.options,
             config = props.config,
             userInfo = props.userInfo,
-            logout = props.logout;
+            logout = props.logout,
+            login = props.login;
         return h("header", {
           "class": "gitting-header"
         }, h("a", {
@@ -1863,7 +1872,7 @@
         }, config.i("logout"))) : h("a", {
           href: "#",
           onClick: function onClick(e) {
-            return _this.login(e);
+            return login(options, e);
           }
         }, config.i("login")), h("a", {
           href: "https://github.com/zhw2590582/gitting"
@@ -1973,20 +1982,54 @@
       }()
     }, {
       key: "onSubmit",
-      value: function onSubmit(e) {}
-    }, {
-      key: "login",
-      value: function login(e) {
-        e.preventDefault();
-        var options = this.props.options;
-        setStorage("redirect_uri", window.location.href);
-        window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
-          state: "Gitting",
-          client_id: options.clientID,
-          redirect_uri: window.location.href,
-          scope: "public_repo"
+      value: function () {
+        var _onSubmit = asyncToGenerator(
+        /*#__PURE__*/
+        regenerator.mark(function _callee2(e) {
+          var _this$props, config, issue, throwError, value, item;
+
+          return regenerator.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _this$props = this.props, config = _this$props.config, issue = _this$props.issue, throwError = _this$props.throwError;
+                  value = this.state.input.trim();
+
+                  if (value) {
+                    _context2.next = 4;
+                    break;
+                  }
+
+                  return _context2.abrupt("return");
+
+                case 4:
+                  _context2.next = 6;
+                  return config.api.creatComments(issue.number, value);
+
+                case 6:
+                  item = _context2.sent;
+                  throwError(!item || !item.id, "Comment failed!");
+                  this.setState(function () {
+                    return {
+                      input: "",
+                      markdown: ""
+                    };
+                  });
+
+                case 9:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
         }));
-      }
+
+        function onSubmit(_x2) {
+          return _onSubmit.apply(this, arguments);
+        }
+
+        return onSubmit;
+      }()
     }, {
       key: "render",
       value: function render(props, state) {
@@ -1994,7 +2037,8 @@
 
         var options = props.options,
             config = props.config,
-            userInfo = props.userInfo;
+            userInfo = props.userInfo,
+            login = props.login;
         var input = state.input,
             preview = state.preview,
             markdown = state.markdown;
@@ -2060,7 +2104,7 @@
           "class": "gitting-send",
           href: "#",
           onClick: function onClick(e) {
-            return _this2.login(e);
+            return login(options, e);
           }
         }, config.i("login")))));
       }
