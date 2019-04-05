@@ -12,7 +12,7 @@ class Header extends Component {
           }`}
           class="gitting-number"
         >
-          {comments.length} {config.i18n("counts")}
+          {issue.comments || 0} {config.i18n("counts")}
         </a>
         <div class="gitting-mate">
           {isLogin ? (

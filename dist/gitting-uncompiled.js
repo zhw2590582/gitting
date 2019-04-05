@@ -914,7 +914,7 @@
 
   var defineProperty = _defineProperty;
 
-  var storageName = 'gitting_settings';
+  var storageName = "gitting_settings";
   function getStorage(key) {
     var storage = JSON.parse(localStorage.getItem(storageName)) || {};
     return key ? storage[key] : storage;
@@ -928,8 +928,8 @@
   }
   function queryStringify(query) {
     var queryString = Object.keys(query).map(function (key) {
-      return "".concat(key, "=").concat(encodeURIComponent(query[key] || ''));
-    }).join('&');
+      return "".concat(key, "=").concat(encodeURIComponent(query[key] || ""));
+    }).join("&");
     return queryString;
   }
   function getURLParameters() {
@@ -938,19 +938,27 @@
       return a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1), a;
     }, {});
   }
+  function smoothScroll(element) {
+    var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    window.scroll({
+      behavior: "smooth",
+      left: 0,
+      top: element.getBoundingClientRect().top + window.scrollY + offset
+    });
+  }
   function request(method, url, body, header) {
     method = method.toUpperCase();
     body = body && JSON.stringify(body);
     var headers = {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      Accept: "application/json"
     };
 
     if (header) {
       headers = Object.assign({}, headers, header);
     }
 
-    var token = getStorage('token');
+    var token = getStorage("token");
 
     if (token) {
       headers.Authorization = "token ".concat(token);
@@ -967,7 +975,7 @@
         cleanStorage();
         window.location.reload();
       } else {
-        if (headers.Accept === 'text/html') {
+        if (headers.Accept === "text/html") {
           return res.text();
         } else {
           return res.json();
@@ -1895,7 +1903,7 @@
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
-        }, comments.length, " ", config.i18n("counts")), h("div", {
+        }, issue.comments || 0, " ", config.i18n("counts")), h("div", {
           "class": "gitting-mate"
         }, isLogin ? h("span", null, h("a", {
           href: "#"
@@ -2155,6 +2163,10 @@
   !function(_,e){module.exports=e(dayjs_min);}(commonjsGlobal,function(_){_=_&&_.hasOwnProperty("default")?_.default:_;var e={name:"zh-cn",weekdays:"星期日_星期一_星期二_星期三_星期四_星期五_星期六".split("_"),weekdaysShort:"周日_周一_周二_周三_周四_周五_周六".split("_"),weekdaysMin:"日_一_二_三_四_五_六".split("_"),months:"一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split("_"),monthsShort:"1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月".split("_"),ordinal:function(_,e){switch(e){case"W":return _+"周";default:return _+"日"}},weekStart:1,formats:{LT:"HH:mm",LTS:"HH:mm:ss",L:"YYYY/MM/DD",LL:"YYYY年M月D日",LLL:"YYYY年M月D日Ah点mm分",LLLL:"YYYY年M月D日ddddAh点mm分",l:"YYYY/M/D",ll:"YYYY年M月D日",lll:"YYYY年M月D日 HH:mm",llll:"YYYY年M月D日dddd HH:mm"},relativeTime:{future:"%s内",past:"%s前",s:"几秒",m:"1 分钟",mm:"%d 分钟",h:"1 小时",hh:"%d 小时",d:"1 天",dd:"%d 天",M:"1 个月",MM:"%d 个月",y:"1 年",yy:"%d 年"}};return _.locale(e,null,!0),e});
   });
 
+  var en = createCommonjsModule(function (module, exports) {
+  !function(e,n){module.exports=n();}(commonjsGlobal,function(){return {name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_")}});
+  });
+
   dayjs_min.extend(relativeTime);
 
   var Comments =
@@ -2168,14 +2180,27 @@
       classCallCheck(this, Comments);
 
       _this = possibleConstructorReturn(this, getPrototypeOf(Comments).call(this, props));
-      _this.page = 1;
       dayjs_min.locale(props.options.language);
       return _this;
     }
 
     createClass(Comments, [{
+      key: "reply",
+      value: function reply(comment, e) {
+        e.preventDefault();
+        var _this$props = this.props,
+            input = _this$props.input,
+            setInput = _this$props.setInput,
+            config = _this$props.config;
+        var markdowm = "".concat(input ? '\n' : '', "> @").concat(comment.user.login, "\n> ").concat(comment.body, "\n");
+        setInput(input + markdowm);
+        smoothScroll(config.$container);
+      }
+    }, {
       key: "render",
       value: function render(_ref) {
+        var _this2 = this;
+
         var options = _ref.options,
             config = _ref.config,
             comments = _ref.comments;
@@ -2209,7 +2234,9 @@
           }, config.i18n("published"), " ", dayjs_min(item.created_at).fromNow())), h("a", {
             className: "gitting-content-reply",
             href: "#",
-            target: "_blank"
+            onClick: function onClick(e) {
+              return _this2.reply(item, e);
+            }
           }, config.i18n("reply")))));
         }));
       }
@@ -2477,8 +2504,7 @@
       published: "Published on"
     }
   };
-  function creatI18n (_ref) {
-    var lang = _ref.lang;
+  function creatI18n (lang) {
     var langObj = i18n[lang] || i18n["zh-cn"];
     return function (key) {
       return langObj[key] || "Unmath key: ".concat(key);
@@ -2496,6 +2522,7 @@
       this.options = Object.assign({}, Gitting.DEFAULT, options);
       this.$root = null;
       this.config = {
+        $container: null,
         api: creatApi(this.options),
         i18n: creatI18n(this.options.language)
       };
@@ -2504,7 +2531,7 @@
     createClass(Gitting, [{
       key: "render",
       value: function render$1(el) {
-        this.$container = el instanceof Element ? el : document.querySelector(el);
+        this.config.$container = this.$container = el instanceof Element ? el : document.querySelector(el);
         this.$root = render(h(_default, {
           options: this.options,
           config: this.config

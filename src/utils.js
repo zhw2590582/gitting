@@ -1,4 +1,4 @@
-const storageName = 'gitting_settings';
+const storageName = "gitting_settings";
 
 export function getStorage(key) {
   const storage = JSON.parse(localStorage.getItem(storageName)) || {};
@@ -7,7 +7,7 @@ export function getStorage(key) {
 
 export function setStorage(key, value) {
   const storage = Object.assign({}, getStorage(), {
-    [key]: value,
+    [key]: value
   });
   return localStorage.setItem(storageName, JSON.stringify(storage));
 }
@@ -18,16 +18,24 @@ export function cleanStorage() {
 
 export function queryStringify(query) {
   const queryString = Object.keys(query)
-    .map(key => `${key}=${encodeURIComponent(query[key] || '')}`)
-    .join('&')
-  return queryString
+    .map(key => `${key}=${encodeURIComponent(query[key] || "")}`)
+    .join("&");
+  return queryString;
 }
 
 export function getURLParameters() {
   var url = window.location.href;
-  return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function (a, v) {
+  return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function(a, v) {
     return (a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1)), a;
   }, {});
+}
+
+export function smoothScroll(element, offset = 0) {
+  window.scroll({
+    behavior: "smooth",
+    left: 0,
+    top: element.getBoundingClientRect().top + window.scrollY + offset
+  });
 }
 
 export function request(method, url, body, header) {
@@ -35,14 +43,14 @@ export function request(method, url, body, header) {
   body = body && JSON.stringify(body);
   let headers = {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json"
   };
 
   if (header) {
     headers = Object.assign({}, headers, header);
   }
 
-  const token = getStorage('token')
+  const token = getStorage("token");
   if (token) {
     headers.Authorization = `token ${token}`;
   }
@@ -58,7 +66,7 @@ export function request(method, url, body, header) {
       cleanStorage();
       window.location.reload();
     } else {
-      if (headers.Accept === 'text/html') {
+      if (headers.Accept === "text/html") {
         return res.text();
       } else {
         return res.json();

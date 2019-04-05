@@ -1,15 +1,24 @@
 import { h, Component } from "preact";
 import Enhanced from "./Enhanced";
+import { smoothScroll } from "../utils";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
+import "dayjs/locale/en";
 dayjs.extend(relativeTime);
 
 class Comments extends Component {
   constructor(props) {
     super(props);
-    this.page = 1;
     dayjs.locale(props.options.language);
+  }
+
+  reply(comment, e) {
+    e.preventDefault();
+    const { input, setInput, config } = this.props;
+    const markdowm = `${input ? '\n' : ''}> @${comment.user.login}\n> ${comment.body}\n`;
+    setInput(input + markdowm);
+    smoothScroll(config.$container);
   }
 
   render({ options, config, comments }) {
@@ -45,7 +54,11 @@ class Comments extends Component {
                       {dayjs(item.created_at).fromNow()}
                     </span>
                   </span>
-                  <a className="gitting-content-reply" href="#" target="_blank">
+                  <a
+                    className="gitting-content-reply"
+                    href="#"
+                    onClick={e => this.reply(item, e)}
+                  >
                     {config.i18n("reply")}
                   </a>
                 </div>

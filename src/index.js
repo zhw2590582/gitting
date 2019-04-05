@@ -9,6 +9,7 @@ class Gitting {
     this.options = Object.assign({}, Gitting.DEFAULT, options);
     this.$root = null;
     this.config = {
+      $container: null,
       api: creatApi(this.options),
       i18n: creatI18n(this.options.language),
     }
@@ -36,7 +37,7 @@ class Gitting {
   }
 
   render(el) {
-    this.$container = el instanceof Element ? el : document.querySelector(el);
+    this.config.$container = this.$container = el instanceof Element ? el : document.querySelector(el);
     this.$root = render(<Container options={this.options} config={this.config} />, this.$container);
   }
 
