@@ -15,7 +15,6 @@ class App extends Component {
       setUserInfo,
       setIssue,
       page,
-      setPage,
       setComments
     } = this.props;
 

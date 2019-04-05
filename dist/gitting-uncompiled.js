@@ -2020,13 +2020,13 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
-          var _this$props2, options, input, config, issue, throwError, value, item;
+          var _this$props2, options, input, config, issue, throwError, setInput, value, item;
 
           return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError;
+                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError, setInput = _this$props2.setInput;
                   value = input.trim();
 
                   if (value) {
@@ -2037,7 +2037,7 @@
                   return _context2.abrupt("return");
 
                 case 4:
-                  throwError(value.length <= options.maxlength, "Too many words: ".concat(value.length));
+                  throwError(value.length > options.maxlength, "Too many words: ".concat(value.length));
                   _context2.next = 7;
                   return config.api.creatComments(issue.number, value);
 
@@ -2049,8 +2049,9 @@
                       markdown: ""
                     };
                   });
+                  setInput('');
 
-                case 10:
+                case 11:
                 case "end":
                   return _context2.stop();
               }
@@ -2168,6 +2169,43 @@
   });
 
   dayjs_min.extend(relativeTime);
+  var CommentItem = Enhanced(function (_ref) {
+    var options = _ref.options,
+        config = _ref.config,
+        item = _ref.item,
+        reply = _ref.reply;
+    return h("div", {
+      className: "gitting-comment-item",
+      key: item.id
+    }, h("div", {
+      className: "gitting-avatar"
+    }, h("img", {
+      src: item.user.avatar_url,
+      alt: "@".concat(item.user.login)
+    })), h("div", {
+      className: "gitting-content gitting-caret"
+    }, h("div", {
+      className: "gitting-content-body markdown-body",
+      dangerouslySetInnerHTML: {
+        __html: item.body_html
+      }
+    }), h("div", {
+      className: "gitting-content-mate"
+    }, h("span", null, h("a", {
+      className: "gitting-content-name",
+      href: item.user.html_url,
+      target: "_blank"
+    }, item.user.login), h("span", {
+      className: "gitting-content-time",
+      "data-time": item.created_at
+    }, config.i18n("published"), " ", dayjs_min(item.created_at).fromNow())), h("a", {
+      className: "gitting-content-reply",
+      href: "#",
+      onClick: function onClick(e) {
+        return reply(item, e);
+      }
+    }, config.i18n("reply")))));
+  });
 
   var Comments =
   /*#__PURE__*/
@@ -2181,6 +2219,7 @@
 
       _this = possibleConstructorReturn(this, getPrototypeOf(Comments).call(this, props));
       dayjs_min.locale(props.options.language);
+      _this.reply = _this.reply.bind(assertThisInitialized(_this));
       return _this;
     }
 
@@ -2192,52 +2231,28 @@
             input = _this$props.input,
             setInput = _this$props.setInput,
             config = _this$props.config;
-        var markdowm = "".concat(input ? '\n' : '', "> @").concat(comment.user.login, "\n> ").concat(comment.body, "\n");
+        var markdowm = "".concat(input ? "\n" : "", "> @").concat(comment.user.login, "\n> ").concat(comment.body, "\n");
         setInput(input + markdowm);
         smoothScroll(config.$container);
       }
     }, {
       key: "render",
-      value: function render(_ref) {
+      value: function render(_ref2) {
         var _this2 = this;
 
-        var options = _ref.options,
-            config = _ref.config,
-            comments = _ref.comments;
+        var options = _ref2.options,
+            config = _ref2.config,
+            comments = _ref2.comments;
         return h("div", {
           className: "gitting-comments"
         }, comments.map(function (item) {
-          return h("div", {
-            className: "gitting-comment-item",
-            key: item.id
-          }, h("div", {
-            className: "gitting-avatar"
-          }, h("img", {
-            src: item.user.avatar_url,
-            alt: "@".concat(item.user.login)
-          })), h("div", {
-            className: "gitting-content gitting-caret"
-          }, h("div", {
-            className: "gitting-content-body markdown-body",
-            dangerouslySetInnerHTML: {
-              __html: item.body_html
-            }
-          }), h("div", {
-            className: "gitting-content-mate"
-          }, h("span", null, h("a", {
-            className: "gitting-content-name",
-            href: item.user.html_url,
-            target: "_blank"
-          }, item.user.login), h("span", {
-            className: "gitting-content-time",
-            "data-time": item.created_at
-          }, config.i18n("published"), " ", dayjs_min(item.created_at).fromNow())), h("a", {
-            className: "gitting-content-reply",
-            href: "#",
-            onClick: function onClick(e) {
-              return _this2.reply(item, e);
-            }
-          }, config.i18n("reply")))));
+          return h(CommentItem, {
+            options: options,
+            config: config,
+            item: item,
+            key: item.id,
+            reply: _this2.reply
+          });
         }));
       }
     }]);
@@ -2264,13 +2279,13 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, options, config, throwError, setUserInfo, setIssue, page, setPage, setComments, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, comments;
+          var _this$props, options, config, throwError, setUserInfo, setIssue, page, setComments, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, comments;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue, page = _this$props.page, setPage = _this$props.setPage, setComments = _this$props.setComments;
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue, page = _this$props.page, setComments = _this$props.setComments;
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {

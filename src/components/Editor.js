@@ -43,10 +43,10 @@ class Editor extends Component {
   }
 
   async onSubmit(e) {
-    const { options, input, config, issue, throwError } = this.props;
+    const { options, input, config, issue, throwError, setInput } = this.props;
     const value = input.trim();
     if (!value) return;
-    throwError(value.length <= options.maxlength, `Too many words: ${value.length}`);
+    throwError(value.length > options.maxlength, `Too many words: ${value.length}`);
     const item = await config.api.creatComments(issue.number, value);
     throwError(!item || !item.id, `Comment failed!`);
     this.setState(() => {
@@ -54,6 +54,7 @@ class Editor extends Component {
         markdown: ""
       };
     });
+    setInput('');
   }
 
   render(props, state) {
