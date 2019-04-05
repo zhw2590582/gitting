@@ -764,6 +764,8 @@
     options: options
   });
 
+  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
@@ -862,6 +864,36 @@
   var preact_1 = preact$2.connect;
   var preact_2 = preact$2.Provider;
 
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    }
+  }
+
+  var arrayWithoutHoles = _arrayWithoutHoles;
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  var iterableToArray = _iterableToArray;
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
+  var nonIterableSpread = _nonIterableSpread;
+
+  function _toConsumableArray(arr) {
+    return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
+  }
+
+  var toConsumableArray = _toConsumableArray;
+
   function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
   //# sourceMappingURL=unistore.es.js.map
 
@@ -944,131 +976,21 @@
     });
   }
 
-  function creatApi(option) {
-    var issuesApi = "https://api.github.com/repos/".concat(option.owner, "/").concat(option.repo, "/issues");
-    var baseQuery = {
-      client_id: option.clientID,
-      client_secret: option.clientSecret
-    };
-    return {
-      // 获取token
-      getToken: function getToken(code) {
-        var query = Object.assign({}, baseQuery, {
-          code: code,
-          redirect_uri: location.href
-        });
-        return request('get', "".concat(option.proxy, "?").concat(queryStringify(query)));
-      },
-      // 获取用户信息
-      getUserInfo: function getUserInfo(token) {
-        return request('get', "https://api.github.com/user?access_token=".concat(token));
-      },
-      // 通过标签获取issue
-      getIssueByLabel: function getIssueByLabel(labels) {
-        var query = Object.assign({}, baseQuery, {
-          labels: labels,
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "?").concat(queryStringify(query)));
-      },
-      // 通过id获取issues
-      getIssueById: function getIssueById(id) {
-        var query = Object.assign({}, baseQuery, {
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "/").concat(id, "?").concat(queryStringify(query)));
-      },
-      // 获取某条issues下的评论
-      getComments: function getComments(id, page) {
-        var query = Object.assign({}, baseQuery, {
-          per_page: option.perPage,
-          page: page,
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "/").concat(id, "/comments?").concat(queryStringify(query)), null, {
-          Accept: "application/vnd.github.v3.full+json"
-        });
-      },
-      // 创建一条issues
-      creatIssues: function creatIssues(issue) {
-        return request('post', issuesApi, issue);
-      },
-      // 创建一条评论
-      creatComments: function creatComments(id, body) {
-        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), {
-          body: body
-        }, {
-          Accept: "application/vnd.github.v3.full+json"
-        });
-      },
-      // 解析markdown
-      mdToHtml: function mdToHtml(text) {
-        return request('post', "https://api.github.com/markdown", {
-          text: text
-        }, {
-          Accept: "text/html"
-        });
-      }
-    };
-  }
-
-  var i18n = {
-    'zh-cn': {
-      init: "初始化一个评论",
-      counts: "条评论",
-      login: "登录",
-      logout: "注销",
-      leave: "发表评论",
-      styling: "支持使用Markdown进行样式设置",
-      write: "编写",
-      preview: "预览",
-      noPreview: "无预览内容",
-      submit: "提交",
-      reply: "回复",
-      loadMore: "加载更多",
-      loadEnd: "加载完毕",
-      published: "发表于"
-    },
-    en: {
-      init: "Initialize A Issue",
-      counts: "comments",
-      login: "Login",
-      logout: "Logout",
-      leave: "Leave a comment",
-      styling: "Styling with Markdown is supported",
-      write: "Write",
-      preview: "Preview",
-      noPreview: "Nothing to preview",
-      submit: "Submit",
-      reply: "Reply",
-      loadMore: "Load More",
-      loadEnd: "Load completed",
-      published: "Published on"
-    }
-  };
-  function creatI18n (_ref) {
-    var lang = _ref.lang;
-    var langObj = i18n[lang] || i18n["zh-cn"];
-    return function (key) {
-      return langObj[key] || "Unmath key: ".concat(key);
-    };
-  }
-
   var state = {
-    isLogin: getStorage('token') && getStorage('userInfo'),
-    api: {},
-    i18n: function i18n() {},
+    isLogin: getStorage("token") && getStorage("userInfo"),
     userInfo: {},
     issue: {},
     comments: [],
-    error: ''
+    error: "",
+    input: "",
+    page: 1
   };
   var store = createStore(state);
   var actions = function actions(store) {
     return {
       throwError: function throwError(state, condition, msg) {
         return {
-          error: !condition ? '' : msg
+          error: !condition ? "" : msg
         };
       },
       setUserInfo: function setUserInfo(state, info) {
@@ -1079,6 +1001,17 @@
       setIssue: function setIssue(state, issue) {
         return {
           issue: issue
+        };
+      },
+      setComments: function setComments(state, comments) {
+        return {
+          comments: [].concat(toConsumableArray(state.comments), toConsumableArray(comments)),
+          page: state.page + 1
+        };
+      },
+      setInput: function setInput(state, input) {
+        return {
+          input: input
         };
       },
       logout: function logout(state, e) {
@@ -1955,13 +1888,14 @@
             userInfo = props.userInfo,
             isLogin = props.isLogin,
             logout = props.logout,
-            login = props.login;
+            login = props.login,
+            comments = props.comments;
         return h("header", {
           "class": "gitting-header"
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
-        }, issue.comments || 0, " ", config.i18n("counts")), h("div", {
+        }, comments.length, " ", config.i18n("counts")), h("div", {
           "class": "gitting-mate"
         }, isLogin ? h("span", null, h("a", {
           href: "#"
@@ -1998,7 +1932,6 @@
 
       _this = possibleConstructorReturn(this, getPrototypeOf(Editor).call(this, props));
       _this.state = {
-        input: "",
         preview: false,
         markdown: ""
       };
@@ -2006,15 +1939,6 @@
     }
 
     createClass(Editor, [{
-      key: "onInput",
-      value: function onInput(e) {
-        this.setState(function () {
-          return {
-            input: e.target.value
-          };
-        });
-      }
-    }, {
       key: "onWrite",
       value: function onWrite(e) {
         this.setState(function () {
@@ -2029,13 +1953,14 @@
         var _onPreview = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee(e) {
-          var config, value, markdown;
+          var _this$props, config, input, value, markdown;
+
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  config = this.props.config;
-                  value = this.state.input.trim();
+                  _this$props = this.props, config = _this$props.config, input = _this$props.input;
+                  value = input.trim();
                   this.setState(function () {
                     return {
                       preview: true,
@@ -2087,14 +2012,14 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
-          var _this$props, options, config, issue, throwError, value, item;
+          var _this$props2, options, input, config, issue, throwError, value, item;
 
           return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, issue = _this$props.issue, throwError = _this$props.throwError;
-                  value = this.state.input.trim();
+                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError;
+                  value = input.trim();
 
                   if (value) {
                     _context2.next = 4;
@@ -2113,7 +2038,6 @@
                   throwError(!item || !item.id, "Comment failed!");
                   this.setState(function () {
                     return {
-                      input: "",
                       markdown: ""
                     };
                   });
@@ -2138,12 +2062,13 @@
         var _this2 = this;
 
         var options = props.options,
+            input = props.input,
+            setInput = props.setInput,
             config = props.config,
             userInfo = props.userInfo,
             login = props.login,
             isLogin = props.isLogin;
-        var input = state.input,
-            preview = state.preview,
+        var preview = state.preview,
             markdown = state.markdown;
         return h("div", {
           "class": "gitting-body"
@@ -2172,7 +2097,7 @@
           spellcheck: false,
           value: input,
           onInput: function onInput(e) {
-            return _this2.onInput(e);
+            return setInput(e.target.value);
           }
         }), h("div", {
           "class": "gitting-tip",
@@ -2218,6 +2143,83 @@
 
   var Editor$1 = Enhanced(Editor);
 
+  var dayjs_min = createCommonjsModule(function (module, exports) {
+  !function(t,n){module.exports=n();}(commonjsGlobal,function(){var t="millisecond",n="second",e="minute",i="hour",r="day",s="week",u="month",a="quarter",o="year",h=/^(\d{4})-?(\d{1,2})-?(\d{0,2})[^0-9]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?.?(\d{1,3})?$/,f=/\[([^\]]+)]|Y{2,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g,c=function(t,n,e){var i=String(t);return !i||i.length>=n?t:""+Array(n+1-i.length).join(e)+t},d={s:c,z:function(t){var n=-t.utcOffset(),e=Math.abs(n),i=Math.floor(e/60),r=e%60;return (n<=0?"+":"-")+c(i,2,"0")+":"+c(r,2,"0")},m:function(t,n){var e=12*(n.year()-t.year())+(n.month()-t.month()),i=t.clone().add(e,u),r=n-i<0,s=t.clone().add(e+(r?-1:1),u);return Number(-(e+(n-i)/(r?i-s:s-i))||0)},a:function(t){return t<0?Math.ceil(t)||0:Math.floor(t)},p:function(h){return {M:u,y:o,w:s,d:r,h:i,m:e,s:n,ms:t,Q:a}[h]||String(h||"").toLowerCase().replace(/s$/,"")},u:function(t){return void 0===t}},$={name:"en",weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_")},l="en",m={};m[l]=$;var y=function(t){return t instanceof S},M=function(t,n,e){var i;if(!t)return null;if("string"==typeof t)m[t]&&(i=t),n&&(m[t]=n,i=t);else{var r=t.name;m[r]=t,i=r;}return e||(l=i),i},g=function(t,n,e){if(y(t))return t.clone();var i=n?"string"==typeof n?{format:n,pl:e}:n:{};return i.date=t,new S(i)},D=d;D.l=M,D.i=y,D.w=function(t,n){return g(t,{locale:n.$L,utc:n.$u})};var S=function(){function c(t){this.$L=this.$L||M(t.locale,null,!0)||l,this.parse(t);}var d=c.prototype;return d.parse=function(t){this.$d=function(t){var n=t.date,e=t.utc;if(null===n)return new Date(NaN);if(D.u(n))return new Date;if(n instanceof Date)return new Date(n);if("string"==typeof n&&!/Z$/i.test(n)){var i=n.match(h);if(i)return e?new Date(Date.UTC(i[1],i[2]-1,i[3]||1,i[4]||0,i[5]||0,i[6]||0,i[7]||0)):new Date(i[1],i[2]-1,i[3]||1,i[4]||0,i[5]||0,i[6]||0,i[7]||0)}return new Date(n)}(t),this.init();},d.init=function(){var t=this.$d;this.$y=t.getFullYear(),this.$M=t.getMonth(),this.$D=t.getDate(),this.$W=t.getDay(),this.$H=t.getHours(),this.$m=t.getMinutes(),this.$s=t.getSeconds(),this.$ms=t.getMilliseconds();},d.$utils=function(){return D},d.isValid=function(){return !("Invalid Date"===this.$d.toString())},d.isSame=function(t,n){var e=g(t);return this.startOf(n)<=e&&e<=this.endOf(n)},d.isAfter=function(t,n){return g(t)<this.startOf(n)},d.isBefore=function(t,n){return this.endOf(n)<g(t)},d.$g=function(t,n,e){return D.u(t)?this[n]:this.set(e,t)},d.year=function(t){return this.$g(t,"$y",o)},d.month=function(t){return this.$g(t,"$M",u)},d.day=function(t){return this.$g(t,"$W",r)},d.date=function(t){return this.$g(t,"$D","date")},d.hour=function(t){return this.$g(t,"$H",i)},d.minute=function(t){return this.$g(t,"$m",e)},d.second=function(t){return this.$g(t,"$s",n)},d.millisecond=function(n){return this.$g(n,"$ms",t)},d.unix=function(){return Math.floor(this.valueOf()/1e3)},d.valueOf=function(){return this.$d.getTime()},d.startOf=function(t,a){var h=this,f=!!D.u(a)||a,c=D.p(t),d=function(t,n){var e=D.w(h.$u?Date.UTC(h.$y,n,t):new Date(h.$y,n,t),h);return f?e:e.endOf(r)},$=function(t,n){return D.w(h.toDate()[t].apply(h.toDate(),(f?[0,0,0,0]:[23,59,59,999]).slice(n)),h)},l=this.$W,m=this.$M,y=this.$D,M="set"+(this.$u?"UTC":"");switch(c){case o:return f?d(1,0):d(31,11);case u:return f?d(1,m):d(0,m+1);case s:var g=this.$locale().weekStart||0,S=(l<g?l+7:l)-g;return d(f?y-S:y+(6-S),m);case r:case"date":return $(M+"Hours",0);case i:return $(M+"Minutes",1);case e:return $(M+"Seconds",2);case n:return $(M+"Milliseconds",3);default:return this.clone()}},d.endOf=function(t){return this.startOf(t,!1)},d.$set=function(s,a){var h,f=D.p(s),c="set"+(this.$u?"UTC":""),d=(h={},h[r]=c+"Date",h.date=c+"Date",h[u]=c+"Month",h[o]=c+"FullYear",h[i]=c+"Hours",h[e]=c+"Minutes",h[n]=c+"Seconds",h[t]=c+"Milliseconds",h)[f],$=f===r?this.$D+(a-this.$W):a;if(f===u||f===o){var l=this.clone().set("date",1);l.$d[d]($),l.init(),this.$d=l.set("date",Math.min(this.$D,l.daysInMonth())).toDate();}else d&&this.$d[d]($);return this.init(),this},d.set=function(t,n){return this.clone().$set(t,n)},d.get=function(t){return this[D.p(t)]()},d.add=function(t,a){var h,f=this;t=Number(t);var c=D.p(a),d=function(n){var e=new Date(f.$d);return e.setDate(e.getDate()+n*t),D.w(e,f)};if(c===u)return this.set(u,this.$M+t);if(c===o)return this.set(o,this.$y+t);if(c===r)return d(1);if(c===s)return d(7);var $=(h={},h[e]=6e4,h[i]=36e5,h[n]=1e3,h)[c]||1,l=this.valueOf()+t*$;return D.w(l,this)},d.subtract=function(t,n){return this.add(-1*t,n)},d.format=function(t){var n=this;if(!this.isValid())return "Invalid Date";var e=t||"YYYY-MM-DDTHH:mm:ssZ",i=D.z(this),r=this.$locale(),s=r.weekdays,u=r.months,a=function(t,n,e,i){return t&&t[n]||e[n].substr(0,i)},o=function(t){return D.s(n.$H%12||12,t,"0")},h={YY:String(this.$y).slice(-2),YYYY:String(this.$y),M:String(this.$M+1),MM:D.s(this.$M+1,2,"0"),MMM:a(r.monthsShort,this.$M,u,3),MMMM:u[this.$M],D:String(this.$D),DD:D.s(this.$D,2,"0"),d:String(this.$W),dd:a(r.weekdaysMin,this.$W,s,2),ddd:a(r.weekdaysShort,this.$W,s,3),dddd:s[this.$W],H:String(this.$H),HH:D.s(this.$H,2,"0"),h:o(1),hh:o(2),a:this.$H<12?"am":"pm",A:this.$H<12?"AM":"PM",m:String(this.$m),mm:D.s(this.$m,2,"0"),s:String(this.$s),ss:D.s(this.$s,2,"0"),SSS:D.s(this.$ms,3,"0"),Z:i};return e.replace(f,function(t,n){return n||h[t]||i.replace(":","")})},d.utcOffset=function(){return 15*-Math.round(this.$d.getTimezoneOffset()/15)},d.diff=function(t,h,f){var c,d=D.p(h),$=g(t),l=6e4*($.utcOffset()-this.utcOffset()),m=this-$,y=D.m(this,$);return y=(c={},c[o]=y/12,c[u]=y,c[a]=y/3,c[s]=(m-l)/6048e5,c[r]=(m-l)/864e5,c[i]=m/36e5,c[e]=m/6e4,c[n]=m/1e3,c)[d]||m,f?y:D.a(y)},d.daysInMonth=function(){return this.endOf(u).$D},d.$locale=function(){return m[this.$L]},d.locale=function(t,n){if(!t)return this.$L;var e=this.clone();return e.$L=M(t,n,!0),e},d.clone=function(){return D.w(this.toDate(),this)},d.toDate=function(){return new Date(this.$d)},d.toJSON=function(){return this.toISOString()},d.toISOString=function(){return this.$d.toISOString()},d.toString=function(){return this.$d.toUTCString()},c}();return g.prototype=S.prototype,g.extend=function(t,n){return t(n,S,g),g},g.locale=M,g.isDayjs=y,g.unix=function(t){return g(1e3*t)},g.en=m[l],g.Ls=m,g});
+  });
+
+  var relativeTime = createCommonjsModule(function (module, exports) {
+  !function(e,r){module.exports=r();}(commonjsGlobal,function(){return function(e,r,t){var n=r.prototype;t.en.relativeTime={future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"};var o=function(e,r,n,o){for(var d,i,a=n.$locale().relativeTime,u=[{l:"s",r:44,d:"second"},{l:"m",r:89},{l:"mm",r:44,d:"minute"},{l:"h",r:89},{l:"hh",r:21,d:"hour"},{l:"d",r:35},{l:"dd",r:25,d:"day"},{l:"M",r:45},{l:"MM",r:10,d:"month"},{l:"y",r:17},{l:"yy",d:"year"}],f=u.length,s=0;s<f;s+=1){var l=u[s];l.d&&(d=o?t(e).diff(n,l.d,!0):n.diff(e,l.d,!0));var m=Math.ceil(Math.abs(d));if(m<=l.r||!l.r){i=a[l.l].replace("%d",m);break}}return r?i:(d>0?a.future:a.past).replace("%s",i)};n.to=function(e,r){return o(e,r,this,!0)},n.from=function(e,r){return o(e,r,this)},n.toNow=function(e){return this.to(t(),e)},n.fromNow=function(e){return this.from(t(),e)};}});
+  });
+
+  var zhCn = createCommonjsModule(function (module, exports) {
+  !function(_,e){module.exports=e(dayjs_min);}(commonjsGlobal,function(_){_=_&&_.hasOwnProperty("default")?_.default:_;var e={name:"zh-cn",weekdays:"星期日_星期一_星期二_星期三_星期四_星期五_星期六".split("_"),weekdaysShort:"周日_周一_周二_周三_周四_周五_周六".split("_"),weekdaysMin:"日_一_二_三_四_五_六".split("_"),months:"一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split("_"),monthsShort:"1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月".split("_"),ordinal:function(_,e){switch(e){case"W":return _+"周";default:return _+"日"}},weekStart:1,formats:{LT:"HH:mm",LTS:"HH:mm:ss",L:"YYYY/MM/DD",LL:"YYYY年M月D日",LLL:"YYYY年M月D日Ah点mm分",LLLL:"YYYY年M月D日ddddAh点mm分",l:"YYYY/M/D",ll:"YYYY年M月D日",lll:"YYYY年M月D日 HH:mm",llll:"YYYY年M月D日dddd HH:mm"},relativeTime:{future:"%s内",past:"%s前",s:"几秒",m:"1 分钟",mm:"%d 分钟",h:"1 小时",hh:"%d 小时",d:"1 天",dd:"%d 天",M:"1 个月",MM:"%d 个月",y:"1 年",yy:"%d 年"}};return _.locale(e,null,!0),e});
+  });
+
+  dayjs_min.extend(relativeTime);
+
+  var Comments =
+  /*#__PURE__*/
+  function (_Component) {
+    inherits(Comments, _Component);
+
+    function Comments(props) {
+      var _this;
+
+      classCallCheck(this, Comments);
+
+      _this = possibleConstructorReturn(this, getPrototypeOf(Comments).call(this, props));
+      _this.page = 1;
+      dayjs_min.locale(props.options.language);
+      return _this;
+    }
+
+    createClass(Comments, [{
+      key: "render",
+      value: function render(_ref) {
+        var options = _ref.options,
+            config = _ref.config,
+            comments = _ref.comments;
+        return h("div", {
+          className: "gitting-comments"
+        }, comments.map(function (item) {
+          return h("div", {
+            className: "gitting-comment-item",
+            key: item.id
+          }, h("div", {
+            className: "gitting-avatar"
+          }, h("img", {
+            src: item.user.avatar_url,
+            alt: "@".concat(item.user.login)
+          })), h("div", {
+            className: "gitting-content gitting-caret"
+          }, h("div", {
+            className: "gitting-content-body markdown-body",
+            dangerouslySetInnerHTML: {
+              __html: item.body_html
+            }
+          }), h("div", {
+            className: "gitting-content-mate"
+          }, h("span", null, h("a", {
+            className: "gitting-content-name",
+            href: item.user.html_url,
+            target: "_blank"
+          }, item.user.login), h("span", {
+            className: "gitting-content-time",
+            "data-time": item.created_at
+          }, config.i18n("published"), " ", dayjs_min(item.created_at).fromNow())), h("a", {
+            className: "gitting-content-reply",
+            href: "#",
+            target: "_blank"
+          }, config.i18n("reply")))));
+        }));
+      }
+    }]);
+
+    return Comments;
+  }(Component);
+
+  var Comments$1 = Enhanced(Comments);
+
   var App =
   /*#__PURE__*/
   function (_Component) {
@@ -2235,13 +2237,13 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, _issue;
+          var _this$props, options, config, throwError, setUserInfo, setIssue, page, setPage, setComments, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, comments;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue, page = _this$props.page, setPage = _this$props.setPage, setComments = _this$props.setComments;
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
@@ -2269,20 +2271,20 @@
 
                 case 16:
                   setUserInfo(getStorage("userInfo"));
+                  issue = null;
 
                   if (!(Number(options.number) > 0)) {
                     _context.next = 25;
                     break;
                   }
 
-                  _context.next = 20;
+                  _context.next = 21;
                   return config.api.getIssueById(options.number);
 
-                case 20:
+                case 21:
                   issue = _context.sent;
                   throwError(!issue || !issue.number, "Failed to get issue by id [".concat(options.number, "] , Do you want to initialize an new issue?"));
-                  setIssue(issue);
-                  _context.next = 31;
+                  _context.next = 30;
                   break;
 
                 case 25:
@@ -2291,11 +2293,19 @@
                   return config.api.getIssueByLabel(labels);
 
                 case 28:
-                  _issue = _context.sent[0];
-                  throwError(!_issue || !_issue.number, "Failed to get issue by labels [".concat(labels, "] , Do you want to initialize an new issue?"));
-                  setIssue(_issue);
+                  issue = _context.sent[0];
+                  throwError(!issue || !issue.number, "Failed to get issue by labels [".concat(labels, "] , Do you want to initialize an new issue?"));
 
-                case 31:
+                case 30:
+                  setIssue(issue);
+                  _context.next = 33;
+                  return config.api.getComments(issue.number, page);
+
+                case 33:
+                  comments = _context.sent;
+                  setComments(comments);
+
+                case 35:
                 case "end":
                   return _context.stop();
               }
@@ -2323,6 +2333,9 @@
           options: options,
           config: config
         }), h(Editor$1, {
+          options: options,
+          config: config
+        }), h(Comments$1, {
           options: options,
           config: config
         }));
@@ -2361,6 +2374,116 @@
 
     return _default;
   }(Component);
+
+  function creatApi(option) {
+    var issuesApi = "https://api.github.com/repos/".concat(option.owner, "/").concat(option.repo, "/issues");
+    var baseQuery = {
+      client_id: option.clientID,
+      client_secret: option.clientSecret
+    };
+    return {
+      // 获取token
+      getToken: function getToken(code) {
+        var query = Object.assign({}, baseQuery, {
+          code: code,
+          redirect_uri: location.href
+        });
+        return request('get', "".concat(option.proxy, "?").concat(queryStringify(query)));
+      },
+      // 获取用户信息
+      getUserInfo: function getUserInfo(token) {
+        return request('get', "https://api.github.com/user?access_token=".concat(token));
+      },
+      // 通过标签获取issue
+      getIssueByLabel: function getIssueByLabel(labels) {
+        var query = Object.assign({}, baseQuery, {
+          labels: labels,
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "?").concat(queryStringify(query)));
+      },
+      // 通过id获取issues
+      getIssueById: function getIssueById(id) {
+        var query = Object.assign({}, baseQuery, {
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "/").concat(id, "?").concat(queryStringify(query)));
+      },
+      // 获取某条issues下的评论
+      getComments: function getComments(id, page) {
+        var query = Object.assign({}, baseQuery, {
+          per_page: option.perPage,
+          page: page,
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "/").concat(id, "/comments?").concat(queryStringify(query)), null, {
+          Accept: "application/vnd.github.v3.full+json"
+        });
+      },
+      // 创建一条issues
+      creatIssues: function creatIssues(issue) {
+        return request('post', issuesApi, issue);
+      },
+      // 创建一条评论
+      creatComments: function creatComments(id, body) {
+        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), {
+          body: body
+        }, {
+          Accept: "application/vnd.github.v3.full+json"
+        });
+      },
+      // 解析markdown
+      mdToHtml: function mdToHtml(text) {
+        return request('post', "https://api.github.com/markdown", {
+          text: text
+        }, {
+          Accept: "text/html"
+        });
+      }
+    };
+  }
+
+  var i18n = {
+    'zh-cn': {
+      init: "初始化一个评论",
+      counts: "条评论",
+      login: "登录",
+      logout: "注销",
+      leave: "发表评论",
+      styling: "支持使用Markdown进行样式设置",
+      write: "编写",
+      preview: "预览",
+      noPreview: "无预览内容",
+      submit: "提交",
+      reply: "回复",
+      loadMore: "加载更多",
+      loadEnd: "加载完毕",
+      published: "发表于"
+    },
+    en: {
+      init: "Initialize A Issue",
+      counts: "comments",
+      login: "Login",
+      logout: "Logout",
+      leave: "Leave a comment",
+      styling: "Styling with Markdown is supported",
+      write: "Write",
+      preview: "Preview",
+      noPreview: "Nothing to preview",
+      submit: "Submit",
+      reply: "Reply",
+      loadMore: "Load More",
+      loadEnd: "Load completed",
+      published: "Published on"
+    }
+  };
+  function creatI18n (_ref) {
+    var lang = _ref.lang;
+    var langObj = i18n[lang] || i18n["zh-cn"];
+    return function (key) {
+      return langObj[key] || "Unmath key: ".concat(key);
+    };
+  }
 
   var Gitting =
   /*#__PURE__*/

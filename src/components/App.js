@@ -4,6 +4,7 @@ import { getURLParameters, setStorage, getStorage } from "../utils";
 import ErrorInfo from "./ErrorInfo";
 import Header from "./Header";
 import Editor from "./Editor";
+import Comments from "./Comments";
 
 class App extends Component {
   async componentDidMount() {
@@ -12,7 +13,10 @@ class App extends Component {
       config,
       throwError,
       setUserInfo,
-      setIssue
+      setIssue,
+      page,
+      setPage,
+      setComments
     } = this.props;
 
     const { code } = getURLParameters();
@@ -33,24 +37,27 @@ class App extends Component {
 
     setUserInfo(getStorage("userInfo"));
 
+    let issue = null;
     if (Number(options.number) > 0) {
-      const issue = await config.api.getIssueById(options.number);
+      issue = await config.api.getIssueById(options.number);
       throwError(
         !issue || !issue.number,
         `Failed to get issue by id [${
           options.number
         }] , Do you want to initialize an new issue?`
       );
-      setIssue(issue);
     } else {
       const labels = options.labels.concat(options.id).join(",");
-      const issue = (await config.api.getIssueByLabel(labels))[0];
+      issue = (await config.api.getIssueByLabel(labels))[0];
       throwError(
         !issue || !issue.number,
         `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`
       );
-      setIssue(issue);
     }
+
+    setIssue(issue);
+    const comments = await config.api.getComments(issue.number, page);
+    setComments(comments);
   }
 
   render({ options, config }) {
@@ -59,6 +66,7 @@ class App extends Component {
         <ErrorInfo options={options} config={config} />
         <Header options={options} config={config} />
         <Editor options={options} config={config} />
+        <Comments options={options} config={config} />
       </div>
     );
   }

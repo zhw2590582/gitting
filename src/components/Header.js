@@ -3,7 +3,7 @@ import Enhanced from "./Enhanced";
 
 class Header extends Component {
   render(props) {
-    const { issue, options, config, userInfo, isLogin, logout, login } = props;
+    const { issue, options, config, userInfo, isLogin, logout, login, comments } = props;
     return (
       <header class="gitting-header">
         <a
@@ -12,7 +12,7 @@ class Header extends Component {
           }`}
           class="gitting-number"
         >
-          {issue.comments || 0} {config.i18n("counts")}
+          {comments.length} {config.i18n("counts")}
         </a>
         <div class="gitting-mate">
           {isLogin ? (

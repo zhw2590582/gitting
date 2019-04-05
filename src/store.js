@@ -1,42 +1,48 @@
-import createStore from 'unistore';
-import {
-  cleanStorage,
-  setStorage,
-  getStorage,
-  queryStringify
-} from "./utils";
-import creatApi from './api';
-import creatI18n from './i18n';
+import createStore from "unistore";
+import { cleanStorage, setStorage, getStorage, queryStringify } from "./utils";
 
 export const state = {
-  isLogin: getStorage('token') && getStorage('userInfo'),
-  api: {},
-  i18n: () => {},
+  isLogin: getStorage("token") && getStorage("userInfo"),
   userInfo: {},
   issue: {},
   comments: [],
-  error: ''
-}
+  error: "",
+  input: "",
+  page: 1
+};
 
 export const store = createStore(state);
 
 export const actions = store => ({
   throwError(state, condition, msg) {
     return {
-      error: !condition ? '' : msg
-    }
+      error: !condition ? "" : msg
+    };
   },
 
   setUserInfo(state, info) {
     return {
       userInfo: info
-    }
+    };
   },
 
   setIssue(state, issue) {
     return {
       issue: issue
-    }
+    };
+  },
+
+  setComments(state, comments) {
+    return {
+      comments: [...state.comments, ...comments],
+      page: state.page + 1
+    };
+  },
+
+  setInput(state, input) {
+    return {
+      input: input
+    };
   },
 
   logout(state, e) {
@@ -57,4 +63,4 @@ export const actions = store => ({
       }
     )}`;
   }
-})
+});

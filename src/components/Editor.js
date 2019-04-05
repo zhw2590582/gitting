@@ -5,18 +5,9 @@ class Editor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: "",
       preview: false,
       markdown: ""
     };
-  }
-
-  onInput(e) {
-    this.setState(() => {
-      return {
-        input: e.target.value
-      };
-    });
   }
 
   onWrite(e) {
@@ -28,8 +19,8 @@ class Editor extends Component {
   }
 
   async onPreview(e) {
-    const { config } = this.props;
-    const value = this.state.input.trim();
+    const { config, input } = this.props;
+    const value = input.trim();
     this.setState(() => {
       return {
         preview: true,
@@ -52,23 +43,22 @@ class Editor extends Component {
   }
 
   async onSubmit(e) {
-    const { options, config, issue, throwError } = this.props;
-    const value = this.state.input.trim();
+    const { options, input, config, issue, throwError } = this.props;
+    const value = input.trim();
     if (!value) return;
     throwError(value.length <= options.maxlength, `Too many words: ${value.length}`);
     const item = await config.api.creatComments(issue.number, value);
     throwError(!item || !item.id, `Comment failed!`);
     this.setState(() => {
       return {
-        input: "",
         markdown: ""
       };
     });
   }
 
   render(props, state) {
-    const { options, config, userInfo, login, isLogin } = props;
-    const { input, preview, markdown } = state;
+    const { options, input, setInput, config, userInfo, login, isLogin } = props;
+    const { preview, markdown } = state;
     return (
       <div class="gitting-body">
         <div class="gitting-avatar">
@@ -96,7 +86,7 @@ class Editor extends Component {
             maxlength={options.maxlength}
             spellcheck={false}
             value={input}
-            onInput={e => this.onInput(e)}
+            onInput={e => setInput(e.target.value)}
           />
           <div
             class="gitting-tip"
