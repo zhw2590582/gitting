@@ -1928,6 +1928,32 @@
 
   var Header$1 = Enhanced(Header);
 
+  var Loading =
+  /*#__PURE__*/
+  function (_Component) {
+    inherits(Loading, _Component);
+
+    function Loading() {
+      classCallCheck(this, Loading);
+
+      return possibleConstructorReturn(this, getPrototypeOf(Loading).apply(this, arguments));
+    }
+
+    createClass(Loading, [{
+      key: "render",
+      value: function render(_ref) {
+        var loading = _ref.loading;
+        return loading ? h("div", {
+          "class": "gitting-loading"
+        }, "Loading...") : null;
+      }
+    }]);
+
+    return Loading;
+  }(Component);
+
+  var Loading$1 = Enhanced(Loading);
+
   var Editor =
   /*#__PURE__*/
   function (_Component) {
@@ -1940,6 +1966,7 @@
 
       _this = possibleConstructorReturn(this, getPrototypeOf(Editor).call(this, props));
       _this.state = {
+        loading: false,
         preview: false,
         markdown: ""
       };
@@ -1978,29 +2005,39 @@
                   markdown = "";
 
                   if (!value) {
-                    _context.next = 10;
+                    _context.next = 12;
                     break;
                   }
 
-                  _context.next = 7;
+                  this.setState(function () {
+                    return {
+                      loading: true
+                    };
+                  });
+                  _context.next = 8;
                   return config.api.mdToHtml(value);
 
-                case 7:
+                case 8:
                   markdown = _context.sent;
-                  _context.next = 11;
+                  this.setState(function () {
+                    return {
+                      loading: false
+                    };
+                  });
+                  _context.next = 13;
                   break;
 
-                case 10:
+                case 12:
                   markdown = config.i18n("noPreview");
 
-                case 11:
+                case 13:
                   this.setState(function () {
                     return {
                       markdown: markdown
                     };
                   });
 
-                case 12:
+                case 14:
                 case "end":
                   return _context.stop();
               }
@@ -2038,20 +2075,30 @@
 
                 case 4:
                   throwError(value.length > options.maxlength, "Too many words: ".concat(value.length));
-                  _context2.next = 7;
+                  this.setState(function () {
+                    return {
+                      loading: true
+                    };
+                  });
+                  _context2.next = 8;
                   return config.api.creatComments(issue.number, value);
 
-                case 7:
+                case 8:
                   item = _context2.sent;
+                  this.setState(function () {
+                    return {
+                      loading: false
+                    };
+                  });
                   throwError(!item || !item.id, "Comment failed!");
                   this.setState(function () {
                     return {
                       markdown: ""
                     };
                   });
-                  setInput('');
+                  setInput("");
 
-                case 11:
+                case 13:
                 case "end":
                   return _context2.stop();
               }
@@ -2078,7 +2125,8 @@
             login = props.login,
             isLogin = props.isLogin;
         var preview = state.preview,
-            markdown = state.markdown;
+            markdown = state.markdown,
+            loading = state.loading;
         return h("div", {
           "class": "gitting-body"
         }, h("div", {
@@ -2143,7 +2191,9 @@
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, config.i18n("login")))));
+        }, config.i18n("login")))), h(Loading$1, {
+          loading: loading
+        }));
       }
     }]);
 
@@ -2219,9 +2269,19 @@
 
       _this = possibleConstructorReturn(this, getPrototypeOf(Comments).call(this, props));
       dayjs_min.locale(props.options.language);
+      _this.state = {
+        loading: false
+      };
       _this.reply = _this.reply.bind(assertThisInitialized(_this));
       return _this;
-    }
+    } // async componentDidMount() {
+    //   const { config, setComments, issue, page } = this.props;
+    //   this.setState(() => ({ loading: true }));
+    //   const comments = await config.api.getComments(issue.number, page);
+    //   this.setState(() => ({ loading: false }));
+    //   setComments(comments);
+    // }
+
 
     createClass(Comments, [{
       key: "reply",
@@ -2237,12 +2297,13 @@
       }
     }, {
       key: "render",
-      value: function render(_ref2) {
+      value: function render(_ref2, _ref3) {
         var _this2 = this;
 
         var options = _ref2.options,
             config = _ref2.config,
             comments = _ref2.comments;
+        var loading = _ref3.loading;
         return h("div", {
           className: "gitting-comments"
         }, comments.map(function (item) {
@@ -2253,6 +2314,8 @@
             key: item.id,
             reply: _this2.reply
           });
+        }), h(Loading$1, {
+          loading: loading
         }));
       }
     }]);

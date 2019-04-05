@@ -1,10 +1,12 @@
 import { h, Component } from "preact";
 import Enhanced from "./Enhanced";
+import Loading from "./Loading";
 
 class Editor extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       preview: false,
       markdown: ""
     };
@@ -30,7 +32,9 @@ class Editor extends Component {
 
     let markdown = "";
     if (value) {
+      this.setState(() => ({ loading: true }));
       markdown = await config.api.mdToHtml(value);
+      this.setState(() => ({ loading: false }));
     } else {
       markdown = config.i18n("noPreview");
     }
@@ -46,20 +50,33 @@ class Editor extends Component {
     const { options, input, config, issue, throwError, setInput } = this.props;
     const value = input.trim();
     if (!value) return;
-    throwError(value.length > options.maxlength, `Too many words: ${value.length}`);
+    throwError(
+      value.length > options.maxlength,
+      `Too many words: ${value.length}`
+    );
+    this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
+    this.setState(() => ({ loading: false }));
     throwError(!item || !item.id, `Comment failed!`);
     this.setState(() => {
       return {
         markdown: ""
       };
     });
-    setInput('');
+    setInput("");
   }
 
   render(props, state) {
-    const { options, input, setInput, config, userInfo, login, isLogin } = props;
-    const { preview, markdown } = state;
+    const {
+      options,
+      input,
+      setInput,
+      config,
+      userInfo,
+      login,
+      isLogin
+    } = props;
+    const { preview, markdown, loading } = state;
     return (
       <div class="gitting-body">
         <div class="gitting-avatar">
@@ -131,6 +148,7 @@ class Editor extends Component {
             )}
           </div>
         </div>
+        <Loading loading={loading} />
       </div>
     );
   }

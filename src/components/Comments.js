@@ -6,6 +6,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
 import "dayjs/locale/en";
 dayjs.extend(relativeTime);
+import Loading from "./Loading";
 
 const CommentItem = Enhanced(({ options, config, item, reply }) => {
   return (
@@ -50,8 +51,19 @@ class Comments extends Component {
   constructor(props) {
     super(props);
     dayjs.locale(props.options.language);
+    this.state = {
+      loading: false
+    };
     this.reply = this.reply.bind(this);
   }
+
+  // async componentDidMount() {
+  //   const { config, setComments, issue, page } = this.props;
+  //   this.setState(() => ({ loading: true }));
+  //   const comments = await config.api.getComments(issue.number, page);
+  //   this.setState(() => ({ loading: false }));
+  //   setComments(comments);
+  // }
 
   reply(comment, e) {
     e.preventDefault();
@@ -63,7 +75,7 @@ class Comments extends Component {
     smoothScroll(config.$container);
   }
 
-  render({ options, config, comments }) {
+  render({ options, config, comments }, { loading }) {
     return (
       <div className="gitting-comments">
         {comments.map(item => {
@@ -77,6 +89,7 @@ class Comments extends Component {
             />
           );
         })}
+        <Loading loading={loading} />
       </div>
     );
   }
