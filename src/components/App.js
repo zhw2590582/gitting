@@ -3,6 +3,7 @@ import Enhanced from "./Enhanced";
 import { getURLParameters, setStorage, getStorage } from "../utils";
 import ErrorInfo from "./ErrorInfo";
 import Header from "./Header";
+import Editor from "./Editor";
 
 class App extends Component {
   async componentDidMount() {
@@ -50,6 +51,7 @@ class App extends Component {
       <div class={`gitting-container gitting-theme-${options.theme}`}>
         <ErrorInfo options={options} config={config} />
         <Header options={options} config={config} />
+        <Editor options={options} config={config} />
       </div>
     );
   }

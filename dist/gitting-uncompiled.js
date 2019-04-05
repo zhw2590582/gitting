@@ -932,9 +932,8 @@
       if (res.status === 404) {
         return Promise.reject("Unauthorized.");
       } else if (res.status === 401) {
-        delStorage("token");
-        delStorage("userInfo");
-        location.reload();
+        cleanStorage();
+        window.location.reload();
       } else {
         if (headers.Accept === 'text/html') {
           return res.text();
@@ -1850,7 +1849,7 @@
         return h("header", {
           "class": "gitting-header"
         }, h("a", {
-          href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.id),
+          href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
         }, issue.comments || 0, " ", config.i("counts")), h("div", {
           "class": "gitting-mate"
@@ -1876,6 +1875,201 @@
   }(Component);
 
   var Header$1 = Enhanced(Header);
+
+  var Editor =
+  /*#__PURE__*/
+  function (_Component) {
+    inherits(Editor, _Component);
+
+    function Editor(props) {
+      var _this;
+
+      classCallCheck(this, Editor);
+
+      _this = possibleConstructorReturn(this, getPrototypeOf(Editor).call(this, props));
+      _this.state = {
+        input: "",
+        preview: false,
+        markdown: ""
+      };
+      return _this;
+    }
+
+    createClass(Editor, [{
+      key: "onInput",
+      value: function onInput(e) {
+        this.setState(function () {
+          return {
+            input: e.target.value
+          };
+        });
+      }
+    }, {
+      key: "onWrite",
+      value: function onWrite(e) {
+        this.setState(function () {
+          return {
+            preview: false
+          };
+        });
+      }
+    }, {
+      key: "onPreview",
+      value: function () {
+        var _onPreview = asyncToGenerator(
+        /*#__PURE__*/
+        regenerator.mark(function _callee(e) {
+          var config, value, markdown;
+          return regenerator.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  config = this.props.config;
+                  value = this.state.input.trim();
+                  this.setState(function () {
+                    return {
+                      preview: true,
+                      markdown: ""
+                    };
+                  });
+                  markdown = "";
+
+                  if (!value) {
+                    _context.next = 10;
+                    break;
+                  }
+
+                  _context.next = 7;
+                  return config.api.mdToHtml(value);
+
+                case 7:
+                  markdown = _context.sent;
+                  _context.next = 11;
+                  break;
+
+                case 10:
+                  markdown = config.i("noPreview");
+
+                case 11:
+                  this.setState(function () {
+                    return {
+                      markdown: markdown
+                    };
+                  });
+
+                case 12:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function onPreview(_x) {
+          return _onPreview.apply(this, arguments);
+        }
+
+        return onPreview;
+      }()
+    }, {
+      key: "onSubmit",
+      value: function onSubmit(e) {}
+    }, {
+      key: "login",
+      value: function login(e) {
+        e.preventDefault();
+        var options = this.props.options;
+        setStorage("redirect_uri", window.location.href);
+        window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
+          state: "Gitting",
+          client_id: options.clientID,
+          redirect_uri: window.location.href,
+          scope: "public_repo"
+        }));
+      }
+    }, {
+      key: "render",
+      value: function render(props, state) {
+        var _this2 = this;
+
+        var options = props.options,
+            config = props.config,
+            userInfo = props.userInfo;
+        var input = state.input,
+            preview = state.preview,
+            markdown = state.markdown;
+        return h("div", {
+          "class": "gitting-body"
+        }, h("div", {
+          "class": "gitting-avatar"
+        }, h("img", {
+          src: config.login ? userInfo.avatar_url : options.avatar,
+          alt: "@".concat(config.login ? userInfo.login : "github")
+        })), h("div", {
+          "class": "gitting-editor"
+        }, h("div", {
+          style: {
+            display: preview ? "" : "none"
+          },
+          "class": "gitting-markdown markdown-body",
+          dangerouslySetInnerHTML: {
+            __html: markdown
+          }
+        }), h("textarea", {
+          style: {
+            display: preview ? "none" : ""
+          },
+          "class": "gitting-textarea",
+          placeholder: config.i("leave"),
+          maxlength: options.maxlength,
+          spellcheck: false,
+          value: input,
+          onInput: function onInput(e) {
+            return _this2.onInput(e);
+          }
+        }), h("div", {
+          "class": "gitting-tip",
+          style: {
+            display: preview ? "none" : ""
+          }
+        }, h("a", {
+          href: "https://guides.github.com/features/mastering-markdown/",
+          target: "_blank"
+        }, config.i("styling")), h("span", {
+          "class": "gitting-counts"
+        }, options.maxlength - input.length, " / ", options.maxlength)), h("div", {
+          "class": "gitting-tool"
+        }, h("div", {
+          "class": "gitting-switch"
+        }, h("span", {
+          "class": preview ? "" : "active",
+          onClick: function onClick(e) {
+            return _this2.onWrite(e);
+          }
+        }, config.i("write")), h("span", {
+          "class": preview ? "active" : "",
+          onClick: function onClick(e) {
+            return _this2.onPreview(e);
+          }
+        }, config.i("preview"))), config.login ? h("button", {
+          "class": "gitting-send",
+          onClick: function onClick(e) {
+            return _this2.onSubmit(e);
+          }
+        }, config.i("submit")) : h("a", {
+          "class": "gitting-send",
+          href: "#",
+          onClick: function onClick(e) {
+            return _this2.login(e);
+          }
+        }, config.i("login")))));
+      }
+    }]);
+
+    return Editor;
+  }(Component);
+
+  var Editor$1 = Enhanced(Editor);
 
   var App =
   /*#__PURE__*/
@@ -1979,6 +2173,9 @@
           options: options,
           config: config
         }), h(Header$1, {
+          options: options,
+          config: config
+        }), h(Editor$1, {
           options: options,
           config: config
         }));

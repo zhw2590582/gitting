@@ -55,9 +55,8 @@ export function request(method, url, body, header) {
     if (res.status === 404) {
       return Promise.reject("Unauthorized.");
     } else if (res.status === 401) {
-      delStorage("token");
-      delStorage("userInfo");
-      location.reload();
+      cleanStorage();
+      window.location.reload();
     } else {
       if (headers.Accept === 'text/html') {
         return res.text();

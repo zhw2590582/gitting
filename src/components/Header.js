@@ -23,7 +23,7 @@ class Header extends Component {
       <header class="gitting-header">
         <a
           href={`https://github.com/${options.owner}/${options.repo}/issues/${
-            issue.id
+            issue.number
           }`}
           class="gitting-number"
         >
