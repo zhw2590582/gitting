@@ -33,7 +33,7 @@ const i18n = {
   }
 };
 
-export default function (lang) {
+export default function ({lang}) {
   const langObj = i18n[lang] || i18n["zh-cn"];
   return function (key) {
     return langObj[key] || `Unmath key: ${key}`;

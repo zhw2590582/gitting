@@ -1,19 +1,13 @@
 import "./style.scss";
 import { h, render } from "preact";
 import Container from "./components";
-import { getStorage } from './utils';
-import i18n from "./i18n";
-import api from "./api";
+import { setStorage } from './utils';
 
 class Gitting {
   constructor(options = {}) {
     this.options = Object.assign({}, Gitting.DEFAULT, options);
+    setStorage('options', this.options);
     this.$root = null;
-    this.config = {
-      login: getStorage('token') && getStorage('userInfo'),
-      i: i18n(this.options.language),
-      api: api(this.options)
-    }
   }
 
   static get DEFAULT() {
@@ -39,7 +33,7 @@ class Gitting {
 
   render(el) {
     this.$container = el instanceof Element ? el : document.querySelector(el);
-    this.$root = render(<Container options={this.options} config={this.config} />, this.$container);
+    this.$root = render(<Container options={this.options} />, this.$container);
   }
 
   destroy() {

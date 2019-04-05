@@ -2,10 +2,16 @@ import createStore from 'unistore';
 import {
   cleanStorage,
   setStorage,
+  getStorage,
   queryStringify
 } from "./utils";
+import creatApi from './api';
+import creatI18n from './i18n';
 
 export const state = {
+  isLogin: false,
+  api: {},
+  i18n: () => {},
   userInfo: {},
   issue: {},
   comments: [],
@@ -15,6 +21,14 @@ export const state = {
 export const store = createStore(state);
 
 export const actions = store => ({
+  init(state) {
+    return {
+      isLogin: getStorage('token') && getStorage('userInfo'),
+      api: creatApi(getStorage('options')),
+      i18n: creatI18n(getStorage('options')),
+    }
+  },
+
   throwError(state, condition, msg) {
     return {
       error: !condition ? '' : msg

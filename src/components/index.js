@@ -1,13 +1,13 @@
 import { h, Component } from "preact";
 import { Provider } from "unistore/preact";
 import { store } from "../store";
-import App from './App';
+import App from "./App";
 
 export default class extends Component {
-  render({ options, config }) {
+  render({ options }) {
     return (
       <Provider store={store}>
-        <App options={options} config={config} />
+        <App options={options} />
       </Provider>
     );
   }

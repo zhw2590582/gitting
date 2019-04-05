@@ -944,7 +944,120 @@
     });
   }
 
+  function creatApi(option) {
+    var issuesApi = "https://api.github.com/repos/".concat(option.owner, "/").concat(option.repo, "/issues");
+    var baseQuery = {
+      client_id: option.clientID,
+      client_secret: option.clientSecret
+    };
+    return {
+      // 获取token
+      getToken: function getToken(code) {
+        var query = Object.assign({}, baseQuery, {
+          code: code,
+          redirect_uri: location.href
+        });
+        return request('get', "".concat(option.proxy, "?").concat(queryStringify(query)));
+      },
+      // 获取用户信息
+      getUserInfo: function getUserInfo(token) {
+        return request('get', "https://api.github.com/user?access_token=".concat(token));
+      },
+      // 通过标签获取issue
+      getIssueByLabel: function getIssueByLabel(labels) {
+        var query = Object.assign({}, baseQuery, {
+          labels: labels,
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "?").concat(queryStringify(query)));
+      },
+      // 通过id获取issues
+      getIssueById: function getIssueById(id) {
+        var query = Object.assign({}, baseQuery, {
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "/").concat(id, "?").concat(queryStringify(query)));
+      },
+      // 获取某条issues下的评论
+      getComments: function getComments(id, page) {
+        var query = Object.assign({}, baseQuery, {
+          per_page: option.perPage,
+          page: page,
+          t: new Date().getTime()
+        });
+        return request('get', "".concat(issuesApi, "/").concat(id, "/comments?").concat(queryStringify(query)), null, {
+          Accept: "application/vnd.github.v3.full+json"
+        });
+      },
+      // 创建一条issues
+      creatIssues: function creatIssues(issue) {
+        return request('post', issuesApi, issue);
+      },
+      // 创建一条评论
+      creatComments: function creatComments(id, body) {
+        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), {
+          body: body
+        }, {
+          Accept: "application/vnd.github.v3.full+json"
+        });
+      },
+      // 解析markdown
+      mdToHtml: function mdToHtml(text) {
+        return request('post', "https://api.github.com/markdown", {
+          text: text
+        }, {
+          Accept: "text/html"
+        });
+      }
+    };
+  }
+
+  var i18n = {
+    'zh-cn': {
+      init: "初始化一个评论",
+      counts: "条评论",
+      login: "登录",
+      logout: "注销",
+      leave: "发表评论",
+      styling: "支持使用Markdown进行样式设置",
+      write: "编写",
+      preview: "预览",
+      noPreview: "无预览内容",
+      submit: "提交",
+      reply: "回复",
+      loadMore: "加载更多",
+      loadEnd: "加载完毕",
+      published: "发表于"
+    },
+    en: {
+      init: "Initialize A Issue",
+      counts: "comments",
+      login: "Login",
+      logout: "Logout",
+      leave: "Leave a comment",
+      styling: "Styling with Markdown is supported",
+      write: "Write",
+      preview: "Preview",
+      noPreview: "Nothing to preview",
+      submit: "Submit",
+      reply: "Reply",
+      loadMore: "Load More",
+      loadEnd: "Load completed",
+      published: "Published on"
+    }
+  };
+  function creatI18n (_ref) {
+    var lang = _ref.lang;
+    var langObj = i18n[lang] || i18n["zh-cn"];
+    return function (key) {
+      return langObj[key] || "Unmath key: ".concat(key);
+    };
+  }
+
   var state = {
+    isLogin: false,
+    api: {},
+    i18n: function i18n() {},
     userInfo: {},
     issue: {},
     comments: [],
@@ -953,6 +1066,13 @@
   var store = createStore(state);
   var actions = function actions(store) {
     return {
+      init: function init(state) {
+        return {
+          isLogin: getStorage('token') && getStorage('userInfo'),
+          api: creatApi(getStorage('options')),
+          i18n: creatI18n(getStorage('options'))
+        };
+      },
       throwError: function throwError(state, condition, msg) {
         return {
           error: !condition ? '' : msg
@@ -1834,25 +1954,13 @@
     }
 
     createClass(Header, [{
-      key: "login",
-      value: function login(e) {
-        e.preventDefault();
-        var options = this.props.options;
-        setStorage("redirect_uri", window.location.href);
-        window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
-          state: "Gitting",
-          client_id: options.clientID,
-          redirect_uri: window.location.href,
-          scope: "public_repo"
-        }));
-      }
-    }, {
       key: "render",
       value: function render(props) {
         var issue = props.issue,
             options = props.options,
-            config = props.config,
+            i18n = props.i18n,
             userInfo = props.userInfo,
+            isLogin = props.isLogin,
             logout = props.logout,
             login = props.login;
         return h("header", {
@@ -1860,21 +1968,21 @@
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
-        }, issue.comments || 0, " ", config.i("counts")), h("div", {
+        }, issue.comments || 0, " ", i18n("counts")), h("div", {
           "class": "gitting-mate"
-        }, config.login ? h("span", null, h("a", {
+        }, isLogin ? h("span", null, h("a", {
           href: "#"
         }, userInfo.login), h("a", {
           href: "#",
           onClick: function onClick(e) {
             return logout(e);
           }
-        }, config.i("logout"))) : h("a", {
+        }, i18n("logout"))) : h("a", {
           href: "#",
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, config.i("login")), h("a", {
+        }, i18n("login")), h("a", {
           href: "https://github.com/zhw2590582/gitting"
         }, "Gitting 2.0.0")));
       }
@@ -2113,7 +2221,7 @@
     return Editor;
   }(Component);
 
-  var Editor$1 = Enhanced(Editor);
+  Enhanced(Editor);
 
   var App =
   /*#__PURE__*/
@@ -2132,31 +2240,37 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, _issue;
+          var _this = this;
+
+          var _this$props, init, options, throwError, api, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
+                  _this$props = this.props, init = _this$props.init, options = _this$props.options, throwError = _this$props.throwError, api = _this$props.api, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
+                  init();
+                  setTimeout(function () {
+                    console.log(_this.props);
+                  }, 1000);
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
-                    _context.next = 16;
+                    _context.next = 18;
                     break;
                   }
 
-                  _context.next = 5;
-                  return config.api.getToken(code);
+                  _context.next = 7;
+                  return api.getToken(code);
 
-                case 5:
+                case 7:
                   data = _context.sent;
                   throwError(!data.access_token, "Can not get token, Please login again!");
                   setStorage("token", data.access_token);
-                  _context.next = 10;
-                  return config.api.getUserInfo(data.access_token);
+                  _context.next = 12;
+                  return api.getUserInfo(data.access_token);
 
-                case 10:
+                case 12:
                   userInfo = _context.sent;
                   throwError(!userInfo.id, "Can not get user info, Please login again!");
                   setStorage("userInfo", userInfo);
@@ -2164,35 +2278,27 @@
                   throwError(!redirect_uri, "Can not get redirect url, Please login again!");
                   window.location.href = redirect_uri;
 
-                case 16:
-                  setUserInfo(getStorage("userInfo"));
+                case 18:
+                  setUserInfo(getStorage("userInfo")); // if (Number(options.number) > 0) {
+                  //   const issue = await api.getIssueById(options.number);
+                  //   throwError(
+                  //     !issue || !issue.number,
+                  //     `Failed to get issue by id [${
+                  //       options.number
+                  //     }] , Do you want to initialize an new issue?`
+                  //   );
+                  //   setIssue(issue);
+                  // } else {
+                  //   const labels = options.labels.concat(options.id).join(",");
+                  //   const issue = (await api.getIssueByLabel(labels))[0];
+                  //   throwError(
+                  //     !issue || !issue.number,
+                  //     `Failed to get issue by labels [${labels}] , Do you want to initialize an new issue?`
+                  //   );
+                  //   setIssue(issue);
+                  // }
 
-                  if (!(Number(options.number) > 0)) {
-                    _context.next = 25;
-                    break;
-                  }
-
-                  _context.next = 20;
-                  return config.api.getIssueById(options.number);
-
-                case 20:
-                  issue = _context.sent;
-                  throwError(!issue || !issue.number, "Failed to get issue by id [".concat(options.number, "] , Do you want to initialize an new issue?"));
-                  setIssue(issue);
-                  _context.next = 31;
-                  break;
-
-                case 25:
-                  labels = options.labels.concat(options.id).join(",");
-                  _context.next = 28;
-                  return config.api.getIssueByLabel(labels);
-
-                case 28:
-                  _issue = _context.sent[0];
-                  throwError(!_issue || !_issue.number, "Failed to get issue by labels [".concat(labels, "] , Do you want to initialize an new issue?"));
-                  setIssue(_issue);
-
-                case 31:
+                case 19:
                 case "end":
                   return _context.stop();
               }
@@ -2209,19 +2315,13 @@
     }, {
       key: "render",
       value: function render(_ref) {
-        var options = _ref.options,
-            config = _ref.config;
+        var options = _ref.options;
         return h("div", {
           "class": "gitting-container gitting-theme-".concat(options.theme)
         }, h(ErrorInfo$1, {
-          options: options,
-          config: config
+          options: options
         }), h(Header$1, {
-          options: options,
-          config: config
-        }), h(Editor$1, {
-          options: options,
-          config: config
+          options: options
         }));
       }
     }]);
@@ -2245,128 +2345,17 @@
     createClass(_default, [{
       key: "render",
       value: function render(_ref) {
-        var options = _ref.options,
-            config = _ref.config;
+        var options = _ref.options;
         return h(preact_2, {
           store: store
         }, h(App$1, {
-          options: options,
-          config: config
+          options: options
         }));
       }
     }]);
 
     return _default;
   }(Component);
-
-  var i18n = {
-    'zh-cn': {
-      init: "初始化一个评论",
-      counts: "条评论",
-      login: "登录",
-      logout: "注销",
-      leave: "发表评论",
-      styling: "支持使用Markdown进行样式设置",
-      write: "编写",
-      preview: "预览",
-      noPreview: "无预览内容",
-      submit: "提交",
-      reply: "回复",
-      loadMore: "加载更多",
-      loadEnd: "加载完毕",
-      published: "发表于"
-    },
-    en: {
-      init: "Initialize A Issue",
-      counts: "comments",
-      login: "Login",
-      logout: "Logout",
-      leave: "Leave a comment",
-      styling: "Styling with Markdown is supported",
-      write: "Write",
-      preview: "Preview",
-      noPreview: "Nothing to preview",
-      submit: "Submit",
-      reply: "Reply",
-      loadMore: "Load More",
-      loadEnd: "Load completed",
-      published: "Published on"
-    }
-  };
-  function i18n$1 (lang) {
-    var langObj = i18n[lang] || i18n["zh-cn"];
-    return function (key) {
-      return langObj[key] || "Unmath key: ".concat(key);
-    };
-  }
-
-  function creatApi(option) {
-    var issuesApi = "https://api.github.com/repos/".concat(option.owner, "/").concat(option.repo, "/issues");
-    var baseQuery = {
-      client_id: option.clientID,
-      client_secret: option.clientSecret
-    };
-    return {
-      // 获取token
-      getToken: function getToken(code) {
-        var query = Object.assign({}, baseQuery, {
-          code: code,
-          redirect_uri: location.href
-        });
-        return request('get', "".concat(option.proxy, "?").concat(queryStringify(query)));
-      },
-      // 获取用户信息
-      getUserInfo: function getUserInfo(token) {
-        return request('get', "https://api.github.com/user?access_token=".concat(token));
-      },
-      // 通过标签获取issue
-      getIssueByLabel: function getIssueByLabel(labels) {
-        var query = Object.assign({}, baseQuery, {
-          labels: labels,
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "?").concat(queryStringify(query)));
-      },
-      // 通过id获取issues
-      getIssueById: function getIssueById(id) {
-        var query = Object.assign({}, baseQuery, {
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "/").concat(id, "?").concat(queryStringify(query)));
-      },
-      // 获取某条issues下的评论
-      getComments: function getComments(id, page) {
-        var query = Object.assign({}, baseQuery, {
-          per_page: option.perPage,
-          page: page,
-          t: new Date().getTime()
-        });
-        return request('get', "".concat(issuesApi, "/").concat(id, "/comments?").concat(queryStringify(query)), null, {
-          Accept: "application/vnd.github.v3.full+json"
-        });
-      },
-      // 创建一条issues
-      creatIssues: function creatIssues(issue) {
-        return request('post', issuesApi, issue);
-      },
-      // 创建一条评论
-      creatComments: function creatComments(id, body) {
-        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), {
-          body: body
-        }, {
-          Accept: "application/vnd.github.v3.full+json"
-        });
-      },
-      // 解析markdown
-      mdToHtml: function mdToHtml(text) {
-        return request('post', "https://api.github.com/markdown", {
-          text: text
-        }, {
-          Accept: "text/html"
-        });
-      }
-    };
-  }
 
   var Gitting =
   /*#__PURE__*/
@@ -2377,12 +2366,8 @@
       classCallCheck(this, Gitting);
 
       this.options = Object.assign({}, Gitting.DEFAULT, options);
+      setStorage('options', this.options);
       this.$root = null;
-      this.config = {
-        login: getStorage('token') && getStorage('userInfo'),
-        i: i18n$1(this.options.language),
-        api: creatApi(this.options)
-      };
     }
 
     createClass(Gitting, [{
@@ -2390,8 +2375,7 @@
       value: function render$1(el) {
         this.$container = el instanceof Element ? el : document.querySelector(el);
         this.$root = render(h(_default, {
-          options: this.options,
-          config: this.config
+          options: this.options
         }), this.$container);
       }
     }, {
