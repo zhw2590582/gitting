@@ -1014,7 +1014,7 @@
       setComments: function setComments(state, comments) {
         return {
           comments: [].concat(toConsumableArray(state.comments), toConsumableArray(comments)),
-          page: state.page + 1
+          page: comments.length ? state.page + 1 : state.page
         };
       },
       setInput: function setInput(state, input) {
@@ -2262,6 +2262,99 @@
 
   var Comments$1 = Enhanced(Comments);
 
+  var Load =
+  /*#__PURE__*/
+  function (_Component) {
+    inherits(Load, _Component);
+
+    function Load(props) {
+      var _this;
+
+      classCallCheck(this, Load);
+
+      _this = possibleConstructorReturn(this, getPrototypeOf(Load).call(this, props));
+      _this.state = {
+        loading: false
+      };
+      return _this;
+    }
+
+    createClass(Load, [{
+      key: "loadMore",
+      value: function () {
+        var _loadMore = asyncToGenerator(
+        /*#__PURE__*/
+        regenerator.mark(function _callee(e) {
+          var _this$props, config, issue, page, setComments, comments;
+
+          return regenerator.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  e.preventDefault();
+                  _this$props = this.props, config = _this$props.config, issue = _this$props.issue, page = _this$props.page, setComments = _this$props.setComments;
+                  this.setState(function () {
+                    return {
+                      loading: true
+                    };
+                  });
+                  _context.next = 5;
+                  return config.api.getComments(issue.number, page);
+
+                case 5:
+                  comments = _context.sent;
+                  this.setState(function () {
+                    return {
+                      loading: false
+                    };
+                  });
+                  setComments(comments);
+
+                case 8:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function loadMore(_x) {
+          return _loadMore.apply(this, arguments);
+        }
+
+        return loadMore;
+      }()
+    }, {
+      key: "render",
+      value: function render(_ref, _ref2) {
+        var _this2 = this;
+
+        var options = _ref.options,
+            config = _ref.config,
+            comments = _ref.comments;
+        var loading = _ref2.loading;
+
+        if (loading) {
+          return h("span", {
+            "class": "gitting-load"
+          }, config.i18n("loading"));
+        }
+
+        return comments.length ? h("a", {
+          href: "#",
+          "class": "gitting-load",
+          onClick: function onClick(e) {
+            return _this2.loadMore(e);
+          }
+        }, config.i18n("loadMore")) : null;
+      }
+    }]);
+
+    return Load;
+  }(Component);
+
+  var Load$1 = Enhanced(Load);
+
   var App =
   /*#__PURE__*/
   function (_Component) {
@@ -2378,6 +2471,9 @@
           options: options,
           config: config
         }), h(Comments$1, {
+          options: options,
+          config: config
+        }), h(Load$1, {
           options: options,
           config: config
         }));
@@ -2499,6 +2595,7 @@
       submit: "提交",
       reply: "回复",
       loadMore: "加载更多",
+      loading: "加载中...",
       loadEnd: "加载完毕",
       published: "发表于"
     },
@@ -2515,6 +2612,7 @@
       submit: "Submit",
       reply: "Reply",
       loadMore: "Load More",
+      loading: "loading...",
       loadEnd: "Load completed",
       published: "Published on"
     }

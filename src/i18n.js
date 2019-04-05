@@ -12,6 +12,7 @@ const i18n = {
     submit: "提交",
     reply: "回复",
     loadMore: "加载更多",
+    loading: "加载中...",
     loadEnd: "加载完毕",
     published: "发表于"
   },
@@ -28,6 +29,7 @@ const i18n = {
     submit: "Submit",
     reply: "Reply",
     loadMore: "Load More",
+    loading: "loading...",
     loadEnd: "Load completed",
     published: "Published on"
   }

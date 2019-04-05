@@ -35,7 +35,7 @@ export const actions = store => ({
   setComments(state, comments) {
     return {
       comments: [...state.comments, ...comments],
-      page: state.page + 1
+      page: comments.length ? state.page + 1 : state.page
     };
   },
 
