@@ -48,28 +48,28 @@ class Editor extends Component {
   }
 
   async onSubmit(e) {
-    const { options, input, config, issue, throwError, setInput, setComments } = this.props;
+    const { options, input, config, issue, throwError, setInput } = this.props;
     const value = input.trim();
     if (!value) return;
     throwError(
       value.length > options.maxlength,
-      `Too many words: ${value.length}`
+      `Word count exceeds limit: ${value.length} / ${options.maxlength}`
     );
     this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
     throwError(!item || !item.id, `Comment failed!`);
-    const comments = await config.api.getComments(issue.number, 1);
-    setComments(comments, true);
     this.setState(() => {
       return {
         loading: false,
         markdown: ''
       };
     });
-    setInput('');
-    setTimeout(() => {
-      smoothScroll(document.querySelector('.gitting-load'));
-    }, 100);
+    if (item.id) {
+      setInput('');
+      setTimeout(() => {
+        smoothScroll(config.$container.querySelector('.gitting-load')).click();
+      }, 100);
+    }
   }
 
   render(props, state) {

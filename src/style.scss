@@ -136,6 +136,7 @@
         margin-top: -1px;
         color: #a5a5a5;
         border: 1px solid #c3c8cf;
+        background: #fff;
         border-top: 0;
         border-bottom: 0;
       }
@@ -232,6 +233,8 @@
 
       .gitting-content {
         flex: 1;
+        background: #fff;
+        border-radius: 3px;
 
         .gitting-content-body {
           min-height: 80px;
@@ -275,6 +278,7 @@
     border-radius: 3px;
     color: #a5a5a5;
     border: 1px solid #d1d5da;
+    background: #fff;
   }
 
   .gitting-loading {

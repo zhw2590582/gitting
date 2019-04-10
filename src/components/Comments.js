@@ -10,7 +10,7 @@ import Loading from './Loading';
 
 const CommentItem = Enhanced(({ options, config, item, reply }) => {
   return (
-    <div className="gitting-comment-item" key={item.id}>
+    <div className="gitting-comment-item" key={item.id} data-id={item.id}>
       <div className="gitting-avatar">
         <a href={item.user.html_url} target="_blank">
           <img src={item.user.avatar_url} alt={`@${item.user.login}`} />
@@ -54,17 +54,23 @@ class Comments extends Component {
     super(props);
     dayjs.locale(props.options.language);
     this.state = {
-      loading: false
+      loading: false,
+      loadMore: false,
+      page: 1
     };
     this.reply = this.reply.bind(this);
   }
 
   async componentDidMount() {
     this.setState(() => ({ loading: true }));
-    const { config, setComments, issue, page } = this.props;
+    const { options, config, setComments, issue } = this.props;
+    const { page } = this.state;
     if (issue.number) {
       const comments = await config.api.getComments(issue.number, page);
       setComments(comments);
+      if (options.perPage === comments.length) {
+        this.setState(() => ({ page: page + 1 }));
+      }
     }
     this.setState(() => ({ loading: false }));
   }
@@ -79,21 +85,46 @@ class Comments extends Component {
     smoothScroll(config.$container);
   }
 
-  render({ options, config, comments }, { loading }) {
+  async loadMore(e) {
+    e.preventDefault();
+    this.setState(() => ({ loadMore: true }));
+    const { options, config, setComments, issue } = this.props;
+    const { page } = this.state;
+    if (issue.number) {
+      const comments = await config.api.getComments(issue.number, page);
+      setComments(comments);
+      if (options.perPage === comments.length) {
+        this.setState(() => ({ page: page + 1 }));
+      }
+    }
+    this.setState(() => ({ loadMore: false }));
+  }
+
+  render({ options, config, comments }, { loading, loadMore }) {
     return (
       <div className="gitting-comments">
-        {comments.map(item => {
-          return (
-            <CommentItem
-              options={options}
-              config={config}
-              item={item}
-              key={item.id}
-              reply={this.reply}
-            />
-          );
-        })}
-        <Loading loading={loading} />
+        {loading ? (
+          <Loading loading={loading} />
+        ) : (
+          comments.map(item => {
+            return (
+              <CommentItem
+                options={options}
+                config={config}
+                item={item}
+                key={item.id}
+                reply={this.reply}
+              />
+            );
+          })
+        )}
+        {loadMore ? (
+          <span class="gitting-load">{config.i18n('loading')}</span>
+        ) : comments.length ? (
+          <a href="#" class="gitting-load" onClick={e => this.loadMore(e)}>
+            {config.i18n('loadMore')}
+          </a>
+        ) : null}
       </div>
     );
   }

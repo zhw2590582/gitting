@@ -7,8 +7,7 @@ export const state = {
   issue: {},
   comments: [],
   error: '',
-  input: '',
-  page: 1
+  input: ''
 };
 
 export const store = createStore(state);
@@ -32,10 +31,15 @@ export const actions = store => ({
     };
   },
 
-  setComments(state, comments, reset) {
+  setComments(state, comments = []) {
+    const retult = [...state.comments];
+    comments.forEach(comment => {
+      if (!retult.find(item => item.id === comment.id)) {
+        retult.push(comment);
+      }
+    });
     return {
-      comments: reset ? comments : [...state.comments, ...comments],
-      page: reset ? 1 : comments.length ? state.page + 1 : state.page
+      comments: retult
     };
   },
 

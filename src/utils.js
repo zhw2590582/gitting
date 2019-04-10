@@ -36,6 +36,7 @@ export function smoothScroll(element, offset = 0) {
     left: 0,
     top: element.getBoundingClientRect().top + window.scrollY + offset
   });
+  return element;
 }
 
 export function request(method, url, body, header) {

@@ -5,7 +5,6 @@ import ErrorInfo from './ErrorInfo';
 import Header from './Header';
 import Editor from './Editor';
 import Comments from './Comments';
-import Load from './Load';
 import Loading from './Loading';
 
 class App extends Component {
@@ -72,7 +71,6 @@ class App extends Component {
             <Header options={options} config={config} />
             <Editor options={options} config={config} />
             <Comments options={options} config={config} />
-            <Load options={options} config={config} />
           </div>
         )}
       </div>

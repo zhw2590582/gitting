@@ -945,6 +945,7 @@
       left: 0,
       top: element.getBoundingClientRect().top + window.scrollY + offset
     });
+    return element;
   }
   function request(method, url, body, header) {
     method = method.toUpperCase();
@@ -990,8 +991,7 @@
     issue: {},
     comments: [],
     error: '',
-    input: '',
-    page: 1
+    input: ''
   };
   var store = createStore(state);
   var actions = function actions(store) {
@@ -1011,10 +1011,20 @@
           issue: issue
         };
       },
-      setComments: function setComments(state, comments, reset) {
+      setComments: function setComments(state) {
+        var comments = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        var retult = toConsumableArray(state.comments);
+
+        comments.forEach(function (comment) {
+          if (!retult.find(function (item) {
+            return item.id === comment.id;
+          })) {
+            retult.push(comment);
+          }
+        });
         return {
-          comments: reset ? comments : [].concat(toConsumableArray(state.comments), toConsumableArray(comments)),
-          page: reset ? 1 : comments.length ? state.page + 1 : state.page
+          comments: retult
         };
       },
       setInput: function setInput(state, input) {
@@ -1901,6 +1911,7 @@
           "class": "gitting-header"
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
+          target: "_blank",
           "class": "gitting-number"
         }, issue.comments || 0, " ", config.i18n('counts')), h("div", {
           "class": "gitting-mate"
@@ -1917,7 +1928,8 @@
             return login(options, e);
           }
         }, config.i18n('login')), h("a", {
-          href: "https://github.com/zhw2590582/gitting"
+          href: "https://github.com/zhw2590582/gitting",
+          target: "_blank"
         }, "Gitting 2.0.0")));
       }
     }]);
@@ -2058,13 +2070,13 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
-          var _this$props2, options, input, config, issue, throwError, setInput, setComments, value, item, comments;
+          var _this$props2, options, input, config, issue, throwError, setInput, value, item;
 
           return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError, setInput = _this$props2.setInput, setComments = _this$props2.setComments;
+                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError, setInput = _this$props2.setInput;
                   value = input.trim();
 
                   if (value) {
@@ -2075,7 +2087,7 @@
                   return _context2.abrupt("return");
 
                 case 4:
-                  throwError(value.length > options.maxlength, "Too many words: ".concat(value.length));
+                  throwError(value.length > options.maxlength, "Word count exceeds limit: ".concat(value.length, " / ").concat(options.maxlength));
                   this.setState(function () {
                     return {
                       loading: true
@@ -2087,24 +2099,21 @@
                 case 8:
                   item = _context2.sent;
                   throwError(!item || !item.id, "Comment failed!");
-                  _context2.next = 12;
-                  return config.api.getComments(issue.number, 1);
-
-                case 12:
-                  comments = _context2.sent;
-                  setComments(comments, true);
                   this.setState(function () {
                     return {
                       loading: false,
                       markdown: ''
                     };
                   });
-                  setInput('');
-                  setTimeout(function () {
-                    smoothScroll(document.querySelector('.gitting-load'));
-                  }, 100);
 
-                case 17:
+                  if (item.id) {
+                    setInput('');
+                    setTimeout(function () {
+                      smoothScroll(config.$container.querySelector('.gitting-load')).click();
+                    }, 100);
+                  }
+
+                case 12:
                 case "end":
                   return _context2.stop();
               }
@@ -2232,7 +2241,8 @@
         reply = _ref.reply;
     return h("div", {
       className: "gitting-comment-item",
-      key: item.id
+      key: item.id,
+      "data-id": item.id
     }, h("div", {
       className: "gitting-avatar"
     }, h("a", {
@@ -2279,7 +2289,9 @@
       _this = possibleConstructorReturn(this, getPrototypeOf(Comments).call(this, props));
       dayjs_min.locale(props.options.language);
       _this.state = {
-        loading: false
+        loading: false,
+        loadMore: false,
+        page: 1
       };
       _this.reply = _this.reply.bind(assertThisInitialized(_this));
       return _this;
@@ -2291,7 +2303,7 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, config, setComments, issue, page, comments;
+          var _this$props, options, config, setComments, issue, page, comments;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
@@ -2302,28 +2314,37 @@
                       loading: true
                     };
                   });
-                  _this$props = this.props, config = _this$props.config, setComments = _this$props.setComments, issue = _this$props.issue, page = _this$props.page;
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, setComments = _this$props.setComments, issue = _this$props.issue;
+                  page = this.state.page;
 
                   if (!issue.number) {
-                    _context.next = 7;
+                    _context.next = 9;
                     break;
                   }
 
-                  _context.next = 5;
+                  _context.next = 6;
                   return config.api.getComments(issue.number, page);
 
-                case 5:
+                case 6:
                   comments = _context.sent;
                   setComments(comments);
 
-                case 7:
+                  if (options.perPage === comments.length) {
+                    this.setState(function () {
+                      return {
+                        page: page + 1
+                      };
+                    });
+                  }
+
+                case 9:
                   this.setState(function () {
                     return {
                       loading: false
                     };
                   });
 
-                case 8:
+                case 10:
                 case "end":
                   return _context.stop();
               }
@@ -2350,90 +2371,59 @@
         smoothScroll(config.$container);
       }
     }, {
-      key: "render",
-      value: function render(_ref2, _ref3) {
-        var _this2 = this;
-
-        var options = _ref2.options,
-            config = _ref2.config,
-            comments = _ref2.comments;
-        var loading = _ref3.loading;
-        return h("div", {
-          className: "gitting-comments"
-        }, comments.map(function (item) {
-          return h(CommentItem, {
-            options: options,
-            config: config,
-            item: item,
-            key: item.id,
-            reply: _this2.reply
-          });
-        }), h(Loading$1, {
-          loading: loading
-        }));
-      }
-    }]);
-
-    return Comments;
-  }(Component);
-
-  var Comments$1 = Enhanced(Comments);
-
-  var Load =
-  /*#__PURE__*/
-  function (_Component) {
-    inherits(Load, _Component);
-
-    function Load(props) {
-      var _this;
-
-      classCallCheck(this, Load);
-
-      _this = possibleConstructorReturn(this, getPrototypeOf(Load).call(this, props));
-      _this.state = {
-        loading: false
-      };
-      return _this;
-    }
-
-    createClass(Load, [{
       key: "loadMore",
       value: function () {
         var _loadMore = asyncToGenerator(
         /*#__PURE__*/
-        regenerator.mark(function _callee(e) {
-          var _this$props, config, issue, page, setComments, comments;
+        regenerator.mark(function _callee2(e) {
+          var _this$props3, options, config, setComments, issue, page, comments;
 
-          return regenerator.wrap(function _callee$(_context) {
+          return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
-              switch (_context.prev = _context.next) {
+              switch (_context2.prev = _context2.next) {
                 case 0:
                   e.preventDefault();
-                  _this$props = this.props, config = _this$props.config, issue = _this$props.issue, page = _this$props.page, setComments = _this$props.setComments;
                   this.setState(function () {
                     return {
-                      loading: true
+                      loadMore: true
                     };
                   });
-                  _context.next = 5;
+                  _this$props3 = this.props, options = _this$props3.options, config = _this$props3.config, setComments = _this$props3.setComments, issue = _this$props3.issue;
+                  page = this.state.page;
+
+                  if (!issue.number) {
+                    _context2.next = 10;
+                    break;
+                  }
+
+                  _context2.next = 7;
                   return config.api.getComments(issue.number, page);
 
-                case 5:
-                  comments = _context.sent;
-                  this.setState(function () {
-                    return {
-                      loading: false,
-                      loadEnd: comments.length === 0
-                    };
-                  });
+                case 7:
+                  comments = _context2.sent;
                   setComments(comments);
 
-                case 8:
+                  if (options.perPage === comments.length) {
+                    this.setState(function () {
+                      return {
+                        page: page + 1
+                      };
+                    });
+                  }
+
+                case 10:
+                  this.setState(function () {
+                    return {
+                      loadMore: false
+                    };
+                  });
+
+                case 11:
                 case "end":
-                  return _context.stop();
+                  return _context2.stop();
               }
             }
-          }, _callee, this);
+          }, _callee2, this);
         }));
 
         function loadMore(_x) {
@@ -2444,34 +2434,42 @@
       }()
     }, {
       key: "render",
-      value: function render(_ref, _ref2) {
+      value: function render(_ref2, _ref3) {
         var _this2 = this;
 
-        var options = _ref.options,
-            config = _ref.config,
-            comments = _ref.comments;
-        var loading = _ref2.loading;
-
-        if (loading) {
-          return h("span", {
-            "class": "gitting-load"
-          }, config.i18n('loading'));
-        }
-
-        return comments.length ? h("a", {
+        var options = _ref2.options,
+            config = _ref2.config,
+            comments = _ref2.comments;
+        var loading = _ref3.loading,
+            loadMore = _ref3.loadMore;
+        return h("div", {
+          className: "gitting-comments"
+        }, loading ? h(Loading$1, {
+          loading: loading
+        }) : comments.map(function (item) {
+          return h(CommentItem, {
+            options: options,
+            config: config,
+            item: item,
+            key: item.id,
+            reply: _this2.reply
+          });
+        }), loadMore ? h("span", {
+          "class": "gitting-load"
+        }, config.i18n('loading')) : comments.length ? h("a", {
           href: "#",
           "class": "gitting-load",
           onClick: function onClick(e) {
             return _this2.loadMore(e);
           }
-        }, config.i18n('loadMore')) : null;
+        }, config.i18n('loadMore')) : null);
       }
     }]);
 
-    return Load;
+    return Comments;
   }(Component);
 
-  var Load$1 = Enhanced(Load);
+  var Comments$1 = Enhanced(Comments);
 
   var App =
   /*#__PURE__*/
@@ -2612,9 +2610,6 @@
           options: options,
           config: config
         }), h(Comments$1, {
-          options: options,
-          config: config
-        }), h(Load$1, {
           options: options,
           config: config
         })));

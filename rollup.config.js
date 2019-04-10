@@ -17,13 +17,13 @@ export default {
   input: "src/index.js",
   output: {
     name: "Gitting",
-    file: isProd ? "dist/gitting.js" : "dist/gitting-uncompiled.js",
+    file: isProd ? "dist/gitting.js" : "docs/gitting-uncompiled.js",
     format: "umd"
   },
   plugins: [
     postcss({
       plugins: [autoprefixer, cssnano],
-      extract: isProd ? "dist/gitting.css" : "dist/gitting-uncompiled.css"
+      extract: isProd ? "dist/gitting.css" : "docs/gitting-uncompiled.css"
     }),
     babel({
       runtimeHelpers: true,

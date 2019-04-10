@@ -10,6 +10,7 @@ class Header extends Component {
           href={`https://github.com/${options.owner}/${options.repo}/issues/${
             issue.number
           }`}
+          target="_blank"
           class="gitting-number"
         >
           {issue.comments || 0} {config.i18n('counts')}
@@ -27,7 +28,7 @@ class Header extends Component {
               {config.i18n('login')}
             </a>
           )}
-          <a href={`https://github.com/zhw2590582/gitting`}>
+          <a href={`https://github.com/zhw2590582/gitting`} target="_blank">
             Gitting __VERSION__
           </a>
         </div>
