@@ -17,7 +17,6 @@
     <div class="gitting"></div>
     <script src="./gitting-uncompiled.js"></script>
     <script>
-      function init() {
         var gitting = new Gitting({
           clientID: '44a942aaaaaca3eec74c',
           clientSecret: '46d38fd88308b469c0f0c279d5f2211c77263273',
@@ -25,16 +24,7 @@
           owner: 'zhw2590582',
           admin: ['zhw2590582']
         });
-        return gitting.render('.gitting');
-      }
-
-      setTimeout(function loop() {
-        var gitting = init();
-        setTimeout(() => {
-            gitting.destroy();
-            // loop();
-        }, 1000);
-      }, 3000);
+        gitting.render('.gitting');
     </script>
   </body>
 </html>

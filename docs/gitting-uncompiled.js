@@ -2800,8 +2800,7 @@
         });
       },
       // 销毁
-      destroy: function destroy() {
-        controller && controller.abort && controller.abort();
+      destroy: function destroy() {// controller && controller.abort && controller.abort();
       }
     };
   }

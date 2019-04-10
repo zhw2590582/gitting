@@ -43,7 +43,6 @@ function creatRequest(controller) {
 export default function creatApi(option) {
   const controller = new AbortController();
   const request = creatRequest(controller);
-
   const issuesApi = `https://api.github.com/repos/${option.owner}/${
     option.repo
   }/issues`;
@@ -140,7 +139,7 @@ export default function creatApi(option) {
 
     // 销毁
     destroy() {
-      controller && controller.abort && controller.abort();
+      // controller && controller.abort && controller.abort();
     }
   };
 }
