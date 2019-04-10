@@ -914,19 +914,19 @@
 
   var storageName = "gitting_settings";
   function getStorage(key) {
-    var storage = JSON.parse(localStorage.getItem(storageName)) || {};
+    var storage = JSON.parse(window.localStorage.getItem(storageName)) || {};
     return key ? storage[key] : storage;
   }
   function setStorage(key, value) {
     var storage = Object.assign({}, getStorage(), defineProperty({}, key, value));
-    return localStorage.setItem(storageName, JSON.stringify(storage));
+    return window.localStorage.setItem(storageName, JSON.stringify(storage));
   }
   function cleanStorage() {
-    return localStorage.removeItem(storageName);
+    return window.localStorage.removeItem(storageName);
   }
   function queryStringify(query) {
     var queryString = Object.keys(query).map(function (key) {
-      return "".concat(key, "=").concat(encodeURIComponent(query[key] || ""));
+      return "".concat(key, "=").concat(window.encodeURIComponent(query[key] || ""));
     }).join("&");
     return queryString;
   }
@@ -1893,7 +1893,7 @@
         }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting",
           target: "_blank"
-        }, "Gitting 2.0.0"))) : null;
+        }, "Gitting 2.0.1"))) : null;
       }
     }]);
 

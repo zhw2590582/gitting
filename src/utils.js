@@ -1,7 +1,7 @@
 const storageName = "gitting_settings";
 
 export function getStorage(key) {
-  const storage = JSON.parse(localStorage.getItem(storageName)) || {};
+  const storage = JSON.parse(window.localStorage.getItem(storageName)) || {};
   return key ? storage[key] : storage;
 }
 
@@ -9,16 +9,16 @@ export function setStorage(key, value) {
   const storage = Object.assign({}, getStorage(), {
     [key]: value
   });
-  return localStorage.setItem(storageName, JSON.stringify(storage));
+  return window.localStorage.setItem(storageName, JSON.stringify(storage));
 }
 
 export function cleanStorage() {
-  return localStorage.removeItem(storageName);
+  return window.localStorage.removeItem(storageName);
 }
 
 export function queryStringify(query) {
   const queryString = Object.keys(query)
-    .map(key => `${key}=${encodeURIComponent(query[key] || "")}`)
+    .map(key => `${key}=${window.encodeURIComponent(query[key] || "")}`)
     .join("&");
   return queryString;
 }
@@ -37,41 +37,4 @@ export function smoothScroll(element, offset = 0) {
     top: element.getBoundingClientRect().top + window.scrollY + offset
   });
   return element;
-}
-
-export function request(method, url, body, header) {
-  method = method.toUpperCase();
-  body = body && JSON.stringify(body);
-  let headers = {
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  };
-
-  if (header) {
-    headers = Object.assign({}, headers, header);
-  }
-
-  const token = getStorage("token");
-  if (token) {
-    headers.Authorization = `token ${token}`;
-  }
-
-  return fetch(url, {
-    method,
-    headers,
-    body
-  }).then(res => {
-    if (res.status === 404) {
-      return Promise.reject("Unauthorized.");
-    } else if (res.status === 401) {
-      cleanStorage();
-      window.location.reload();
-    } else {
-      if (headers.Accept === "text/html") {
-        return res.text();
-      } else {
-        return res.json();
-      }
-    }
-  });
 }
