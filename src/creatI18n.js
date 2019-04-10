@@ -1,6 +1,6 @@
 const i18n = {
   'zh-cn': {
-    init: "初始化一个评论",
+    init: "登录以初始化一个评论",
     counts: "条评论",
     login: "登录",
     logout: "注销",
@@ -17,7 +17,7 @@ const i18n = {
     published: "发表于"
   },
   en: {
-    init: "Initialize A Issue",
+    init: "Login then initialize a issue",
     counts: "comments",
     login: "Login",
     logout: "Logout",
