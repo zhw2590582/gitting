@@ -3,7 +3,7 @@ import { cleanStorage, setStorage, getStorage, queryStringify } from './utils';
 
 export const state = {
   isLogin: () => !!getStorage('token') && !!getStorage('userInfo'),
-  userInfo: getStorage('userInfo'),
+  userInfo: {},
   issue: {},
   comments: [],
   error: '',

@@ -950,7 +950,7 @@
     isLogin: function isLogin() {
       return !!getStorage('token') && !!getStorage('userInfo');
     },
-    userInfo: getStorage('userInfo'),
+    userInfo: {},
     issue: {},
     comments: [],
     error: '',
@@ -1893,7 +1893,7 @@
         }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting",
           target: "_blank"
-        }, "Gitting 2.0.1"))) : null;
+        }, "Gitting 2.0.3"))) : null;
       }
     }]);
 
@@ -2473,7 +2473,7 @@
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
-                    _context.next = 18;
+                    _context.next = 17;
                     break;
                   }
 
@@ -2491,12 +2491,12 @@
                   userInfo = _context.sent;
                   throwError(!userInfo.id, 'Can not get user info, Please login again!');
                   setStorage('userInfo', userInfo);
-                  setUserInfo(userInfo);
                   redirect_uri = getStorage('redirect_uri');
                   throwError(!redirect_uri, 'Can not get redirect url, Please login again!');
                   window.history.replaceState(null, '', redirect_uri);
 
-                case 18:
+                case 17:
+                  setUserInfo(getStorage('userInfo'));
                   issue = null;
 
                   if (!(Number(options.number) > 0)) {
@@ -2689,8 +2689,8 @@
     return _default;
   }(Component);
 
-  var controller = new AbortController();
-  var signal = controller.signal;
+  var controller;
+  var signal;
 
   function request(method, url, body, header) {
     method = method.toUpperCase();
@@ -2732,6 +2732,8 @@
   }
 
   function creatApi(option) {
+    controller = new AbortController();
+    signal = controller.signal;
     var issuesApi = "https://api.github.com/repos/".concat(option.owner, "/").concat(option.repo, "/issues");
     var baseQuery = {
       client_id: option.clientID,
@@ -2798,7 +2800,7 @@
       },
       // 销毁
       destroy: function destroy() {
-        controller.abort();
+        controller && controller.abort && controller.abort();
       }
     };
   }
@@ -2910,8 +2912,6 @@
 
     return Gitting;
   }();
-
-  window.Gitting = Gitting;
 
   return Gitting;
 

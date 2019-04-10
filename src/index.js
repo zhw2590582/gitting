@@ -4,7 +4,7 @@ import Container from "./components";
 import creatApi from './creatApi';
 import creatI18n from './creatI18n';
 
-class Gitting {
+export default class Gitting {
   constructor(options = {}) {
     this.options = Object.assign({}, Gitting.DEFAULT, options);
     ['clientID', 'clientSecret', 'repo', 'owner'].forEach(item => {
@@ -49,6 +49,3 @@ class Gitting {
     this.config.api.destroy();
   }
 }
-
-window.Gitting = Gitting;
-export default Gitting;

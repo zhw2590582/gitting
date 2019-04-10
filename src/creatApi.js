@@ -1,7 +1,7 @@
 import { queryStringify, cleanStorage, getStorage } from './utils';
 
-const controller = new AbortController();
-const signal = controller.signal;
+let controller;
+let signal;
 
 function request(method, url, body, header) {
   method = method.toUpperCase();
@@ -42,6 +42,9 @@ function request(method, url, body, header) {
 }
 
 export default function creatApi(option) {
+  controller = new AbortController();
+  signal = controller.signal;
+
   const issuesApi = `https://api.github.com/repos/${option.owner}/${
     option.repo
   }/issues`;
@@ -138,7 +141,7 @@ export default function creatApi(option) {
 
     // 销毁
     destroy() {
-      controller.abort();
+      controller && controller.abort && controller.abort();
     },
   };
 }

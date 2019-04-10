@@ -27,7 +27,6 @@ class App extends Component {
       const userInfo = await config.api.getUserInfo(data.access_token);
       throwError(!userInfo.id, 'Can not get user info, Please login again!');
       setStorage('userInfo', userInfo);
-      setUserInfo(userInfo);
       const redirect_uri = getStorage('redirect_uri');
       throwError(
         !redirect_uri,
@@ -35,6 +34,8 @@ class App extends Component {
       );
       window.history.replaceState(null, '', redirect_uri);
     }
+
+    setUserInfo(getStorage('userInfo'));
 
     let issue = null;
     if (Number(options.number) > 0) {
