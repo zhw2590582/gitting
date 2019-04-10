@@ -1,18 +1,20 @@
-import { h, Component } from "preact";
-import Enhanced from "./Enhanced";
-import { smoothScroll } from "../utils";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/zh-cn";
-import "dayjs/locale/en";
+import { h, Component } from 'preact';
+import Enhanced from './Enhanced';
+import { smoothScroll } from '../utils';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn';
+import 'dayjs/locale/en';
 dayjs.extend(relativeTime);
-import Loading from "./Loading";
+import Loading from './Loading';
 
 const CommentItem = Enhanced(({ options, config, item, reply }) => {
   return (
     <div className="gitting-comment-item" key={item.id}>
       <div className="gitting-avatar">
-        <img src={item.user.avatar_url} alt={`@${item.user.login}`} />
+        <a href={item.user.html_url} target="_blank">
+          <img src={item.user.avatar_url} alt={`@${item.user.login}`} />
+        </a>
       </div>
       <div className="gitting-content gitting-caret">
         <div
@@ -31,7 +33,7 @@ const CommentItem = Enhanced(({ options, config, item, reply }) => {
               {item.user.login}
             </a>
             <span className="gitting-content-time" data-time={item.created_at}>
-              {config.i18n("published")} {dayjs(item.created_at).fromNow()}
+              {config.i18n('published')} {dayjs(item.created_at).fromNow()}
             </span>
           </span>
           <a
@@ -39,7 +41,7 @@ const CommentItem = Enhanced(({ options, config, item, reply }) => {
             href="#"
             onClick={e => reply(item, e)}
           >
-            {config.i18n("reply")}
+            {config.i18n('reply')}
           </a>
         </div>
       </div>
@@ -57,18 +59,20 @@ class Comments extends Component {
     this.reply = this.reply.bind(this);
   }
 
-  // async componentDidMount() {
-  //   const { config, setComments, issue, page } = this.props;
-  //   this.setState(() => ({ loading: true }));
-  //   const comments = await config.api.getComments(issue.number, page);
-  //   this.setState(() => ({ loading: false }));
-  //   setComments(comments);
-  // }
+  async componentDidMount() {
+    this.setState(() => ({ loading: true }));
+    const { config, setComments, issue, page } = this.props;
+    if (issue.number) {
+      const comments = await config.api.getComments(issue.number, page);
+      setComments(comments);
+    }
+    this.setState(() => ({ loading: false }));
+  }
 
   reply(comment, e) {
     e.preventDefault();
     const { input, setInput, config } = this.props;
-    const markdowm = `${input ? "\n" : ""}> @${comment.user.login}\n> ${
+    const markdowm = `${input ? '\n' : ''}> @${comment.user.login}\n> ${
       comment.body
     }\n`;
     setInput(input + markdowm);

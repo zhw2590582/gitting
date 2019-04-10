@@ -1,9 +1,18 @@
-import { h, Component } from "preact";
-import Enhanced from "./Enhanced";
+import { h, Component } from 'preact';
+import Enhanced from './Enhanced';
 
 class Loading extends Component {
   render({ loading }) {
-    return loading ? <div class="gitting-loading">Loading...</div> : null;
+    return loading ? (
+      <div class="gitting-loading">
+        <div class="lds-ellipsis">
+          <div />
+          <div />
+          <div />
+          <div />
+        </div>
+      </div>
+    ) : null;
   }
 }
 

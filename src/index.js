@@ -1,14 +1,19 @@
 import "./style.scss";
 import { h, render } from "preact";
 import Container from "./components";
-import creatApi from './api';
-import creatI18n from './i18n';
+import creatApi from './creatApi';
+import creatI18n from './creatI18n';
 
 class Gitting {
   constructor(options = {}) {
     this.options = Object.assign({}, Gitting.DEFAULT, options);
-    this.$root = null;
+    ['clientID', 'clientSecret', 'repo', 'owner'].forEach(item => {
+      if (!this.options[item].trim()) {
+        throw new Error(`The options.${item} can not be empty`);
+      }
+    });
     this.config = {
+      $root: null,
       $container: null,
       api: creatApi(this.options),
       i18n: creatI18n(this.options.language),
@@ -23,11 +28,11 @@ class Gitting {
       owner: "",
       admin: [],
       theme: "white",
-      id: location.pathname,
+      id: window.location.pathname,
       number: -1,
       labels: ["Gitting"],
       title: document.title,
-      body: `${document.title}\n${location.href}`,
+      body: `${document.title}\n${window.location.href}`,
       language: "zh-cn",
       perPage: 10,
       maxlength: 500,
@@ -37,12 +42,13 @@ class Gitting {
   }
 
   render(el) {
-    this.config.$container = this.$container = el instanceof Element ? el : document.querySelector(el);
-    this.$root = render(<Container options={this.options} config={this.config} />, this.$container);
+    this.config.$container = el instanceof Element ? el : document.querySelector(el);
+    this.config.$root = render(<Container options={this.options} config={this.config} />, this.config.$container);
   }
 
   destroy() {
-    render(null, this.$container, this.$root);
+    render(null, this.config.$container, this.config.$root);
+    this.config.api.destroy();
   }
 }
 

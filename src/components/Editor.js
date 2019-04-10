@@ -1,6 +1,7 @@
-import { h, Component } from "preact";
-import Enhanced from "./Enhanced";
-import Loading from "./Loading";
+import { h, Component } from 'preact';
+import Enhanced from './Enhanced';
+import Loading from './Loading';
+import { smoothScroll } from '../utils';
 
 class Editor extends Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class Editor extends Component {
     this.state = {
       loading: false,
       preview: false,
-      markdown: ""
+      markdown: ''
     };
   }
 
@@ -26,17 +27,17 @@ class Editor extends Component {
     this.setState(() => {
       return {
         preview: true,
-        markdown: ""
+        markdown: ''
       };
     });
 
-    let markdown = "";
+    let markdown = '';
     if (value) {
       this.setState(() => ({ loading: true }));
       markdown = await config.api.mdToHtml(value);
       this.setState(() => ({ loading: false }));
     } else {
-      markdown = config.i18n("noPreview");
+      markdown = config.i18n('noPreview');
     }
 
     this.setState(() => {
@@ -47,7 +48,7 @@ class Editor extends Component {
   }
 
   async onSubmit(e) {
-    const { options, input, config, issue, throwError, setInput } = this.props;
+    const { options, input, config, issue, throwError, setInput, setComments } = this.props;
     const value = input.trim();
     if (!value) return;
     throwError(
@@ -56,14 +57,19 @@ class Editor extends Component {
     );
     this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
-    this.setState(() => ({ loading: false }));
     throwError(!item || !item.id, `Comment failed!`);
+    const comments = await config.api.getComments(issue.number, 1);
+    setComments(comments, true);
     this.setState(() => {
       return {
-        markdown: ""
+        loading: false,
+        markdown: ''
       };
     });
-    setInput("");
+    setInput('');
+    setTimeout(() => {
+      smoothScroll(document.querySelector('.gitting-load'));
+    }, 100);
   }
 
   render(props, state) {
@@ -82,13 +88,13 @@ class Editor extends Component {
         <div class="gitting-avatar">
           <img
             src={isLogin ? userInfo.avatar_url : options.avatar}
-            alt={`@${isLogin ? userInfo.login : "github"}`}
+            alt={`@${isLogin ? userInfo.login : 'github'}`}
           />
         </div>
         <div class="gitting-editor">
           <div
             style={{
-              display: preview ? "" : "none"
+              display: preview ? '' : 'none'
             }}
             class="gitting-markdown markdown-body"
             dangerouslySetInnerHTML={{
@@ -97,10 +103,10 @@ class Editor extends Component {
           />
           <textarea
             style={{
-              display: preview ? "none" : ""
+              display: preview ? 'none' : ''
             }}
             class="gitting-textarea"
-            placeholder={config.i18n("leave")}
+            placeholder={config.i18n('leave')}
             maxlength={options.maxlength}
             spellcheck={false}
             value={input}
@@ -109,14 +115,14 @@ class Editor extends Component {
           <div
             class="gitting-tip"
             style={{
-              display: preview ? "none" : ""
+              display: preview ? 'none' : ''
             }}
           >
             <a
               href="https://guides.github.com/features/mastering-markdown/"
               target="_blank"
             >
-              {config.i18n("styling")}
+              {config.i18n('styling')}
             </a>
             <span class="gitting-counts">
               {options.maxlength - input.length} / {options.maxlength}
@@ -125,25 +131,25 @@ class Editor extends Component {
           <div class="gitting-tool">
             <div class="gitting-switch">
               <span
-                class={preview ? "" : "active"}
+                class={preview ? '' : 'active'}
                 onClick={e => this.onWrite(e)}
               >
-                {config.i18n("write")}
+                {config.i18n('write')}
               </span>
               <span
-                class={preview ? "active" : ""}
+                class={preview ? 'active' : ''}
                 onClick={e => this.onPreview(e)}
               >
-                {config.i18n("preview")}
+                {config.i18n('preview')}
               </span>
             </div>
             {isLogin ? (
               <button class="gitting-send" onClick={e => this.onSubmit(e)}>
-                {config.i18n("submit")}
+                {config.i18n('submit')}
               </button>
             ) : (
               <a class="gitting-send" href="#" onClick={e => login(options, e)}>
-                {config.i18n("login")}
+                {config.i18n('login')}
               </a>
             )}
           </div>

@@ -985,12 +985,12 @@
   }
 
   var state = {
-    isLogin: getStorage("token") && getStorage("userInfo"),
-    userInfo: {},
+    isLogin: getStorage('token') && getStorage('userInfo'),
+    userInfo: getStorage('userInfo'),
     issue: {},
     comments: [],
-    error: "",
-    input: "",
+    error: '',
+    input: '',
     page: 1
   };
   var store = createStore(state);
@@ -998,7 +998,7 @@
     return {
       throwError: function throwError(state, condition, msg) {
         return {
-          error: !condition ? "" : msg
+          error: !condition ? '' : msg
         };
       },
       setUserInfo: function setUserInfo(state, info) {
@@ -1011,10 +1011,10 @@
           issue: issue
         };
       },
-      setComments: function setComments(state, comments) {
+      setComments: function setComments(state, comments, reset) {
         return {
-          comments: [].concat(toConsumableArray(state.comments), toConsumableArray(comments)),
-          page: comments.length ? state.page + 1 : state.page
+          comments: reset ? comments : [].concat(toConsumableArray(state.comments), toConsumableArray(comments)),
+          page: reset ? 1 : comments.length ? state.page + 1 : state.page
         };
       },
       setInput: function setInput(state, input) {
@@ -1029,12 +1029,12 @@
       },
       login: function login(state, options, e) {
         e.preventDefault();
-        setStorage("redirect_uri", window.location.href);
+        setStorage('redirect_uri', window.location.href);
         window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
-          state: "Gitting",
+          state: 'Gitting',
           client_id: options.clientID,
           redirect_uri: window.location.href,
-          scope: "public_repo"
+          scope: 'public_repo'
         }));
       }
     };
@@ -1896,14 +1896,13 @@
             userInfo = props.userInfo,
             isLogin = props.isLogin,
             logout = props.logout,
-            login = props.login,
-            comments = props.comments;
+            login = props.login;
         return h("header", {
           "class": "gitting-header"
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
           "class": "gitting-number"
-        }, issue.comments || 0, " ", config.i18n("counts")), h("div", {
+        }, issue.comments || 0, " ", config.i18n('counts')), h("div", {
           "class": "gitting-mate"
         }, isLogin ? h("span", null, h("a", {
           href: "#"
@@ -1912,12 +1911,12 @@
           onClick: function onClick(e) {
             return logout(e);
           }
-        }, config.i18n("logout"))) : h("a", {
+        }, config.i18n('logout'))) : h("a", {
           href: "#",
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, config.i18n("login")), h("a", {
+        }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting"
         }, "Gitting 2.0.0")));
       }
@@ -1945,7 +1944,9 @@
         var loading = _ref.loading;
         return loading ? h("div", {
           "class": "gitting-loading"
-        }, "Loading...") : null;
+        }, h("div", {
+          "class": "lds-ellipsis"
+        }, h("div", null), h("div", null), h("div", null), h("div", null))) : null;
       }
     }]);
 
@@ -1968,7 +1969,7 @@
       _this.state = {
         loading: false,
         preview: false,
-        markdown: ""
+        markdown: ''
       };
       return _this;
     }
@@ -1999,10 +2000,10 @@
                   this.setState(function () {
                     return {
                       preview: true,
-                      markdown: ""
+                      markdown: ''
                     };
                   });
-                  markdown = "";
+                  markdown = '';
 
                   if (!value) {
                     _context.next = 12;
@@ -2028,7 +2029,7 @@
                   break;
 
                 case 12:
-                  markdown = config.i18n("noPreview");
+                  markdown = config.i18n('noPreview');
 
                 case 13:
                   this.setState(function () {
@@ -2057,13 +2058,13 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
-          var _this$props2, options, input, config, issue, throwError, setInput, value, item;
+          var _this$props2, options, input, config, issue, throwError, setInput, setComments, value, item, comments;
 
           return regenerator.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError, setInput = _this$props2.setInput;
+                  _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, throwError = _this$props2.throwError, setInput = _this$props2.setInput, setComments = _this$props2.setComments;
                   value = input.trim();
 
                   if (value) {
@@ -2085,20 +2086,25 @@
 
                 case 8:
                   item = _context2.sent;
-                  this.setState(function () {
-                    return {
-                      loading: false
-                    };
-                  });
                   throwError(!item || !item.id, "Comment failed!");
+                  _context2.next = 12;
+                  return config.api.getComments(issue.number, 1);
+
+                case 12:
+                  comments = _context2.sent;
+                  setComments(comments, true);
                   this.setState(function () {
                     return {
-                      markdown: ""
+                      loading: false,
+                      markdown: ''
                     };
                   });
-                  setInput("");
+                  setInput('');
+                  setTimeout(function () {
+                    smoothScroll(document.querySelector('.gitting-load'));
+                  }, 100);
 
-                case 13:
+                case 17:
                 case "end":
                   return _context2.stop();
               }
@@ -2133,12 +2139,12 @@
           "class": "gitting-avatar"
         }, h("img", {
           src: isLogin ? userInfo.avatar_url : options.avatar,
-          alt: "@".concat(isLogin ? userInfo.login : "github")
+          alt: "@".concat(isLogin ? userInfo.login : 'github')
         })), h("div", {
           "class": "gitting-editor"
         }, h("div", {
           style: {
-            display: preview ? "" : "none"
+            display: preview ? '' : 'none'
           },
           "class": "gitting-markdown markdown-body",
           dangerouslySetInnerHTML: {
@@ -2146,10 +2152,10 @@
           }
         }), h("textarea", {
           style: {
-            display: preview ? "none" : ""
+            display: preview ? 'none' : ''
           },
           "class": "gitting-textarea",
-          placeholder: config.i18n("leave"),
+          placeholder: config.i18n('leave'),
           maxlength: options.maxlength,
           spellcheck: false,
           value: input,
@@ -2159,39 +2165,39 @@
         }), h("div", {
           "class": "gitting-tip",
           style: {
-            display: preview ? "none" : ""
+            display: preview ? 'none' : ''
           }
         }, h("a", {
           href: "https://guides.github.com/features/mastering-markdown/",
           target: "_blank"
-        }, config.i18n("styling")), h("span", {
+        }, config.i18n('styling')), h("span", {
           "class": "gitting-counts"
         }, options.maxlength - input.length, " / ", options.maxlength)), h("div", {
           "class": "gitting-tool"
         }, h("div", {
           "class": "gitting-switch"
         }, h("span", {
-          "class": preview ? "" : "active",
+          "class": preview ? '' : 'active',
           onClick: function onClick(e) {
             return _this2.onWrite(e);
           }
-        }, config.i18n("write")), h("span", {
-          "class": preview ? "active" : "",
+        }, config.i18n('write')), h("span", {
+          "class": preview ? 'active' : '',
           onClick: function onClick(e) {
             return _this2.onPreview(e);
           }
-        }, config.i18n("preview"))), isLogin ? h("button", {
+        }, config.i18n('preview'))), isLogin ? h("button", {
           "class": "gitting-send",
           onClick: function onClick(e) {
             return _this2.onSubmit(e);
           }
-        }, config.i18n("submit")) : h("a", {
+        }, config.i18n('submit')) : h("a", {
           "class": "gitting-send",
           href: "#",
           onClick: function onClick(e) {
             return login(options, e);
           }
-        }, config.i18n("login")))), h(Loading$1, {
+        }, config.i18n('login')))), h(Loading$1, {
           loading: loading
         }));
       }
@@ -2229,10 +2235,13 @@
       key: item.id
     }, h("div", {
       className: "gitting-avatar"
+    }, h("a", {
+      href: item.user.html_url,
+      target: "_blank"
     }, h("img", {
       src: item.user.avatar_url,
       alt: "@".concat(item.user.login)
-    })), h("div", {
+    }))), h("div", {
       className: "gitting-content gitting-caret"
     }, h("div", {
       className: "gitting-content-body markdown-body",
@@ -2248,13 +2257,13 @@
     }, item.user.login), h("span", {
       className: "gitting-content-time",
       "data-time": item.created_at
-    }, config.i18n("published"), " ", dayjs_min(item.created_at).fromNow())), h("a", {
+    }, config.i18n('published'), " ", dayjs_min(item.created_at).fromNow())), h("a", {
       className: "gitting-content-reply",
       href: "#",
       onClick: function onClick(e) {
         return reply(item, e);
       }
-    }, config.i18n("reply")))));
+    }, config.i18n('reply')))));
   });
 
   var Comments =
@@ -2274,24 +2283,69 @@
       };
       _this.reply = _this.reply.bind(assertThisInitialized(_this));
       return _this;
-    } // async componentDidMount() {
-    //   const { config, setComments, issue, page } = this.props;
-    //   this.setState(() => ({ loading: true }));
-    //   const comments = await config.api.getComments(issue.number, page);
-    //   this.setState(() => ({ loading: false }));
-    //   setComments(comments);
-    // }
-
+    }
 
     createClass(Comments, [{
+      key: "componentDidMount",
+      value: function () {
+        var _componentDidMount = asyncToGenerator(
+        /*#__PURE__*/
+        regenerator.mark(function _callee() {
+          var _this$props, config, setComments, issue, page, comments;
+
+          return regenerator.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  this.setState(function () {
+                    return {
+                      loading: true
+                    };
+                  });
+                  _this$props = this.props, config = _this$props.config, setComments = _this$props.setComments, issue = _this$props.issue, page = _this$props.page;
+
+                  if (!issue.number) {
+                    _context.next = 7;
+                    break;
+                  }
+
+                  _context.next = 5;
+                  return config.api.getComments(issue.number, page);
+
+                case 5:
+                  comments = _context.sent;
+                  setComments(comments);
+
+                case 7:
+                  this.setState(function () {
+                    return {
+                      loading: false
+                    };
+                  });
+
+                case 8:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function componentDidMount() {
+          return _componentDidMount.apply(this, arguments);
+        }
+
+        return componentDidMount;
+      }()
+    }, {
       key: "reply",
       value: function reply(comment, e) {
         e.preventDefault();
-        var _this$props = this.props,
-            input = _this$props.input,
-            setInput = _this$props.setInput,
-            config = _this$props.config;
-        var markdowm = "".concat(input ? "\n" : "", "> @").concat(comment.user.login, "\n> ").concat(comment.body, "\n");
+        var _this$props2 = this.props,
+            input = _this$props2.input,
+            setInput = _this$props2.setInput,
+            config = _this$props2.config;
+        var markdowm = "".concat(input ? '\n' : '', "> @").concat(comment.user.login, "\n> ").concat(comment.body, "\n");
         setInput(input + markdowm);
         smoothScroll(config.$container);
       }
@@ -2368,7 +2422,8 @@
                   comments = _context.sent;
                   this.setState(function () {
                     return {
-                      loading: false
+                      loading: false,
+                      loadEnd: comments.length === 0
                     };
                   });
                   setComments(comments);
@@ -2400,7 +2455,7 @@
         if (loading) {
           return h("span", {
             "class": "gitting-load"
-          }, config.i18n("loading"));
+          }, config.i18n('loading'));
         }
 
         return comments.length ? h("a", {
@@ -2409,7 +2464,7 @@
           onClick: function onClick(e) {
             return _this2.loadMore(e);
           }
-        }, config.i18n("loadMore")) : null;
+        }, config.i18n('loadMore')) : null;
       }
     }]);
 
@@ -2423,10 +2478,16 @@
   function (_Component) {
     inherits(App, _Component);
 
-    function App() {
+    function App(props) {
+      var _this;
+
       classCallCheck(this, App);
 
-      return possibleConstructorReturn(this, getPrototypeOf(App).apply(this, arguments));
+      _this = possibleConstructorReturn(this, getPrototypeOf(App).call(this, props));
+      _this.state = {
+        loading: false
+      };
+      return _this;
     }
 
     createClass(App, [{
@@ -2435,80 +2496,94 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, options, config, throwError, setUserInfo, setIssue, page, setComments, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, comments;
+          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue, page = _this$props.page, setComments = _this$props.setComments;
+                  this.setState(function () {
+                    return {
+                      loading: true
+                    };
+                  });
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, throwError = _this$props.throwError, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
-                    _context.next = 16;
+                    _context.next = 18;
                     break;
                   }
 
-                  _context.next = 5;
+                  _context.next = 6;
                   return config.api.getToken(code);
 
-                case 5:
+                case 6:
                   data = _context.sent;
-                  throwError(!data.access_token, "Can not get token, Please login again!");
-                  setStorage("token", data.access_token);
-                  _context.next = 10;
+                  throwError(!data.access_token, 'Can not get token, Please login again!');
+                  setStorage('token', data.access_token);
+                  _context.next = 11;
                   return config.api.getUserInfo(data.access_token);
 
-                case 10:
+                case 11:
                   userInfo = _context.sent;
-                  throwError(!userInfo.id, "Can not get user info, Please login again!");
-                  setStorage("userInfo", userInfo);
-                  redirect_uri = getStorage("redirect_uri");
-                  throwError(!redirect_uri, "Can not get redirect url, Please login again!");
-                  window.location.href = redirect_uri;
+                  throwError(!userInfo.id, 'Can not get user info, Please login again!');
+                  setStorage('userInfo', userInfo);
+                  setUserInfo(userInfo);
+                  redirect_uri = getStorage('redirect_uri');
+                  throwError(!redirect_uri, 'Can not get redirect url, Please login again!');
+                  window.history.replaceState(null, '', redirect_uri);
 
-                case 16:
-                  setUserInfo(getStorage("userInfo"));
+                case 18:
                   issue = null;
 
                   if (!(Number(options.number) > 0)) {
-                    _context.next = 25;
+                    _context.next = 32;
                     break;
                   }
 
-                  _context.next = 21;
+                  _context.prev = 20;
+                  _context.next = 23;
                   return config.api.getIssueById(options.number);
 
-                case 21:
+                case 23:
                   issue = _context.sent;
-                  throwError(!issue || !issue.number, "Failed to get issue by id [".concat(options.number, "] , Do you want to initialize an new issue?"));
+                  setIssue(issue);
                   _context.next = 30;
                   break;
 
-                case 25:
-                  labels = options.labels.concat(options.id).join(",");
-                  _context.next = 28;
-                  return config.api.getIssueByLabel(labels);
-
-                case 28:
-                  issue = _context.sent[0];
-                  throwError(!issue || !issue.number, "Failed to get issue by labels [".concat(labels, "] , Do you want to initialize an new issue?"));
+                case 27:
+                  _context.prev = 27;
+                  _context.t0 = _context["catch"](20);
+                  throwError(!issue || !issue.number, "Failed to get issue by id: ".concat(options.number, ", Do you want to initialize an new issue?"));
 
                 case 30:
-                  setIssue(issue);
-                  _context.next = 33;
-                  return config.api.getComments(issue.number, page);
+                  _context.next = 38;
+                  break;
 
-                case 33:
-                  comments = _context.sent;
-                  setComments(comments);
+                case 32:
+                  labels = options.labels.concat(options.id).join(',');
+                  _context.next = 35;
+                  return config.api.getIssueByLabel(labels);
 
                 case 35:
+                  issue = _context.sent[0];
+                  setIssue(issue);
+                  throwError(!issue || !issue.number, "Failed to get issue by labels: ".concat(labels, ", Do you want to initialize an new issue?"));
+
+                case 38:
+                  this.setState(function () {
+                    return {
+                      loading: false
+                    };
+                  });
+
+                case 39:
                 case "end":
                   return _context.stop();
               }
             }
-          }, _callee, this);
+          }, _callee, this, [[20, 27]]);
         }));
 
         function componentDidMount() {
@@ -2519,12 +2594,15 @@
       }()
     }, {
       key: "render",
-      value: function render(_ref) {
+      value: function render(_ref, _ref2) {
         var options = _ref.options,
             config = _ref.config;
+        var loading = _ref2.loading;
         return h("div", {
           "class": "gitting-container gitting-theme-".concat(options.theme)
-        }, h(ErrorInfo$1, {
+        }, loading ? h(Loading$1, {
+          loading: loading
+        }) : h("div", null, h(ErrorInfo$1, {
           options: options,
           config: config
         }), h(Header$1, {
@@ -2539,7 +2617,7 @@
         }), h(Load$1, {
           options: options,
           config: config
-        }));
+        })));
       }
     }]);
 
@@ -2691,13 +2769,20 @@
   /*#__PURE__*/
   function () {
     function Gitting() {
+      var _this = this;
+
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       classCallCheck(this, Gitting);
 
       this.options = Object.assign({}, Gitting.DEFAULT, options);
-      this.$root = null;
+      ['clientID', 'clientSecret', 'repo', 'owner'].forEach(function (item) {
+        if (!_this.options[item].trim()) {
+          throw new Error("The options.".concat(item, " can not be empty"));
+        }
+      });
       this.config = {
+        $root: null,
         $container: null,
         api: creatApi(this.options),
         i18n: creatI18n(this.options.language)
@@ -2707,16 +2792,18 @@
     createClass(Gitting, [{
       key: "render",
       value: function render$1(el) {
-        this.config.$container = this.$container = el instanceof Element ? el : document.querySelector(el);
-        this.$root = render(h(_default, {
+        this.config.$container = el instanceof Element ? el : document.querySelector(el);
+        this.config.$root = render(h(_default, {
           options: this.options,
           config: this.config
-        }), this.$container);
+        }), this.config.$container);
       }
     }, {
       key: "destroy",
       value: function destroy() {
-        render(null, this.$container, this.$root);
+        render(null, this.config.$container, this.config.$root);
+
+        this.config.api.destroy();
       }
     }], [{
       key: "DEFAULT",
@@ -2728,11 +2815,11 @@
           owner: "",
           admin: [],
           theme: "white",
-          id: location.pathname,
+          id: window.location.pathname,
           number: -1,
           labels: ["Gitting"],
           title: document.title,
-          body: "".concat(document.title, "\n").concat(location.href),
+          body: "".concat(document.title, "\n").concat(window.location.href),
           language: "zh-cn",
           perPage: 10,
           maxlength: 500,

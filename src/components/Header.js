@@ -1,9 +1,9 @@
-import { h, Component } from "preact";
-import Enhanced from "./Enhanced";
+import { h, Component } from 'preact';
+import Enhanced from './Enhanced';
 
 class Header extends Component {
   render(props) {
-    const { issue, options, config, userInfo, isLogin, logout, login, comments } = props;
+    const { issue, options, config, userInfo, isLogin, logout, login } = props;
     return (
       <header class="gitting-header">
         <a
@@ -12,19 +12,19 @@ class Header extends Component {
           }`}
           class="gitting-number"
         >
-          {issue.comments || 0} {config.i18n("counts")}
+          {issue.comments || 0} {config.i18n('counts')}
         </a>
         <div class="gitting-mate">
           {isLogin ? (
             <span>
               <a href="#">{userInfo.login}</a>
               <a href="#" onClick={e => logout(e)}>
-                {config.i18n("logout")}
+                {config.i18n('logout')}
               </a>
             </span>
           ) : (
             <a href="#" onClick={e => login(options, e)}>
-              {config.i18n("login")}
+              {config.i18n('login')}
             </a>
           )}
           <a href={`https://github.com/zhw2590582/gitting`}>
