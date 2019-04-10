@@ -1,38 +1,51 @@
-const babel = require("rollup-plugin-babel");
-const commonjs = require("rollup-plugin-commonjs");
-const nodeResolve = require("rollup-plugin-node-resolve");
-const postcss = require("rollup-plugin-postcss");
-const autoprefixer = require("autoprefixer");
-const cssnano = require("cssnano");
-const replace = require("rollup-plugin-replace");
-const { uglify } = require("rollup-plugin-uglify");
-const { version } = require("./package.json");
-const isProd = process.env.NODE_ENV === "production";
+const babel = require('rollup-plugin-babel');
+const commonjs = require('rollup-plugin-commonjs');
+const nodeResolve = require('rollup-plugin-node-resolve');
+const postcss = require('rollup-plugin-postcss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const replace = require('rollup-plugin-replace');
+const { uglify } = require('rollup-plugin-uglify');
+const { version } = require('./package.json');
+const isProd = process.env.NODE_ENV === 'production';
 
 export default {
-  input: "src/index.js",
+  input: 'src/index.js',
   output: {
-    name: "Gitting",
-    file: isProd ? "dist/gitting.js" : "dist/gitting-uncompiled.js",
-    format: "umd"
+    name: 'Gitting',
+    file: isProd ? 'dist/gitting.js' : 'docs/gitting-uncompiled.js',
+    format: 'umd'
   },
   plugins: [
     postcss({
-      plugins: [autoprefixer, cssnano],
-      extract: isProd ? "dist/gitting.css" : "dist/gitting-uncompiled.css"
+      plugins: [
+        autoprefixer({
+          browsers: ['last 2 versions']
+        }),
+        cssnano({
+          preset: 'default'
+        })
+      ],
+      extract: isProd ? 'dist/gitting.css' : 'docs/gitting-uncompiled.css'
     }),
     babel({
       runtimeHelpers: true,
-      exclude: "node_modules/**",
+      exclude: 'node_modules/**',
       plugins: [
-        "@babel/plugin-external-helpers",
-        "@babel/plugin-transform-runtime"
+        [
+          '@babel/plugin-transform-react-jsx',
+          {
+            pragma: 'h'
+          }
+        ],
+        '@babel/plugin-external-helpers',
+        '@babel/plugin-transform-runtime'
       ]
     }),
     nodeResolve(),
     commonjs(),
     replace({
-      __ENV__: JSON.stringify(process.env.NODE_ENV || "development"),
+      __ENV__: JSON.stringify(process.env.NODE_ENV || 'development'),
       __VERSION__: version
     }),
     isProd && uglify()

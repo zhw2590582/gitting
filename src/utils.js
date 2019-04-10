@@ -1,84 +1,57 @@
-// 查询url参数
-export const getURLParameters = () => {
+const storageName = "gitting_settings";
+
+export function getStorage(key) {
+  const storage = JSON.parse(localStorage.getItem(storageName)) || {};
+  return key ? storage[key] : storage;
+}
+
+export function setStorage(key, value) {
+  const storage = Object.assign({}, getStorage(), {
+    [key]: value
+  });
+  return localStorage.setItem(storageName, JSON.stringify(storage));
+}
+
+export function cleanStorage() {
+  return localStorage.removeItem(storageName);
+}
+
+export function queryStringify(query) {
+  const queryString = Object.keys(query)
+    .map(key => `${key}=${encodeURIComponent(query[key] || "")}`)
+    .join("&");
+  return queryString;
+}
+
+export function getURLParameters() {
   var url = window.location.href;
   return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function(a, v) {
     return (a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1)), a;
   }, {});
 }
 
-// 从参数生成url
-export const queryStringify = query => {
-  const queryString = Object.keys(query)
-    .map(key => `${key}=${encodeURIComponent(query[key] || '')}`)
-    .join('&')
-  return queryString
-}
-
-// 保存storage
-export const setStorage = (key, val) => {
-  localStorage.setItem(key, JSON.stringify(val));
-}
-
-// 获取storage
-export const getStorage = (key) => {
-  return JSON.parse(localStorage.getItem(key));
-}
-
-// 删除storage
-export const delStorage = (key) => {
-  localStorage.removeItem(key)
-}
-
-// 选择元素
-export const query = (doc = document, selector) => {
-  return doc.querySelector(selector);
-}
-
-// 删除dom元素
-export const removeElement = selector => {
-  const el = selector instanceof Element ? selector : document.querySelector(selector);
-  el && el.parentNode && el.parentNode.removeChild(el);
-}
-
-// 创建loading
-export const loading = selector => {
-  const el = selector instanceof Element ? selector : document.querySelector(selector);
-  const loadingEl = document.createElement('div');
-  loadingEl.classList.add('gt-loading');
-  loadingEl.innerHTML = `
-    <div class="lds-ellipsis">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  `;
-  el.appendChild(loadingEl);
-  return () => el.removeChild(loadingEl);
-}
-
-export const smoothScroll = (element, offset = 0) => {
+export function smoothScroll(element, offset = 0) {
   window.scroll({
-    behavior: 'smooth',
+    behavior: "smooth",
     left: 0,
     top: element.getBoundingClientRect().top + window.scrollY + offset
   });
+  return element;
 }
 
-// 请求
-export const request = (method, url, body, header) => {
+export function request(method, url, body, header) {
   method = method.toUpperCase();
   body = body && JSON.stringify(body);
   let headers = {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json"
   };
 
   if (header) {
     headers = Object.assign({}, headers, header);
   }
 
-  const token = getStorage('gitting-token')
+  const token = getStorage("token");
   if (token) {
     headers.Authorization = `token ${token}`;
   }
@@ -90,12 +63,11 @@ export const request = (method, url, body, header) => {
   }).then(res => {
     if (res.status === 404) {
       return Promise.reject("Unauthorized.");
-    } else if(res.status === 401) {
-      delStorage("gitting-token");
-      delStorage("gitting-userInfo");
-      location.reload();
+    } else if (res.status === 401) {
+      cleanStorage();
+      window.location.reload();
     } else {
-      if (headers.Accept === 'text/html') {
+      if (headers.Accept === "text/html") {
         return res.text();
       } else {
         return res.json();

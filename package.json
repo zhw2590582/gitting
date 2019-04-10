@@ -1,7 +1,7 @@
 {
   "name": "gitting",
-  "version": "1.1.4",
-  "description": "Gitting is a modern comment component based on Github Issue. ",
+  "version": "2.0.0",
+  "description": "Gitting is a modern comment component based on Github Issue.",
   "main": "dist/gitting.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.3",
     "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "@babel/runtime": "^7.4.3",
@@ -37,7 +38,9 @@
     "rollup-plugin-uglify": "^6.0.2"
   },
   "dependencies": {
-    "dayjs": "^1.7.5",
-    "github-markdown-css": "^2.10.0"
+    "dayjs": "^1.8.12",
+    "github-markdown-css": "^3.0.1",
+    "preact": "^8.4.2",
+    "unistore": "^3.4.1"
   }
 }
