@@ -105,7 +105,7 @@ export default function creatApi(option) {
 
     // 创建一条issues
     creatIssues(issue) {
-      return request('post', issuesApi, issue);
+      return request('post', issuesApi, Object.assign({}, issue, baseQuery));
     },
 
     // 创建一条评论

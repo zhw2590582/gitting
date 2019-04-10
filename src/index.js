@@ -31,8 +31,6 @@ class Gitting {
       id: window.location.pathname,
       number: -1,
       labels: ["Gitting"],
-      title: document.title,
-      body: `${document.title}\n${window.location.href}`,
       language: "zh-cn",
       perPage: 10,
       maxlength: 500,

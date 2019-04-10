@@ -11,7 +11,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
+      init: false,
     };
   }
 
@@ -41,26 +42,55 @@ class App extends Component {
         issue = await config.api.getIssueById(options.number);
         setIssue(issue);
       } catch (error) {
-        throwError(
-          !issue || !issue.number,
-          `Failed to get issue by id: ${
-            options.number
-          }, Do you want to initialize an new issue?`
-        );
+        if (!issue || !issue.number) {
+          this.setState(() => ({ init: true }));
+          throwError(
+            true,
+            `Failed to get issue by number: ${
+              options.number
+            }, Do you want to initialize an new issue?`
+          );
+        }
       }
     } else {
       const labels = options.labels.concat(options.id).join(',');
       issue = (await config.api.getIssueByLabel(labels))[0];
+      if (!issue || !issue.number) {
+        this.setState(() => ({ init: true }));
+        throwError(
+          true,
+          `Failed to get issue by labels: ${labels}, Do you want to initialize an new issue?`
+        );
+      }
       setIssue(issue);
-      throwError(
-        !issue || !issue.number,
-        `Failed to get issue by labels: ${labels}, Do you want to initialize an new issue?`
-      );
     }
     this.setState(() => ({ loading: false }));
   }
 
-  render({ options, config }, { loading }) {
+  async onInit() {
+    const { options, config, userInfo, isLogin, throwError, login } = this.props;
+    if (!isLogin()) {
+      login(options);
+      return;
+    }
+    throwError(
+      !options.admin.includes(userInfo.login),
+      `You have no permission to initialize this issue`
+    );
+    const detail = {
+      title: document.title,
+      body: `${document.title}\n${window.location.href}`,
+      labels: options.labels.concat(options.id)
+    };
+    const issue = await config.api.creatIssues(detail);
+    throwError(
+      !issue || !issue.number,
+      `Initialize issue failed: ${JSON.stringify(detail)}`
+    );
+    window.location.reload();
+  }
+
+  render({ options, config }, { loading, init }) {
     return (
       <div class={`gitting-container gitting-theme-${options.theme}`}>
         {loading ? (
@@ -68,9 +98,17 @@ class App extends Component {
         ) : (
           <div>
             <ErrorInfo options={options} config={config} />
-            <Header options={options} config={config} />
-            <Editor options={options} config={config} />
-            <Comments options={options} config={config} />
+            {init ? (
+              <button className="gitting-init" onClick={e => this.onInit(e)}>
+                {config.i18n('init')}
+              </button>
+            ) : (
+              <div>
+                <Header options={options} config={config} />
+                <Editor options={options} config={config} />
+                <Comments options={options} config={config} />
+              </div>
+            )}
           </div>
         )}
       </div>

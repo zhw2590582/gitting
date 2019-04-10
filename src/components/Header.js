@@ -4,7 +4,7 @@ import Enhanced from './Enhanced';
 class Header extends Component {
   render(props) {
     const { issue, options, config, userInfo, isLogin, logout, login } = props;
-    return (
+    return issue ? (
       <header class="gitting-header">
         <a
           href={`https://github.com/${options.owner}/${options.repo}/issues/${
@@ -16,7 +16,7 @@ class Header extends Component {
           {issue.comments || 0} {config.i18n('counts')}
         </a>
         <div class="gitting-mate">
-          {isLogin ? (
+          {isLogin() ? (
             <span>
               <a href="#">{userInfo.login}</a>
               <a href="#" onClick={e => logout(e)}>
@@ -33,7 +33,7 @@ class Header extends Component {
           </a>
         </div>
       </header>
-    );
+    ) : null;
   }
 }
 

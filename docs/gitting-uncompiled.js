@@ -750,6 +750,7 @@
   	rerender: rerender,
   	options: options
   };
+  //# sourceMappingURL=preact.mjs.map
 
   var preact$1 = /*#__PURE__*/Object.freeze({
     default: preact,
@@ -858,7 +859,7 @@
 
   var preact$2 = createCommonjsModule(function (module, exports) {
   var t=require$$0;function n(t,n){for(var r in n)t[r]=n[r];return t}function r(t){this.getChildContext=function(){return {store:t.store}};}r.prototype.render=function(t){return t.children&&t.children[0]||t.children},exports.connect=function(r,e){var o;return "function"!=typeof r&&("string"==typeof(o=r||{})&&(o=o.split(/\s*,\s*/)),r=function(t){for(var n={},r=0;r<o.length;r++)n[o[r]]=t[o[r]];return n}),function(o){function i(i,u){var c=this,f=u.store,s=r(f?f.getState():{},i),a=e?function(t,n){"function"==typeof t&&(t=t(n));var r={};for(var e in t)r[e]=n.action(t[e]);return r}(e,f):{store:f},p=function(){var t=r(f?f.getState():{},i);for(var n in t)if(t[n]!==s[n])return s=t,c.setState({});for(var e in s)if(!(e in t))return s=t,c.setState({})};this.componentWillReceiveProps=function(t){i=t,p();},this.componentDidMount=function(){f.subscribe(p);},this.componentWillUnmount=function(){f.unsubscribe(p);},this.render=function(r){return t.h(o,n(n(n({},a),r),s))};}return (i.prototype=new t.Component).constructor=i}},exports.Provider=r;
-
+  //# sourceMappingURL=preact.js.map
   });
   var preact_1 = preact$2.connect;
   var preact_2 = preact$2.Provider;
@@ -894,6 +895,7 @@
   var toConsumableArray = _toConsumableArray;
 
   function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
+  //# sourceMappingURL=unistore.es.js.map
 
   function _defineProperty(obj, key, value) {
     if (key in obj) {
@@ -947,7 +949,9 @@
   }
 
   var state = {
-    isLogin: getStorage('token') && getStorage('userInfo'),
+    isLogin: function isLogin() {
+      return !!getStorage('token') && !!getStorage('userInfo');
+    },
     userInfo: getStorage('userInfo'),
     issue: {},
     comments: [],
@@ -994,12 +998,12 @@
         };
       },
       logout: function logout(state, e) {
-        e.preventDefault();
+        e && e.preventDefault();
         cleanStorage();
         window.location.reload();
       },
       login: function login(state, options, e) {
-        e.preventDefault();
+        e && e.preventDefault();
         setStorage('redirect_uri', window.location.href);
         window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
           state: 'Gitting',
@@ -1868,7 +1872,7 @@
             isLogin = props.isLogin,
             logout = props.logout,
             login = props.login;
-        return h("header", {
+        return issue ? h("header", {
           "class": "gitting-header"
         }, h("a", {
           href: "https://github.com/".concat(options.owner, "/").concat(options.repo, "/issues/").concat(issue.number),
@@ -1876,7 +1880,7 @@
           "class": "gitting-number"
         }, issue.comments || 0, " ", config.i18n('counts')), h("div", {
           "class": "gitting-mate"
-        }, isLogin ? h("span", null, h("a", {
+        }, isLogin() ? h("span", null, h("a", {
           href: "#"
         }, userInfo.login), h("a", {
           href: "#",
@@ -1891,7 +1895,7 @@
         }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting",
           target: "_blank"
-        }, "Gitting 2.0.0")));
+        }, "Gitting 2.0.0"))) : null;
       }
     }]);
 
@@ -2108,8 +2112,8 @@
         }, h("div", {
           "class": "gitting-avatar"
         }, h("img", {
-          src: isLogin ? userInfo.avatar_url : options.avatar,
-          alt: "@".concat(isLogin ? userInfo.login : 'github')
+          src: isLogin() ? userInfo.avatar_url : options.avatar,
+          alt: "@".concat(isLogin() ? userInfo.login : 'github')
         })), h("div", {
           "class": "gitting-editor"
         }, h("div", {
@@ -2156,7 +2160,7 @@
           onClick: function onClick(e) {
             return _this2.onPreview(e);
           }
-        }, config.i18n('preview'))), isLogin ? h("button", {
+        }, config.i18n('preview'))), isLogin() ? h("button", {
           "class": "gitting-send",
           onClick: function onClick(e) {
             return _this2.onSubmit(e);
@@ -2417,13 +2421,13 @@
           });
         }), loadMore ? h("span", {
           "class": "gitting-load"
-        }, config.i18n('loading')) : comments.length ? h("a", {
+        }, config.i18n('loading')) : h("a", {
           href: "#",
           "class": "gitting-load",
           onClick: function onClick(e) {
             return _this2.loadMore(e);
           }
-        }, config.i18n('loadMore')) : null);
+        }, config.i18n('loadMore')));
       }
     }]);
 
@@ -2444,7 +2448,8 @@
 
       _this = possibleConstructorReturn(this, getPrototypeOf(App).call(this, props));
       _this.state = {
-        loading: false
+        loading: false,
+        init: false
       };
       return _this;
     }
@@ -2514,7 +2519,15 @@
                 case 27:
                   _context.prev = 27;
                   _context.t0 = _context["catch"](20);
-                  throwError(!issue || !issue.number, "Failed to get issue by id: ".concat(options.number, ", Do you want to initialize an new issue?"));
+
+                  if (!issue || !issue.number) {
+                    this.setState(function () {
+                      return {
+                        init: true
+                      };
+                    });
+                    throwError(true, "Failed to get issue by number: ".concat(options.number, ", Do you want to initialize an new issue?"));
+                  }
 
                 case 30:
                   _context.next = 38;
@@ -2527,8 +2540,17 @@
 
                 case 35:
                   issue = _context.sent[0];
+
+                  if (!issue || !issue.number) {
+                    this.setState(function () {
+                      return {
+                        init: true
+                      };
+                    });
+                    throwError(true, "Failed to get issue by labels: ".concat(labels, ", Do you want to initialize an new issue?"));
+                  }
+
                   setIssue(issue);
-                  throwError(!issue || !issue.number, "Failed to get issue by labels: ".concat(labels, ", Do you want to initialize an new issue?"));
 
                 case 38:
                   this.setState(function () {
@@ -2552,11 +2574,65 @@
         return componentDidMount;
       }()
     }, {
+      key: "onInit",
+      value: function () {
+        var _onInit = asyncToGenerator(
+        /*#__PURE__*/
+        regenerator.mark(function _callee2() {
+          var _this$props2, options, config, userInfo, isLogin, throwError, login, detail, issue;
+
+          return regenerator.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _this$props2 = this.props, options = _this$props2.options, config = _this$props2.config, userInfo = _this$props2.userInfo, isLogin = _this$props2.isLogin, throwError = _this$props2.throwError, login = _this$props2.login;
+
+                  if (isLogin()) {
+                    _context2.next = 4;
+                    break;
+                  }
+
+                  login(options);
+                  return _context2.abrupt("return");
+
+                case 4:
+                  throwError(!options.admin.includes(userInfo.login), "You have no permission to initialize this issue");
+                  detail = {
+                    title: document.title,
+                    body: "".concat(document.title, "\n").concat(window.location.href),
+                    labels: options.labels.concat(options.id)
+                  };
+                  _context2.next = 8;
+                  return config.api.creatIssues(detail);
+
+                case 8:
+                  issue = _context2.sent;
+                  throwError(!issue || !issue.number, "Initialize issue failed: ".concat(JSON.stringify(detail)));
+                  window.location.reload();
+
+                case 11:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function onInit() {
+          return _onInit.apply(this, arguments);
+        }
+
+        return onInit;
+      }()
+    }, {
       key: "render",
       value: function render(_ref, _ref2) {
+        var _this2 = this;
+
         var options = _ref.options,
             config = _ref.config;
-        var loading = _ref2.loading;
+        var loading = _ref2.loading,
+            init = _ref2.init;
         return h("div", {
           "class": "gitting-container gitting-theme-".concat(options.theme)
         }, loading ? h(Loading$1, {
@@ -2564,7 +2640,12 @@
         }) : h("div", null, h(ErrorInfo$1, {
           options: options,
           config: config
-        }), h(Header$1, {
+        }), init ? h("button", {
+          className: "gitting-init",
+          onClick: function onClick(e) {
+            return _this2.onInit(e);
+          }
+        }, config.i18n('init')) : h("div", null, h(Header$1, {
           options: options,
           config: config
         }), h(Editor$1, {
@@ -2573,7 +2654,7 @@
         }), h(Comments$1, {
           options: options,
           config: config
-        })));
+        }))));
       }
     }]);
 
@@ -2699,7 +2780,7 @@
       },
       // 创建一条issues
       creatIssues: function creatIssues(issue) {
-        return request('post', issuesApi, issue);
+        return request('post', issuesApi, Object.assign({}, issue, baseQuery));
       },
       // 创建一条评论
       creatComments: function creatComments(id, body) {
@@ -2820,8 +2901,6 @@
           id: window.location.pathname,
           number: -1,
           labels: ["Gitting"],
-          title: document.title,
-          body: "".concat(document.title, "\n").concat(window.location.href),
           language: "zh-cn",
           perPage: 10,
           maxlength: 500,

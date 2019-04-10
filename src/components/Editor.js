@@ -87,8 +87,8 @@ class Editor extends Component {
       <div class="gitting-body">
         <div class="gitting-avatar">
           <img
-            src={isLogin ? userInfo.avatar_url : options.avatar}
-            alt={`@${isLogin ? userInfo.login : 'github'}`}
+            src={isLogin() ? userInfo.avatar_url : options.avatar}
+            alt={`@${isLogin() ? userInfo.login : 'github'}`}
           />
         </div>
         <div class="gitting-editor">
@@ -143,7 +143,7 @@ class Editor extends Component {
                 {config.i18n('preview')}
               </span>
             </div>
-            {isLogin ? (
+            {isLogin() ? (
               <button class="gitting-send" onClick={e => this.onSubmit(e)}>
                 {config.i18n('submit')}
               </button>

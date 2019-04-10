@@ -120,11 +120,11 @@ class Comments extends Component {
         )}
         {loadMore ? (
           <span class="gitting-load">{config.i18n('loading')}</span>
-        ) : comments.length ? (
+        ) : (
           <a href="#" class="gitting-load" onClick={e => this.loadMore(e)}>
             {config.i18n('loadMore')}
           </a>
-        ) : null}
+        )}
       </div>
     );
   }
