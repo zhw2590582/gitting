@@ -1,31 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Gitting</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./gitting-uncompiled.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="./gitting-uncompiled.css" />
     <style>
-        .gitting {
-            width: 600px;
-            margin: 20px auto;
-        }
+      .gitting {
+        width: 600px;
+        margin: 20px auto;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="gitting"></div>
     <script src="./gitting-uncompiled.js"></script>
     <script>
+      function init() {
         var gitting = new Gitting({
-            clientID: '44a942aaaaaca3eec74c',
-            clientSecret: '46d38fd88308b469c0f0c279d5f2211c77263273',
-            repo: 'gitting',
-            owner: 'zhw2590582',
-            admin: ['zhw2590582'],
+          clientID: '44a942aaaaaca3eec74c',
+          clientSecret: '46d38fd88308b469c0f0c279d5f2211c77263273',
+          repo: 'gitting',
+          owner: 'zhw2590582',
+          admin: ['zhw2590582']
         });
+        return gitting.render('.gitting');
+      }
 
-        gitting.render('.gitting');
+      setTimeout(function loop() {
+        var gitting = init();
+        setTimeout(() => {
+            gitting.destroy();
+            // loop();
+        }, 1000);
+      }, 3000);
     </script>
-</body>
+  </body>
 </html>

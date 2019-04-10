@@ -1,49 +1,48 @@
 import { queryStringify, cleanStorage, getStorage } from './utils';
 
-let controller;
-let signal;
+function creatRequest(controller) {
+  return function request(method, url, body, header) {
+    method = method.toUpperCase();
+    body = body && JSON.stringify(body);
+    let headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    };
 
-function request(method, url, body, header) {
-  method = method.toUpperCase();
-  body = body && JSON.stringify(body);
-  let headers = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  };
-
-  if (header) {
-    headers = Object.assign({}, headers, header);
-  }
-
-  const token = getStorage('token');
-  if (token) {
-    headers.Authorization = `token ${token}`;
-  }
-
-  return fetch(url, {
-    method,
-    headers,
-    body,
-    signal,
-  }).then(res => {
-    if (res.status === 404) {
-      return Promise.reject('Unauthorized.');
-    } else if (res.status === 401) {
-      cleanStorage();
-      window.location.reload();
-    } else {
-      if (headers.Accept === 'text/html') {
-        return res.text();
-      } else {
-        return res.json();
-      }
+    if (header) {
+      headers = Object.assign({}, headers, header);
     }
-  });
+
+    const token = getStorage('token');
+    if (token) {
+      headers.Authorization = `token ${token}`;
+    }
+
+    return fetch(url, {
+      method,
+      headers,
+      body,
+      signal: controller.signal
+    }).then(res => {
+      if (res.status === 404) {
+        return Promise.reject('Unauthorized.');
+      } else if (res.status === 401) {
+        cleanStorage();
+        window.location.reload();
+      } else {
+        if (headers.Accept === 'text/html') {
+          return res.text();
+        } else {
+          return res.json();
+        }
+      }
+    });
+  };
 }
 
 export default function creatApi(option) {
-  controller = new AbortController();
-  signal = controller.signal;
+  const controller = new AbortController();
+  const request = creatRequest(controller);
 
   const issuesApi = `https://api.github.com/repos/${option.owner}/${
     option.repo
@@ -142,6 +141,6 @@ export default function creatApi(option) {
     // 销毁
     destroy() {
       controller && controller.abort && controller.abort();
-    },
+    }
   };
 }

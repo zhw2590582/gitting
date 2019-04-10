@@ -42,6 +42,7 @@ export default class Gitting {
   render(el) {
     this.config.$container = el instanceof Element ? el : document.querySelector(el);
     this.config.$root = render(<Container options={this.options} config={this.config} />, this.config.$container);
+    return this;
   }
 
   destroy() {
