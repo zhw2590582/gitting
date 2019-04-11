@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import Enhanced from './Enhanced';
 import Loading from './Loading';
-import { smoothScroll, throwError } from '../utils';
+import { smoothScroll, throwError, tip } from '../utils';
 
 class Editor extends Component {
   constructor(props) {
@@ -50,14 +50,16 @@ class Editor extends Component {
   async onSubmit(e) {
     const { options, input, config, issue, setInput } = this.props;
     const value = input.trim();
-    if (!value) return;
+    throwError(value, `Comment content cannot be empty!`);
     throwError(
       value.length <= options.maxlength,
       `Word count exceeds limit: ${value.length} / ${options.maxlength}`
     );
     this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
-    throwError(item && item.id, `Comment failed!`);
+    throwError(item && item.id, `Comment failed, please try again!`, () => {
+      this.setState(() => ({ loading: false }));
+    });
     this.setState(() => {
       return {
         loading: false,
@@ -66,6 +68,7 @@ class Editor extends Component {
     });
     if (item.id) {
       setInput('');
+      tip('Comment posted successfully!');
       setTimeout(() => {
         smoothScroll(config.$container.querySelector('.gitting-load')).click();
       }, 100);

@@ -1867,7 +1867,7 @@
         }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting",
           target: "_blank"
-        }, "Gitting 2.0.7"))) : null;
+        }, "Gitting 2.0.8"))) : null;
       }
     }]);
 
@@ -2007,6 +2007,8 @@
         var _onSubmit = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee2(e) {
+          var _this2 = this;
+
           var _this$props2, options, input, config, issue, setInput, value, item;
 
           return regenerator.wrap(function _callee2$(_context2) {
@@ -2015,27 +2017,25 @@
                 case 0:
                   _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, setInput = _this$props2.setInput;
                   value = input.trim();
-
-                  if (value) {
-                    _context2.next = 4;
-                    break;
-                  }
-
-                  return _context2.abrupt("return");
-
-                case 4:
+                  throwError(value, "Comment content cannot be empty!");
                   throwError(value.length <= options.maxlength, "Word count exceeds limit: ".concat(value.length, " / ").concat(options.maxlength));
                   this.setState(function () {
                     return {
                       loading: true
                     };
                   });
-                  _context2.next = 8;
+                  _context2.next = 7;
                   return config.api.creatComments(issue.number, value);
 
-                case 8:
+                case 7:
                   item = _context2.sent;
-                  throwError(item && item.id, "Comment failed!");
+                  throwError(item && item.id, "Comment failed, please try again!", function () {
+                    _this2.setState(function () {
+                      return {
+                        loading: false
+                      };
+                    });
+                  });
                   this.setState(function () {
                     return {
                       loading: false,
@@ -2045,12 +2045,13 @@
 
                   if (item.id) {
                     setInput('');
+                    tip('Comment posted successfully!');
                     setTimeout(function () {
                       smoothScroll(config.$container.querySelector('.gitting-load')).click();
                     }, 100);
                   }
 
-                case 12:
+                case 11:
                 case "end":
                   return _context2.stop();
               }
@@ -2067,7 +2068,7 @@
     }, {
       key: "render",
       value: function render(props, state) {
-        var _this2 = this;
+        var _this3 = this;
 
         var options = props.options,
             input = props.input,
@@ -2125,17 +2126,17 @@
         }, h("span", {
           "class": preview ? '' : 'active',
           onClick: function onClick(e) {
-            return _this2.onWrite(e);
+            return _this3.onWrite(e);
           }
         }, config.i18n('write')), h("span", {
           "class": preview ? 'active' : '',
           onClick: function onClick(e) {
-            return _this2.onPreview(e);
+            return _this3.onPreview(e);
           }
         }, config.i18n('preview'))), isLogin() ? h("button", {
           "class": "gitting-send",
           onClick: function onClick(e) {
-            return _this2.onSubmit(e);
+            return _this3.onSubmit(e);
           }
         }, config.i18n('submit')) : h("a", {
           "class": "gitting-send",
