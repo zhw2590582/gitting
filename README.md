@@ -22,11 +22,13 @@ $ yarn add gitting
 
 ```js
 import Gitting from "gitting";
+import "gitting/dist/gitting.css";
 ```
 
 Or umd builds are also available
 
 ```html
+<link href="path/to/gitting.css" rel="stylesheet">
 <script src="path/to/gitting.js"></script>
 ```
 
