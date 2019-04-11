@@ -1,4 +1,5 @@
 import "./style.scss";
+import "github-markdown-css";
 import { h, render } from "preact";
 import Container from "./components";
 import creatApi from './creatApi';
