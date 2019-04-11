@@ -51,10 +51,7 @@ class Editor extends Component {
     const { options, input, config, issue, setInput } = this.props;
     const value = input.trim();
     throwError(value, config.i18n('commentEmpty'));
-    throwError(
-      value.length <= options.maxlength,
-      `Word count exceeds limit: ${value.length} / ${options.maxlength}`
-    );
+    throwError(value.length <= options.maxlength, config.i18n('wordsExceeds'));
     this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
     throwError(item && item.id, config.i18n('commentFail'), () => {

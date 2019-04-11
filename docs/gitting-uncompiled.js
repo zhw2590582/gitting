@@ -2018,7 +2018,7 @@
                   _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, setInput = _this$props2.setInput;
                   value = input.trim();
                   throwError(value, config.i18n('commentEmpty'));
-                  throwError(value.length <= options.maxlength, "Word count exceeds limit: ".concat(value.length, " / ").concat(options.maxlength));
+                  throwError(value.length <= options.maxlength, config.i18n('wordsExceeds'));
                   this.setState(function () {
                     return {
                       loading: true
@@ -2813,7 +2813,8 @@
       commentEmpty: "评论不能为空！",
       commentFail: "评论失败，请重试！",
       commentSuccess: "评论成功！",
-      getCommentFail: "获取评论列表失败，请重试！"
+      getCommentFail: "获取评论列表失败，请重试！",
+      wordsExceeds: "字数超出限制，请重新输入！"
     },
     en: {
       init: "Login then initialize a issue",
@@ -2840,7 +2841,8 @@
       commentEmpty: "Comment content cannot be empty!",
       commentFail: "Comment failed, please try again!",
       commentSuccess: "Comment successfully!",
-      getCommentFail: "Failed to get comment list, please try again!"
+      getCommentFail: "Failed to get comment list, please try again!",
+      wordsExceeds: "The number of words exceeds the limit, please re-enter!"
     }
   };
   function creatI18n (lang) {

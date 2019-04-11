@@ -25,6 +25,7 @@ const i18n = {
     commentFail: "评论失败，请重试！",
     commentSuccess: "评论成功！",
     getCommentFail: "获取评论列表失败，请重试！",
+    wordsExceeds: "字数超出限制，请重新输入！",
   },
   en: {
     init: "Login then initialize a issue",
@@ -52,6 +53,7 @@ const i18n = {
     commentFail: "Comment failed, please try again!",
     commentSuccess: "Comment successfully!",
     getCommentFail: "Failed to get comment list, please try again!",
+    wordsExceeds: "The number of words exceeds the limit, please re-enter!",
   }
 };
 
