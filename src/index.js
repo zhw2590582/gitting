@@ -47,6 +47,11 @@ export default class Gitting {
 
   destroy() {
     render(null, this.config.$container, this.config.$root);
-    this.config.api.destroy();
+    return this;
+  }
+
+  abort() {
+    this.config.api.abort();
+    return this;
   }
 }

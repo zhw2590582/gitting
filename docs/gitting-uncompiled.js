@@ -2460,7 +2460,7 @@
         var _componentDidMount = asyncToGenerator(
         /*#__PURE__*/
         regenerator.mark(function _callee() {
-          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels;
+          var _this$props, options, config, throwError, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, result, _issue;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
@@ -2499,13 +2499,13 @@
 
                 case 17:
                   setUserInfo(getStorage('userInfo'));
-                  issue = null;
 
                   if (!(Number(options.number) > 0)) {
                     _context.next = 32;
                     break;
                   }
 
+                  issue = null;
                   _context.prev = 20;
                   _context.next = 23;
                   return config.api.getIssueById(options.number);
@@ -2530,7 +2530,7 @@
                   }
 
                 case 30:
-                  _context.next = 38;
+                  _context.next = 39;
                   break;
 
                 case 32:
@@ -2539,9 +2539,10 @@
                   return config.api.getIssueByLabel(labels);
 
                 case 35:
-                  issue = _context.sent[0];
+                  result = _context.sent;
+                  _issue = Array.isArray(result) && result.length ? result[0] : null;
 
-                  if (!issue || !issue.number) {
+                  if (!_issue || !_issue.number) {
                     this.setState(function () {
                       return {
                         init: true
@@ -2550,16 +2551,16 @@
                     throwError(true, "Failed to get issue by labels: ".concat(labels, ", Do you want to initialize an new issue?"));
                   }
 
-                  setIssue(issue);
+                  setIssue(_issue);
 
-                case 38:
+                case 39:
                   this.setState(function () {
                     return {
                       loading: false
                     };
                   });
 
-                case 39:
+                case 40:
                 case "end":
                   return _context.stop();
               }
@@ -2728,6 +2729,8 @@
             return res.json();
           }
         }
+      })["catch"](function (err) {
+        console.warn(err, url);
       });
     };
   }
@@ -2757,14 +2760,14 @@
       getIssueByLabel: function getIssueByLabel(labels) {
         var query = Object.assign({}, baseQuery, {
           labels: labels,
-          t: new Date().getTime()
+          t: Date.now()
         });
         return request('get', "".concat(issuesApi, "?").concat(queryStringify(query)));
       },
       // 通过id获取issues
       getIssueById: function getIssueById(id) {
         var query = Object.assign({}, baseQuery, {
-          t: new Date().getTime()
+          t: Date.now()
         });
         return request('get', "".concat(issuesApi, "/").concat(id, "?").concat(queryStringify(query)));
       },
@@ -2773,7 +2776,7 @@
         var query = Object.assign({}, baseQuery, {
           per_page: option.perPage,
           page: page,
-          t: new Date().getTime()
+          t: Date.now()
         });
         return request('get', "".concat(issuesApi, "/").concat(id, "/comments?").concat(queryStringify(query)), null, {
           Accept: 'application/vnd.github.v3.full+json'
@@ -2781,26 +2784,34 @@
       },
       // 创建一条issues
       creatIssues: function creatIssues(issue) {
-        return request('post', issuesApi, Object.assign({}, issue, baseQuery));
+        var query = Object.assign({}, baseQuery, issue, {
+          t: Date.now()
+        });
+        return request('post', issuesApi, query);
       },
       // 创建一条评论
       creatComments: function creatComments(id, body) {
-        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), {
-          body: body
-        }, {
+        var query = Object.assign({}, baseQuery, {
+          body: body,
+          t: Date.now()
+        });
+        return request('post', "".concat(issuesApi, "/").concat(id, "/comments"), query, {
           Accept: 'application/vnd.github.v3.full+json'
         });
       },
       // 解析markdown
       mdToHtml: function mdToHtml(text) {
-        return request('post', "https://api.github.com/markdown", {
-          text: text
-        }, {
+        var query = Object.assign({}, baseQuery, {
+          text: text,
+          t: Date.now()
+        });
+        return request('post', "https://api.github.com/markdown", query, {
           Accept: 'text/html'
         });
       },
       // 销毁
-      destroy: function destroy() {// controller && controller.abort && controller.abort();
+      abort: function abort() {
+        controller && controller.abort && controller.abort();
       }
     };
   }
@@ -2887,7 +2898,13 @@
       value: function destroy() {
         render(null, this.config.$container, this.config.$root);
 
-        this.config.api.destroy();
+        return this;
+      }
+    }, {
+      key: "abort",
+      value: function abort() {
+        this.config.api.abort();
+        return this;
       }
     }], [{
       key: "DEFAULT",

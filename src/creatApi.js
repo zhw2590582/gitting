@@ -36,6 +36,8 @@ function creatRequest(controller) {
           return res.json();
         }
       }
+    }).catch(err => {
+      console.warn(err, url);
     });
   };
 }
@@ -74,7 +76,7 @@ export default function creatApi(option) {
     getIssueByLabel(labels) {
       const query = Object.assign({}, baseQuery, {
         labels: labels,
-        t: new Date().getTime()
+        t: Date.now()
       });
       return request('get', `${issuesApi}?${queryStringify(query)}`);
     },
@@ -82,7 +84,7 @@ export default function creatApi(option) {
     // 通过id获取issues
     getIssueById(id) {
       const query = Object.assign({}, baseQuery, {
-        t: new Date().getTime()
+        t: Date.now()
       });
       return request('get', `${issuesApi}/${id}?${queryStringify(query)}`);
     },
@@ -92,7 +94,7 @@ export default function creatApi(option) {
       const query = Object.assign({}, baseQuery, {
         per_page: option.perPage,
         page: page,
-        t: new Date().getTime()
+        t: Date.now()
       });
       return request(
         'get',
@@ -106,40 +108,37 @@ export default function creatApi(option) {
 
     // 创建一条issues
     creatIssues(issue) {
-      return request('post', issuesApi, Object.assign({}, issue, baseQuery));
+      const query = Object.assign({}, baseQuery, issue, {
+        t: Date.now()
+      });
+      return request('post', issuesApi, query);
     },
 
     // 创建一条评论
     creatComments(id, body) {
-      return request(
-        'post',
-        `${issuesApi}/${id}/comments`,
-        {
-          body
-        },
-        {
-          Accept: 'application/vnd.github.v3.full+json'
-        }
-      );
+      const query = Object.assign({}, baseQuery, {
+        body,
+        t: Date.now()
+      });
+      return request('post', `${issuesApi}/${id}/comments`, query, {
+        Accept: 'application/vnd.github.v3.full+json'
+      });
     },
 
     // 解析markdown
     mdToHtml(text) {
-      return request(
-        'post',
-        `https://api.github.com/markdown`,
-        {
-          text
-        },
-        {
-          Accept: 'text/html'
-        }
-      );
+      const query = Object.assign({}, baseQuery, {
+        text,
+        t: Date.now()
+      });
+      return request('post', `https://api.github.com/markdown`, query, {
+        Accept: 'text/html'
+      });
     },
 
     // 销毁
-    destroy() {
-      // controller && controller.abort && controller.abort();
+    abort() {
+      controller && controller.abort && controller.abort();
     }
   };
 }

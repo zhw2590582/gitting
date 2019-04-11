@@ -37,8 +37,8 @@ class App extends Component {
 
     setUserInfo(getStorage('userInfo'));
 
-    let issue = null;
     if (Number(options.number) > 0) {
+      let issue = null;
       try {
         issue = await config.api.getIssueById(options.number);
         setIssue(issue);
@@ -55,7 +55,8 @@ class App extends Component {
       }
     } else {
       const labels = options.labels.concat(options.id).join(',');
-      issue = (await config.api.getIssueByLabel(labels))[0];
+      const result = await config.api.getIssueByLabel(labels);
+      const issue = Array.isArray(result) && result.length ? result[0] : null;
       if (!issue || !issue.number) {
         this.setState(() => ({ init: true }));
         throwError(
