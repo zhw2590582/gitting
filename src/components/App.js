@@ -17,7 +17,7 @@ class App extends Component {
 
   async componentDidMount() {
     this.setState(() => ({ loading: true }));
-    const { options, config, setUserInfo, setIssue } = this.props;
+    const { options, config, setUserInfo, setIssue, setInput } = this.props;
     const { code } = getURLParameters();
     if (code) {
       const data = await config.api.getToken(code);
@@ -31,7 +31,9 @@ class App extends Component {
       window.history.replaceState(null, '', redirect_uri);
     }
 
-    setUserInfo(getStorage('userInfo'));
+    setUserInfo(getStorage('userInfo') || {});
+    setInput(getStorage('input') || '');
+    setStorage('input', '');
 
     if (Number(options.number) > 0) {
       const issue = await config.api.getIssueById(options.number);

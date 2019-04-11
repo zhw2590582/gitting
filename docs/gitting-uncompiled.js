@@ -750,7 +750,6 @@
   	rerender: rerender,
   	options: options
   };
-  //# sourceMappingURL=preact.mjs.map
 
   var preact$1 = /*#__PURE__*/Object.freeze({
     default: preact,
@@ -859,7 +858,7 @@
 
   var preact$2 = createCommonjsModule(function (module, exports) {
   var t=require$$0;function n(t,n){for(var r in n)t[r]=n[r];return t}function r(t){this.getChildContext=function(){return {store:t.store}};}r.prototype.render=function(t){return t.children&&t.children[0]||t.children},exports.connect=function(r,e){var o;return "function"!=typeof r&&("string"==typeof(o=r||{})&&(o=o.split(/\s*,\s*/)),r=function(t){for(var n={},r=0;r<o.length;r++)n[o[r]]=t[o[r]];return n}),function(o){function i(i,u){var c=this,f=u.store,s=r(f?f.getState():{},i),a=e?function(t,n){"function"==typeof t&&(t=t(n));var r={};for(var e in t)r[e]=n.action(t[e]);return r}(e,f):{store:f},p=function(){var t=r(f?f.getState():{},i);for(var n in t)if(t[n]!==s[n])return s=t,c.setState({});for(var e in s)if(!(e in t))return s=t,c.setState({})};this.componentWillReceiveProps=function(t){i=t,p();},this.componentDidMount=function(){f.subscribe(p);},this.componentWillUnmount=function(){f.unsubscribe(p);},this.render=function(r){return t.h(o,n(n(n({},a),r),s))};}return (i.prototype=new t.Component).constructor=i}},exports.Provider=r;
-  //# sourceMappingURL=preact.js.map
+
   });
   var preact_1 = preact$2.connect;
   var preact_2 = preact$2.Provider;
@@ -895,7 +894,6 @@
   var toConsumableArray = _toConsumableArray;
 
   function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
-  //# sourceMappingURL=unistore.es.js.map
 
   function _defineProperty(obj, key, value) {
     if (key in obj) {
@@ -1021,6 +1019,11 @@
       },
       login: function login(state, options, e) {
         e && e.preventDefault();
+
+        if (state.input.trim()) {
+          setStorage('input', state.input);
+        }
+
         setStorage('redirect_uri', window.location.href);
         window.location.href = "http://github.com/login/oauth/authorize?".concat(queryStringify({
           state: 'Gitting',
@@ -2437,7 +2440,7 @@
         regenerator.mark(function _callee() {
           var _this2 = this;
 
-          var _this$props, options, config, setUserInfo, setIssue, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, result, _issue;
+          var _this$props, options, config, setUserInfo, setIssue, setInput, _getURLParameters, code, data, userInfo, redirect_uri, issue, labels, result, _issue;
 
           return regenerator.wrap(function _callee$(_context) {
             while (1) {
@@ -2448,7 +2451,7 @@
                       loading: true
                     };
                   });
-                  _this$props = this.props, options = _this$props.options, config = _this$props.config, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue;
+                  _this$props = this.props, options = _this$props.options, config = _this$props.config, setUserInfo = _this$props.setUserInfo, setIssue = _this$props.setIssue, setInput = _this$props.setInput;
                   _getURLParameters = getURLParameters(), code = _getURLParameters.code;
 
                   if (!code) {
@@ -2475,17 +2478,19 @@
                   window.history.replaceState(null, '', redirect_uri);
 
                 case 17:
-                  setUserInfo(getStorage('userInfo'));
+                  setUserInfo(getStorage('userInfo') || {});
+                  setInput(getStorage('input') || '');
+                  setStorage('input', '');
 
                   if (!(Number(options.number) > 0)) {
-                    _context.next = 26;
+                    _context.next = 28;
                     break;
                   }
 
-                  _context.next = 21;
+                  _context.next = 23;
                   return config.api.getIssueById(options.number);
 
-                case 21:
+                case 23:
                   issue = _context.sent;
                   throwError(issue && issue.number, config.i18n('getIssueFail'), function () {
                     _this2.setState(function () {
@@ -2501,15 +2506,15 @@
                     });
                   });
                   setIssue(issue);
-                  _context.next = 33;
+                  _context.next = 35;
                   break;
 
-                case 26:
+                case 28:
                   labels = options.labels.concat(options.id).join(',');
-                  _context.next = 29;
+                  _context.next = 31;
                   return config.api.getIssueByLabel(labels);
 
-                case 29:
+                case 31:
                   result = _context.sent;
                   _issue = Array.isArray(result) && result.length ? result[0] : null;
                   throwError(_issue && _issue.number, config.i18n('getIssueFail'), function () {
@@ -2527,14 +2532,14 @@
                   });
                   setIssue(_issue);
 
-                case 33:
+                case 35:
                   this.setState(function () {
                     return {
                       loading: false
                     };
                   });
 
-                case 34:
+                case 36:
                 case "end":
                   return _context.stop();
               }

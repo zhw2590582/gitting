@@ -57,6 +57,9 @@ export const actions = store => ({
 
   login(state, options, e) {
     e && e.preventDefault();
+    if (state.input.trim()) {
+      setStorage('input', state.input);
+    }
     setStorage('redirect_uri', window.location.href);
     window.location.href = `http://github.com/login/oauth/authorize?${queryStringify(
       {
