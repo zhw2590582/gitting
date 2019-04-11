@@ -1,4 +1,4 @@
-const storageName = "gitting_settings";
+const storageName = 'gitting_settings';
 
 export function getStorage(key) {
   const storage = JSON.parse(window.localStorage.getItem(storageName)) || {};
@@ -18,23 +18,41 @@ export function cleanStorage() {
 
 export function queryStringify(query) {
   const queryString = Object.keys(query)
-    .map(key => `${key}=${window.encodeURIComponent(query[key] || "")}`)
-    .join("&");
+    .map(key => `${key}=${window.encodeURIComponent(query[key] || '')}`)
+    .join('&');
   return queryString;
 }
 
 export function getURLParameters() {
   var url = window.location.href;
   return (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(function(a, v) {
-    return (a[v.slice(0, v.indexOf("="))] = v.slice(v.indexOf("=") + 1)), a;
+    return (a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a;
   }, {});
 }
 
 export function smoothScroll(element, offset = 0) {
   window.scroll({
-    behavior: "smooth",
+    behavior: 'smooth',
     left: 0,
     top: element.getBoundingClientRect().top + window.scrollY + offset
   });
   return element;
+}
+
+export function tip(msg, time = 3000) {
+  const el = document.createElement('div');
+  el.classList.add('gitting-alert');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    document.body.removeChild(el);
+  }, time);
+}
+
+export function throwError(condition, msg, callback) {
+  if (!condition) {
+    callback && callback();
+    tip(msg);
+    throw new Error(`Gitting Error: ${msg}`);
+  }
 }
