@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import Enhanced from './Enhanced';
-import { smoothScroll } from '../utils';
+import { smoothScroll, throwError } from '../utils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
@@ -67,6 +67,7 @@ class Comments extends Component {
     const { page } = this.state;
     if (issue.number) {
       const comments = await config.api.getComments(issue.number, page);
+      throwError(Array.isArray(comments), config.i18n('getCommentFail'));
       setComments(comments);
       if (options.perPage === comments.length) {
         this.setState(() => ({ page: page + 1 }));
@@ -92,6 +93,7 @@ class Comments extends Component {
     const { page } = this.state;
     if (issue.number) {
       const comments = await config.api.getComments(issue.number, page);
+      throwError(Array.isArray(comments), config.i18n('getCommentFail'));
       setComments(comments);
       if (options.perPage === comments.length) {
         this.setState(() => ({ page: page + 1 }));

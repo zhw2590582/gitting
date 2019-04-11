@@ -2017,7 +2017,7 @@
                 case 0:
                   _this$props2 = this.props, options = _this$props2.options, input = _this$props2.input, config = _this$props2.config, issue = _this$props2.issue, setInput = _this$props2.setInput;
                   value = input.trim();
-                  throwError(value, "Comment content cannot be empty!");
+                  throwError(value, config.i18n('commentEmpty'));
                   throwError(value.length <= options.maxlength, "Word count exceeds limit: ".concat(value.length, " / ").concat(options.maxlength));
                   this.setState(function () {
                     return {
@@ -2029,7 +2029,7 @@
 
                 case 7:
                   item = _context2.sent;
-                  throwError(item && item.id, "Comment failed, please try again!", function () {
+                  throwError(item && item.id, config.i18n('commentFail'), function () {
                     _this2.setState(function () {
                       return {
                         loading: false
@@ -2045,7 +2045,7 @@
 
                   if (item.id) {
                     setInput('');
-                    tip('Comment posted successfully!');
+                    tip(config.i18n('commentSuccess'));
                     setTimeout(function () {
                       smoothScroll(config.$container.querySelector('.gitting-load')).click();
                     }, 100);
@@ -2256,7 +2256,7 @@
                   page = this.state.page;
 
                   if (!issue.number) {
-                    _context.next = 9;
+                    _context.next = 10;
                     break;
                   }
 
@@ -2265,6 +2265,7 @@
 
                 case 6:
                   comments = _context.sent;
+                  throwError(Array.isArray(comments), config.i18n('getCommentFail'));
                   setComments(comments);
 
                   if (options.perPage === comments.length) {
@@ -2275,14 +2276,14 @@
                     });
                   }
 
-                case 9:
+                case 10:
                   this.setState(function () {
                     return {
                       loading: false
                     };
                   });
 
-                case 10:
+                case 11:
                 case "end":
                   return _context.stop();
               }
@@ -2330,7 +2331,7 @@
                   page = this.state.page;
 
                   if (!issue.number) {
-                    _context2.next = 10;
+                    _context2.next = 11;
                     break;
                   }
 
@@ -2339,6 +2340,7 @@
 
                 case 7:
                   comments = _context2.sent;
+                  throwError(Array.isArray(comments), config.i18n('getCommentFail'));
                   setComments(comments);
 
                   if (options.perPage === comments.length) {
@@ -2349,14 +2351,14 @@
                     });
                   }
 
-                case 10:
+                case 11:
                   this.setState(function () {
                     return {
                       loadMore: false
                     };
                   });
 
-                case 11:
+                case 12:
                 case "end":
                   return _context2.stop();
               }
@@ -2459,17 +2461,17 @@
 
                 case 6:
                   data = _context.sent;
-                  throwError(data.access_token, 'Can not get token, Please login again!');
+                  throwError(data.access_token, config.i18n('loginAgainForToken'));
                   setStorage('token', data.access_token);
                   _context.next = 11;
                   return config.api.getUserInfo(data.access_token);
 
                 case 11:
                   userInfo = _context.sent;
-                  throwError(userInfo.id, 'Can not get user info, Please login again!');
+                  throwError(userInfo.id, config.i18n('loginAgainForUser'));
                   setStorage('userInfo', userInfo);
                   redirect_uri = getStorage('redirect_uri');
-                  throwError(redirect_uri, 'Can not get redirect url, Please login again!');
+                  throwError(redirect_uri, config.i18n('loginAgainForRedirect'));
                   window.history.replaceState(null, '', redirect_uri);
 
                 case 17:
@@ -2485,7 +2487,7 @@
 
                 case 21:
                   issue = _context.sent;
-                  throwError(issue && issue.number, "Failed to get issue by number: ".concat(options.number, ", Do you want to initialize an new issue?"), function () {
+                  throwError(issue && issue.number, config.i18n('getIssueFail'), function () {
                     _this2.setState(function () {
                       return {
                         init: true
@@ -2510,7 +2512,7 @@
                 case 29:
                   result = _context.sent;
                   _issue = Array.isArray(result) && result.length ? result[0] : null;
-                  throwError(_issue && _issue.number, "Failed to get issue by labels: ".concat(labels, ", Do you want to initialize an new issue?"), function () {
+                  throwError(_issue && _issue.number, config.i18n('getIssueFail'), function () {
                     _this2.setState(function () {
                       return {
                         init: true
@@ -2569,7 +2571,7 @@
                   return _context2.abrupt("return");
 
                 case 4:
-                  throwError(options.admin.includes(userInfo.login), "You have no permission to initialize this issue");
+                  throwError(options.admin.includes(userInfo.login), config.i18n('permissionFail'));
                   detail = {
                     title: document.title,
                     body: "".concat(document.title, "\n").concat(window.location.href),
@@ -2580,7 +2582,7 @@
 
                 case 8:
                   issue = _context2.sent;
-                  throwError(issue && issue.number, "Initialize issue failed: ".concat(JSON.stringify(detail)));
+                  throwError(issue && issue.number, config.i18n('initFail'));
                   window.location.reload();
 
                 case 11:
@@ -2801,7 +2803,17 @@
       loadMore: "加载更多",
       loading: "加载中...",
       loadEnd: "加载完毕",
-      published: "发表于"
+      published: "发表于",
+      loginAgainForToken: "无法获取token，请重新登录!",
+      loginAgainForUser: "无法获取用户信息，请重新登录!",
+      loginAgainForRedirect: "无法获取重定向地址，请重新登录!",
+      getIssueFail: "获取issue失败，是否初始化一个issue?",
+      permissionFail: "你无权限初始化此issue，请联系管理员！",
+      initFail: "初始化issue失败，请重试！",
+      commentEmpty: "评论不能为空！",
+      commentFail: "评论失败，请重试！",
+      commentSuccess: "评论成功！",
+      getCommentFail: "获取评论列表失败，请重试！"
     },
     en: {
       init: "Login then initialize a issue",
@@ -2818,7 +2830,17 @@
       loadMore: "Load More",
       loading: "loading...",
       loadEnd: "Load completed",
-      published: "Published on"
+      published: "Published on",
+      loginAgainForToken: "Can not get token, Please login again!",
+      loginAgainForUser: "Can not get user info, Please login again!",
+      loginAgainForRedirect: "Can not get redirect url, Please login again!",
+      getIssueFail: "Failed to get issue, Do you want to initialize an new issue?",
+      permissionFail: "You do not have permission to initialize this issue, please contact the administrator",
+      initFail: "Initialization of the issue failed, please try again!",
+      commentEmpty: "Comment content cannot be empty!",
+      commentFail: "Comment failed, please try again!",
+      commentSuccess: "Comment successfully!",
+      getCommentFail: "Failed to get comment list, please try again!"
     }
   };
   function creatI18n (lang) {

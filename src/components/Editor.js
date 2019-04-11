@@ -50,14 +50,14 @@ class Editor extends Component {
   async onSubmit(e) {
     const { options, input, config, issue, setInput } = this.props;
     const value = input.trim();
-    throwError(value, `Comment content cannot be empty!`);
+    throwError(value, config.i18n('commentEmpty'));
     throwError(
       value.length <= options.maxlength,
       `Word count exceeds limit: ${value.length} / ${options.maxlength}`
     );
     this.setState(() => ({ loading: true }));
     const item = await config.api.creatComments(issue.number, value);
-    throwError(item && item.id, `Comment failed, please try again!`, () => {
+    throwError(item && item.id, config.i18n('commentFail'), () => {
       this.setState(() => ({ loading: false }));
     });
     this.setState(() => {
@@ -68,7 +68,7 @@ class Editor extends Component {
     });
     if (item.id) {
       setInput('');
-      tip('Comment posted successfully!');
+      tip(config.i18n('commentSuccess'));
       setTimeout(() => {
         smoothScroll(config.$container.querySelector('.gitting-load')).click();
       }, 100);

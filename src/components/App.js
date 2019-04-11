@@ -21,13 +21,13 @@ class App extends Component {
     const { code } = getURLParameters();
     if (code) {
       const data = await config.api.getToken(code);
-      throwError(data.access_token, 'Can not get token, Please login again!');
+      throwError(data.access_token, config.i18n('loginAgainForToken'));
       setStorage('token', data.access_token);
       const userInfo = await config.api.getUserInfo(data.access_token);
-      throwError(userInfo.id, 'Can not get user info, Please login again!');
+      throwError(userInfo.id, config.i18n('loginAgainForUser'));
       setStorage('userInfo', userInfo);
       const redirect_uri = getStorage('redirect_uri');
-      throwError(redirect_uri, 'Can not get redirect url, Please login again!');
+      throwError(redirect_uri, config.i18n('loginAgainForRedirect'));
       window.history.replaceState(null, '', redirect_uri);
     }
 
@@ -35,29 +35,19 @@ class App extends Component {
 
     if (Number(options.number) > 0) {
       const issue = await config.api.getIssueById(options.number);
-      throwError(
-        issue && issue.number,
-        `Failed to get issue by number: ${
-          options.number
-        }, Do you want to initialize an new issue?`,
-        () => {
-          this.setState(() => ({ init: true }));
-          this.setState(() => ({ loading: false }));
-        }
-      );
+      throwError(issue && issue.number, config.i18n('getIssueFail'), () => {
+        this.setState(() => ({ init: true }));
+        this.setState(() => ({ loading: false }));
+      });
       setIssue(issue);
     } else {
       const labels = options.labels.concat(options.id).join(',');
       const result = await config.api.getIssueByLabel(labels);
       const issue = Array.isArray(result) && result.length ? result[0] : null;
-      throwError(
-        issue && issue.number,
-        `Failed to get issue by labels: ${labels}, Do you want to initialize an new issue?`,
-        () => {
-          this.setState(() => ({ init: true }));
-          this.setState(() => ({ loading: false }));
-        }
-      );
+      throwError(issue && issue.number, config.i18n('getIssueFail'), () => {
+        this.setState(() => ({ init: true }));
+        this.setState(() => ({ loading: false }));
+      });
       setIssue(issue);
     }
     this.setState(() => ({ loading: false }));
@@ -72,7 +62,7 @@ class App extends Component {
 
     throwError(
       options.admin.includes(userInfo.login),
-      `You have no permission to initialize this issue`
+      config.i18n('permissionFail')
     );
     const detail = {
       title: document.title,
@@ -80,10 +70,7 @@ class App extends Component {
       labels: options.labels.concat(options.id)
     };
     const issue = await config.api.creatIssues(detail);
-    throwError(
-      issue && issue.number,
-      `Initialize issue failed: ${JSON.stringify(detail)}`
-    );
+    throwError(issue && issue.number, config.i18n('initFail'));
     window.location.reload();
   }
 
