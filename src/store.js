@@ -1,4 +1,3 @@
-import createStore from 'unistore';
 import { cleanStorage, setStorage, getStorage, queryStringify } from './utils';
 
 export const state = {
@@ -9,8 +8,6 @@ export const state = {
   error: '',
   input: ''
 };
-
-export const store = createStore(state);
 
 export const actions = store => ({
   throwError(state, condition, msg) {

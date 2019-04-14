@@ -1,6 +1,6 @@
 {
   "name": "gitting",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "description": "Gitting is a modern comment component based on Github Issue.",
   "main": "dist/gitting.js",
   "scripts": {

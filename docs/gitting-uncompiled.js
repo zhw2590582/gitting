@@ -750,6 +750,7 @@
   	rerender: rerender,
   	options: options
   };
+  //# sourceMappingURL=preact.mjs.map
 
   var preact$1 = /*#__PURE__*/Object.freeze({
     default: preact,
@@ -854,11 +855,14 @@
 
   var inherits = _inherits;
 
+  function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
+  //# sourceMappingURL=unistore.es.js.map
+
   var require$$0 = getCjsExportFromNamespace(preact$1);
 
   var preact$2 = createCommonjsModule(function (module, exports) {
   var t=require$$0;function n(t,n){for(var r in n)t[r]=n[r];return t}function r(t){this.getChildContext=function(){return {store:t.store}};}r.prototype.render=function(t){return t.children&&t.children[0]||t.children},exports.connect=function(r,e){var o;return "function"!=typeof r&&("string"==typeof(o=r||{})&&(o=o.split(/\s*,\s*/)),r=function(t){for(var n={},r=0;r<o.length;r++)n[o[r]]=t[o[r]];return n}),function(o){function i(i,u){var c=this,f=u.store,s=r(f?f.getState():{},i),a=e?function(t,n){"function"==typeof t&&(t=t(n));var r={};for(var e in t)r[e]=n.action(t[e]);return r}(e,f):{store:f},p=function(){var t=r(f?f.getState():{},i);for(var n in t)if(t[n]!==s[n])return s=t,c.setState({});for(var e in s)if(!(e in t))return s=t,c.setState({})};this.componentWillReceiveProps=function(t){i=t,p();},this.componentDidMount=function(){f.subscribe(p);},this.componentWillUnmount=function(){f.unsubscribe(p);},this.render=function(r){return t.h(o,n(n(n({},a),r),s))};}return (i.prototype=new t.Component).constructor=i}},exports.Provider=r;
-
+  //# sourceMappingURL=preact.js.map
   });
   var preact_1 = preact$2.connect;
   var preact_2 = preact$2.Provider;
@@ -892,8 +896,6 @@
   }
 
   var toConsumableArray = _toConsumableArray;
-
-  function n(n,t){for(var r in t)n[r]=t[r];return n}function createStore(t){var r=[];function u(n){for(var t=[],u=0;u<r.length;u++)r[u]===n?n=null:t.push(r[u]);r=t;}function e(u,e,f){t=e?u:n(n({},t),u);for(var i=r,o=0;o<i.length;o++)i[o](t,f);}return t=t||{},{action:function(n){function r(t){e(t,!1,n);}return function(){for(var u=arguments,e=[t],f=0;f<arguments.length;f++)e.push(u[f]);var i=n.apply(this,e);if(null!=i)return i.then?i.then(r):r(i)}},setState:e,subscribe:function(n){return r.push(n),function(){u(n);}},unsubscribe:u,getState:function(){return t}}}
 
   function _defineProperty(obj, key, value) {
     if (key in obj) {
@@ -973,7 +975,6 @@
     error: '',
     input: ''
   };
-  var store = createStore(state);
   var actions = function actions(store) {
     return {
       throwError: function throwError(state, condition, msg) {
@@ -1870,7 +1871,7 @@
         }, config.i18n('login')), h("a", {
           href: "https://github.com/zhw2590582/gitting",
           target: "_blank"
-        }, "Gitting 2.0.8"))) : null;
+        }, "Gitting 2.0.9"))) : null;
       }
     }]);
 
@@ -2645,10 +2646,14 @@
   function (_Component) {
     inherits(_default, _Component);
 
-    function _default() {
+    function _default(props) {
+      var _this;
+
       classCallCheck(this, _default);
 
-      return possibleConstructorReturn(this, getPrototypeOf(_default).apply(this, arguments));
+      _this = possibleConstructorReturn(this, getPrototypeOf(_default).call(this, props));
+      _this.store = createStore(state);
+      return _this;
     }
 
     createClass(_default, [{
@@ -2657,7 +2662,7 @@
         var options = _ref.options,
             config = _ref.config;
         return h(preact_2, {
-          store: store
+          store: this.store
         }, h(App$1, {
           options: options,
           config: config
