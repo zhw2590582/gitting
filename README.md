@@ -2,7 +2,7 @@
 
 > Gitting is a modern comment component based on Github Issue API.
 
-[Demo Page](https://blog.zhw-island.com/gitting)
+[Demo Page](https://zhw2590582.github.io/gitting/)
 
 ![Screenshot](./screenshot.png)
 
@@ -74,4 +74,4 @@ gitting.destroy();
 
 ## License
 
-MIT © [Harvey Zack](https://www.zhw-island.com/)
+MIT © [Harvey Zack](https://sleepy.im/)
